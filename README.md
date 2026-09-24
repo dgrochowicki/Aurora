@@ -1,12 +1,18 @@
-# Aurora Now — pliki strony
+# Aurora Now
 
-To aktualna wersja projektu aurora-mobile. Strona składa się z `index.html`, `styles.css` i `app.js`. Nie wymaga instalowania pakietów ani logowania do Sites.
+Aurora Now to mobilna strona pomagająca sprawdzić, czy w wybranym miejscu można zobaczyć zorzę polarną. Łączy dane o aktywności zorzy, zachmurzeniu i porze dnia w prostą prognozę godzinową. Po uruchomieniu próbuje użyć bieżącej lokalizacji; gdy jest ona niedostępna, pokazuje Szczecin.
 
-## Uruchomienie na komputerze
+## Co można zrobić
 
-1. Rozpakuj ZIP.
-2. Otwórz Terminal w rozpakowanym folderze.
-3. Uruchom `python3 -m http.server 8000`.
-4. Wejdź na `http://localhost:8000` w przeglądarce.
+- Sprawdzić szacowaną lokalną szansę zobaczenia zorzy teraz i w najbliższych godzinach oraz wskazówkę dotyczącą najlepszego momentu obserwacji.
+- Zobaczyć zachmurzenie, aktywność, informację o ciemności oraz bieżące wartości Kp i Bz wraz z objaśnieniami.
+- Otworzyć mapę modelu zorzy NOAA OVATION z oznaczeniem wybranego miejsca.
+- Wyszukać inne miejscowości i zapisać je na swoim urządzeniu.
 
-Aby opublikować stronę gdzie indziej, prześlij te trzy pliki do katalogu głównego statycznego hostingu. Prognoza, wyszukiwanie miejsc i mapa pobierają dane z zewnętrznych usług, więc wymagają połączenia z internetem. Dostęp do bieżącej lokalizacji wymaga HTTPS na opublikowanej stronie (albo localhost podczas pracy lokalnej). Zapisane miejsca są przechowywane w przeglądarce danego urządzenia i nie przeniosą się automatycznie między adresami strony.
+## Dane i interpretacja
+
+Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
+
+## Projekt
+
+To statyczna aplikacja internetowa w języku polskim. Pliki strony znajdują się w `dist/` (`index.html`, `styles.css`, `app.js`); można ją uruchomić przez lokalny serwer plików statycznych. Zapisane miejscowości są przechowywane w `localStorage` przeglądarki, bez konta użytkownika. Do pobrania danych i mapy potrzebne jest połączenie z internetem.
