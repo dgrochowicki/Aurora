@@ -12,7 +12,23 @@ function closeSheet(){els.sheet.hidden=true;els.backdrop.hidden=true;els.input.v
 function switchView(name){const views={forecast:els.forecastView,map:els.mapView,places:els.placesView};Object.entries(views).forEach(([key,el])=>el.hidden=key!==name);[['homeBtn','forecast'],['mapBtn','map'],['savedBtn','places']].forEach(([id,key])=>$('#'+id).classList.toggle('active',key===name));if(name==='map')showMap();window.scrollTo({top:0,behavior:'smooth'})}
 async function fetchJSON(url,timeout=10000){const c=new AbortController();const t=setTimeout(()=>c.abort(),timeout);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error(r.status);return await r.json()}finally{clearTimeout(t)}}
 async function getAuroraGrid(){if(auroraGrid)return auroraGrid;try{const d=await fetchJSON('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');auroraGrid={coords:d.coordinates||[],time:d['Forecast Time']||d['Observation Time']};return auroraGrid}catch{return {coords:[],time:null}}}
-async function getSpaceWeather(){if(spaceWeather)return spaceWeather;try{const [kpRows,magRows]=await Promise.all([fetchJSON('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),fetchJSON('https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json')]);const kpRow=kpRows.slice(1).reverse().find(r=>Number.isFinite(Number(r[1])));const bzRow=magRows.slice(1).reverse().find(r=>Number.isFinite(Number(r[3])));spaceWeather={kp:kpRow?Number(kpRow[1]):null,bz:bzRow?Number(bzRow[3]):null,time:bzRow?.[0]||kpRow?.[0]};return spaceWeather}catch{return {kp:null,bz:null,time:null}}}
+async function getSpaceWeather(){
+	if(spaceWeather)return spaceWeather;
+	const [kpResult,magResult]=await Promise.allSettled([
+		fetchJSON('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
+		fetchJSON('https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json')
+	]);
+	const kpRows=kpResult.status==='fulfilled'?kpResult.value:[];
+	const magRows=magResult.status==='fulfilled'?magResult.value:[];
+	const kpRow=kpRows.slice().reverse().find(r=>Number.isFinite(Number(r.Kp)))||kpRows.slice(1).reverse().find(r=>Number.isFinite(Number(r[1])));
+	const bzRow=magRows.find(r=>Number.isFinite(Number(r.bz_gsm)))||magRows.slice(1).reverse().find(r=>Number.isFinite(Number(r[3])));
+	spaceWeather={
+		kp:kpRow?Number(kpRow.Kp??kpRow[1]):null,
+		bz:bzRow?Number(bzRow.bz_gsm??bzRow[3]):null,
+		time:bzRow?.time_tag||bzRow?.[0]||kpRow?.time_tag||kpRow?.[0]
+	};
+	return spaceWeather;
+}
 function auroraAt(lat,lon,grid){if(!grid.coords.length)return clamp((Math.abs(lat)-48)*2.2,0,45);let best=Infinity,val=0;const targetLon=lon<0?lon+360:lon;for(const p of grid.coords){const dLat=p[1]-lat,dLon=Math.min(Math.abs(p[0]-targetLon),360-Math.abs(p[0]-targetLon));const d=dLat*dLat+dLon*dLon;if(d<best){best=d;val=p[2]}}return Number(val)||0}
 function darknessAt(time,sunrise,sunset){const t=new Date(time).getTime(),sr=new Date(sunrise).getTime(),ss=new Date(sunset).getTime();return (t<sr||t>ss)?1:0.08}
 async function reverseGeocode(lat,lon){try{const d=await fetchJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=pl`);return {name:d.city||d.locality||d.principalSubdivision||'Twoja lokalizacja',country:d.countryName||''}}catch{return null}}
