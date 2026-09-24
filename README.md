@@ -11,7 +11,7 @@ Aurora Now to mobilna strona pomagająca sprawdzić, czy w wybranym miejscu moż
 
 ## Dane i interpretacja
 
-Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
+Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Na najbliższą godzinę aktywność pochodzi z modelu OVATION, a na dalsze godziny z trzydniowej prognozy Kp. Ciemność zależy od wysokości Słońca, czyli od zmierzchu, oraz od jasności i wysokości Księżyca, liczonych w przeglądarce. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
 
 ## Projekt
 
