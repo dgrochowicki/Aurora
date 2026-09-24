@@ -11,14 +11,19 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 
 - [x] **Wyścig przy starcie i przełączaniu miejsc.** `locate()` najpierw ładuje Szczecin, a równolegle ustala lokalizację. Jeśli odpowiedź dla Szczecina przyjdzie później, nadpisze właściwe miejsce. Trzeba ignorować odpowiedzi, które nie dotyczą aktualnie wybranego miejsca.
 - [x] **Dane NOAA nigdy się nie odświeżają.** `auroraGrid` i `spaceWeather` są pobierane raz na całe życie strony. Dane są teraz ważne 5 minut, a prognoza odświeża się co 5 minut, gdy karta jest widoczna.
-- [ ] **Nazwy miejsc wstawiane do HTML bez escapowania.** Dotyczy `renderPlaces()` i `search()`. Dane pochodzą z geokodowania i `localStorage`. Należy je escapować albo budować elementy przez `textContent`.
-- [ ] **Ciemność liczona zero-jedynkowo.** Zaraz po zachodzie słońca aplikacja uznaje, że jest ciemno. Warto uwzględnić zmierzch żeglarski lub astronomiczny oraz ewentualnie fazę i wysokość Księżyca.
+- [x] **Nazwy miejsc wstawiane do HTML bez escapowania.** Dotyczy `renderPlaces()` i `search()`. Dane pochodzą z geokodowania i `localStorage`. Należy je escapować albo budować elementy przez `textContent`.
 - [ ] **Komunikat „Spróbuj ponownie” nigdy się nie pokazuje.** W `loadLocation()` tekst trafia do elementu `#quality`, który ma atrybut `hidden`. Dodatkowo każdy wyjątek, także błąd w kodzie, jest pokazywany jako „Brak połączenia”.
 - [ ] **Nieużywana funkcja `explain()`.** Można ją usunąć.
 - [x] **Napis „Teraz” zamiast czasu aktualizacji.** Pole aktualizacji nie pokazuje, z kiedy są dane.
 - [ ] **Bz to pojedynczy odczyt z jednej minuty.** Wartość jest zaszumiona. Średnia z ostatnich 15–30 minut lepiej oddaje warunki.
 - [x] **Szansa i zachmurzenie zlewają się w kafelku godzinowym.** Na telefonie wygląda to jak „24%5% chmur”. Element `small` w `.hour` powinien mieć `display:block`, żeby zachmurzenie było w osobnej linii.
 - [x] **Przeglądarka trzyma starą wersję `app.js`.** Po zmianach w kodzie stary plik bywa brany z pamięci podręcznej. Pomaga dopisanie wersji do adresu skryptu w `index.html`, np. `app.js?v=2`, i podbijanie jej przy każdej zmianie. Wersja jest już dopisana, trzeba ją tylko podbijać.
+
+## Pomysły na lepszą prognozę
+
+- [ ] **Aktywność ta sama dla wszystkich 12 godzin.** Wartość z modelu OVATION dotyczy najbliższych 30–90 minut, a aplikacja przykłada ją do całej listy godzin. Na dalsze godziny warto użyć prognozy Kp z NOAA na 3 dni.
+- [ ] **Kp i Bz w kafelku aktywności.** Bz już jest w wyniku pośrednio, bo model OVATION liczy się z danych wiatru słonecznego. Kp nie jest używane w wyniku. Kafelek może pokazywać poziom aktywności, a pod nim Kp i Bz. Do wyniku lepiej dodać trend Bz, na przykład jak długo jest ujemne, niż samą wartość, żeby nie liczyć Bz dwa razy.
+- [ ] **Ciemność ze zmierzchem i Księżycem.** Teraz ciemno jest od razu po zachodzie słońca. Lepiej liczyć wysokość Słońca, czyli zmierzch żeglarski przy -12° i astronomiczny przy -18°. Do tego oświetlenie i wysokość Księżyca, bo jasny Księżyc wysoko na niebie gasi słabą zorzę. Można to policzyć lokalnie, np. biblioteką SunCalc z cdnjs, bez nowego API.
 
 ## Dokumentacja i konfiguracja
 
