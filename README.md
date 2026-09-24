@@ -11,8 +11,10 @@ Aurora Now to mobilna strona pomagająca sprawdzić, czy w wybranym miejscu moż
 
 ## Dane i interpretacja
 
-Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
+Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
 
 ## Projekt
 
-To statyczna aplikacja internetowa w języku polskim. Pliki strony znajdują się w `dist/` (`index.html`, `styles.css`, `app.js`); można ją uruchomić przez lokalny serwer plików statycznych. Zapisane miejscowości są przechowywane w `localStorage` przeglądarki, bez konta użytkownika. Do pobrania danych i mapy potrzebne jest połączenie z internetem.
+To statyczna aplikacja internetowa w języku polskim. Pliki strony (`index.html`, `styles.css`, `app.js`) znajdują się w katalogu głównym repozytorium. Można ją uruchomić przez lokalny serwer plików statycznych, na przykład `python3 -m http.server 4173`. Zapisane miejscowości są przechowywane w `localStorage` przeglądarki, bez konta użytkownika. Do pobrania danych i mapy potrzebne jest połączenie z internetem.
+
+Lista znanych problemów i planowanych poprawek znajduje się w pliku `UWAGI.md`.
