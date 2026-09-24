@@ -24,6 +24,7 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [x] **Aktywność ta sama dla wszystkich 12 godzin.** Wartość z modelu OVATION dotyczy najbliższych 30–90 minut, a aplikacja przykłada ją do całej listy godzin. Na dalsze godziny warto użyć prognozy Kp z NOAA na 3 dni.
 - [x] **Kp i Bz w kafelku aktywności.** Bz już jest w wyniku pośrednio, bo model OVATION liczy się z danych wiatru słonecznego. Kp nie jest używane w wyniku. Kafelek może pokazywać poziom aktywności, a pod nim Kp i Bz. Do wyniku lepiej dodać trend Bz, na przykład jak długo jest ujemne, niż samą wartość, żeby nie liczyć Bz dwa razy.
 - [x] **Ciemność ze zmierzchem i Księżycem.** Teraz ciemno jest od razu po zachodzie słońca. Lepiej liczyć wysokość Słońca, czyli zmierzch żeglarski przy -12° i astronomiczny przy -18°. Do tego oświetlenie i wysokość Księżyca, bo jasny Księżyc wysoko na niebie gasi słabą zorzę. Można to policzyć lokalnie, np. biblioteką SunCalc z cdnjs, bez nowego API.
+- [ ] **Chmury obniżają wynik za słabo i wszystkie jednakowo.** Wynik jest mnożony przez `1 - zachmurzenie × 0,0075`, więc przy 100% chmur zostaje jeszcze 25% szansy. Pełne zachmurzenie niskimi chmurami powinno dawać prawie zero. Open-Meteo podaje `cloud_cover_low`, `cloud_cover_mid` i `cloud_cover_high`. Niskie i średnie chmury powinny ważyć najwięcej, a wysokie, cienkie mniej.
 
 ## Dokumentacja i konfiguracja
 
