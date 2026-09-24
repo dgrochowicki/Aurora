@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071217" />
+  <meta name="description" content="Mobilna prognoza zorzy polarnej dla Twojej lokalizacji." />
+  <title>Aurora Now</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23071217'/%3E%3Cpath d='M5 22c5-14 10 4 22-13-5 15-11 6-22 13Z' fill='%2368f7bb'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">AURORA NOW</p>
+        <h1 id="locationName">Szczecin</h1>
+        <p class="coords" id="coords">53.43°N  •  14.55°E</p>
+      </div>
+      <button class="icon-button" id="locateBtn" aria-label="Użyj mojej lokalizacji" title="Moja lokalizacja">⌖</button>
+    </header>
+
+    <div class="view active" id="forecastView">
+    <section class="hero-card" aria-live="polite">
+      <div class="aurora-glow"></div>
+      <div class="hero-head">
+        <span class="status-pill"><i></i><span id="statusText">Pobieranie danych</span></span>
+        <span class="updated" id="updatedText">—</span>
+      </div>
+      <div class="score-row">
+        <div>
+          <p class="label">Szansa lokalna teraz</p>
+          <strong class="score" id="score">—</strong><span class="percent">%</span>
+        </div>
+        <div class="quality" id="quality" hidden></div>
+      </div>
+      <h2 class="verdict" id="verdict">Sprawdzam, czy zobaczysz zorzę…</h2>
+      <p class="summary" id="summary">Łączę aktywność zorzową, zachmurzenie i porę dnia dla wybranego miejsca.</p>
+    </section>
+
+    <section class="tonight-card" id="tonightCard" aria-label="Rekomendacja na dziś" hidden>
+      <div class="tonight-main">
+        <p class="mini-label">NAJLEPSZY MOMENT</p>
+        <strong id="bestWindow">Obliczam…</strong>
+        <span id="viewMode">Sprawdzam widoczność</span>
+      </div>
+      <div class="direction"><span id="directionArrow">↑</span><small>Patrz</small><b id="directionText">na północ</b></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title"><h2>Najbliższe godziny</h2><span id="forecastDate"></span></div>
+      <div class="hourly" id="hourly" aria-label="Prognoza godzinowa"></div>
+    </section>
+
+    <section class="metrics" aria-label="Warunki">
+      <article><span class="metric-icon">☁</span><p>Zachmurzenie</p><strong id="cloudMetric">—</strong></article>
+      <article><span class="metric-icon">◉</span><p>Aktywność</p><strong id="activityMetric">—</strong></article>
+      <article><span class="metric-icon">☾</span><p>Ciemność</p><strong id="darkMetric">—</strong></article>
+    </section>
+
+    <section class="space-weather" aria-label="Pogoda kosmiczna">
+      <button class="space-chip" data-detail="kp"><span>Kp <i>i</i></span><strong id="kpValue">—</strong></button>
+      <button class="space-chip" data-detail="bz"><span>Bz <i>i</i></span><strong id="bzValue">—</strong><small> nT</small></button>
+      <p id="confidenceText">Pewność prognozy: obliczam…</p>
+    </section>
+    </div>
+
+    <section class="view map-view" id="mapView" hidden>
+      <div class="view-heading"><div><p class="eyebrow">AKTUALNY MODEL</p><h2>Mapa zorzy</h2></div><span class="live-badge">NOAA OVATION</span></div>
+      <p class="view-copy">Kolorowe punkty pokazują aktualną przewidywaną intensywność zorzy. Przybliż mapę, aby sprawdzić wybrany obszar.</p>
+      <div id="auroraMap" aria-label="Mapa aktualnej aktywności zorzy"></div>
+      <div class="map-legend"><span>Niska</span><i></i><span>Wysoka</span></div>
+      <div class="map-note" id="mapNote">Ładowanie aktualnego modelu NOAA…</div>
+    </section>
+
+    <section class="view places-section" id="placesView" hidden>
+      <div class="view-heading"><div><p class="eyebrow">LOKALIZACJE</p><h2>Twoje miejsca</h2></div><button class="add-place" id="addPlaceBtn">＋ Dodaj</button></div>
+      <p class="view-copy">Wybierz miejsce, aby zobaczyć dla niego aktualną prognozę.</p>
+      <div class="places" id="places"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Główna nawigacja">
+    <button id="mapBtn" class="nav-button"><span>⌁</span>Mapa</button>
+    <button id="homeBtn" class="nav-button active"><span>◉</span>Prognoza</button>
+    <button id="savedBtn" class="nav-button"><span>♡</span>Miejsca</button>
+  </nav>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="search-sheet" id="searchSheet" aria-modal="true" role="dialog" aria-labelledby="searchTitle" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h2 id="searchTitle">Dodaj lokalizację</h2><button id="closeSearch" aria-label="Zamknij">×</button></div>
+    <label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="Wpisz miasto lub miejscowość" autocomplete="off" /></label>
+    <p class="search-hint" id="searchHint">Wpisz co najmniej 2 znaki.</p>
+    <div class="search-results" id="searchResults"></div>
+  </section>
+
+  <div class="sheet-backdrop" id="detailBackdrop" hidden></div>
+  <section class="info-sheet" id="infoSheet" aria-modal="true" role="dialog" aria-labelledby="infoTitle" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h2 id="infoTitle">Szczegóły</h2><button id="closeInfo" aria-label="Zamknij">×</button></div>
+    <div class="info-value" id="infoValue">—</div>
+    <p id="infoBody"></p>
+    <div class="info-scale" id="infoScale"></div>
+    <p class="source-note">Aktualne dane: NOAA Space Weather Prediction Center</p>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
