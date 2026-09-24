@@ -9,15 +9,15 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 
 ## Mniejsze problemy
 
-- [ ] **Wyścig przy starcie i przełączaniu miejsc.** `locate()` najpierw ładuje Szczecin, a równolegle ustala lokalizację. Jeśli odpowiedź dla Szczecina przyjdzie później, nadpisze właściwe miejsce. Trzeba ignorować odpowiedzi, które nie dotyczą aktualnie wybranego miejsca.
-- [ ] **Dane NOAA nigdy się nie odświeżają.** `auroraGrid` i `spaceWeather` są pobierane raz na całe życie strony. Warto dodać czas ważności pamięci podręcznej, np. 5–10 minut, i okresowe odświeżanie.
+- [x] **Wyścig przy starcie i przełączaniu miejsc.** `locate()` najpierw ładuje Szczecin, a równolegle ustala lokalizację. Jeśli odpowiedź dla Szczecina przyjdzie później, nadpisze właściwe miejsce. Trzeba ignorować odpowiedzi, które nie dotyczą aktualnie wybranego miejsca.
+- [x] **Dane NOAA nigdy się nie odświeżają.** `auroraGrid` i `spaceWeather` są pobierane raz na całe życie strony. Dane są teraz ważne 5 minut, a prognoza odświeża się co 5 minut, gdy karta jest widoczna.
 - [ ] **Nazwy miejsc wstawiane do HTML bez escapowania.** Dotyczy `renderPlaces()` i `search()`. Dane pochodzą z geokodowania i `localStorage`. Należy je escapować albo budować elementy przez `textContent`.
 - [ ] **Ciemność liczona zero-jedynkowo.** Zaraz po zachodzie słońca aplikacja uznaje, że jest ciemno. Warto uwzględnić zmierzch żeglarski lub astronomiczny oraz ewentualnie fazę i wysokość Księżyca.
 - [ ] **Komunikat „Spróbuj ponownie” nigdy się nie pokazuje.** W `loadLocation()` tekst trafia do elementu `#quality`, który ma atrybut `hidden`. Dodatkowo każdy wyjątek, także błąd w kodzie, jest pokazywany jako „Brak połączenia”.
 - [ ] **Nieużywana funkcja `explain()`.** Można ją usunąć.
-- [ ] **Napis „Teraz” zamiast czasu aktualizacji.** Pole aktualizacji nie pokazuje, z kiedy są dane.
+- [x] **Napis „Teraz” zamiast czasu aktualizacji.** Pole aktualizacji nie pokazuje, z kiedy są dane.
 - [ ] **Bz to pojedynczy odczyt z jednej minuty.** Wartość jest zaszumiona. Średnia z ostatnich 15–30 minut lepiej oddaje warunki.
-- [ ] **Szansa i zachmurzenie zlewają się w kafelku godzinowym.** Na telefonie wygląda to jak „24%5% chmur”. Element `small` w `.hour` powinien mieć `display:block`, żeby zachmurzenie było w osobnej linii.
+- [x] **Szansa i zachmurzenie zlewają się w kafelku godzinowym.** Na telefonie wygląda to jak „24%5% chmur”. Element `small` w `.hour` powinien mieć `display:block`, żeby zachmurzenie było w osobnej linii.
 - [x] **Przeglądarka trzyma starą wersję `app.js`.** Po zmianach w kodzie stary plik bywa brany z pamięci podręcznej. Pomaga dopisanie wersji do adresu skryptu w `index.html`, np. `app.js?v=2`, i podbijanie jej przy każdej zmianie. Wersja jest już dopisana, trzeba ją tylko podbijać.
 
 ## Dokumentacja i konfiguracja
@@ -26,3 +26,8 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [x] **README nie wymieniało BigDataCloud.** Serwis jest używany do ustalania nazwy miejsca z lokalizacji.
 - [ ] **Leaflet z unpkg bez sumy kontrolnej.** Warto dodać atrybut `integrity` albo przejść na cdnjs.
 - [ ] **Katalog `.vscode/` jest nieśledzony.** Zawiera lokalne ustawienia, więc lepiej dodać go do `.gitignore`.
+
+## Ustalenia
+
+- **Godziny dla odległych miejsc.** Pokazujemy czas wybranego miejsca. Gdy strefa różni się od strefy użytkownika, pod listą godzin jest informacja o różnicy, a przy najlepszym momencie podajemy też czas użytkownika. Pierwszy kafelek ma etykietę „Teraz”.
+- **Wersja skryptu.** Przy zmianach w `app.js` podbijamy wersję w `index.html`, np. `app.js?v=3`, zwłaszcza gdy zmienia się też HTML.
