@@ -8,7 +8,9 @@
   <title>Aurora Now</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23071217'/%3E%3Cpath d='M5 22c5-14 10 4 22-13-5 15-11 6-22 13Z' fill='%2368f7bb'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="./styles.css?v=9" />
+  <link rel="stylesheet" href="./css/tokens.css?v=11" />
+  <link rel="stylesheet" href="./css/base.css?v=11" />
+  <link rel="stylesheet" href="./css/components.css?v=11" />
 </head>
 <body>
   <main class="app-shell">
@@ -61,20 +63,12 @@
 
     <section class="section" aria-label="Aktywność zorzy">
       <div class="section-title"><h2>Aktywność zorzy</h2><span>Teraz</span></div>
-      <div class="tile-grid">
-        <button type="button" class="data-tile" data-detail="mag" aria-haspopup="dialog"><span class="tile-top">Magnetometr<i aria-hidden="true">›</i></span><span class="tile-number"><span id="goesValue">—</span> <small>nT</small></span><span class="tile-status" id="goesStatus">—</span></button>
-        <button type="button" class="data-tile" data-detail="bz" aria-haspopup="dialog"><span class="tile-top">Pole słoneczne · Bz<i aria-hidden="true">›</i></span><span class="tile-number"><span id="bzValue">—</span> <small>nT</small></span><span class="tile-status" id="bzStatus">—</span></button>
-        <button type="button" class="data-tile" data-detail="kp" aria-haspopup="dialog"><span class="tile-top">Indeks Kp<i aria-hidden="true">›</i></span><span class="tile-number"><span id="kpValue">—</span> <small>/ 9</small></span><span class="tile-status" id="kpStatus">—</span></button>
-        <button type="button" class="data-tile" data-detail="wind" aria-haspopup="dialog"><span class="tile-top">Wiatr słoneczny<i aria-hidden="true">›</i></span><span class="tile-number"><span id="windValue">—</span> <small>km/s</small></span><span class="tile-status" id="windStatus">—</span></button>
-      </div>
+      <div class="tile-grid" id="activityTiles"></div>
     </section>
 
     <section class="section" aria-label="Warunki obserwacji">
       <div class="section-title"><h2>Warunki obserwacji</h2><span>Tej nocy</span></div>
-      <div class="tile-grid">
-        <button type="button" class="data-tile wide-tile" data-detail="cloud" aria-haspopup="dialog"><span class="tile-top">Zachmurzenie<i aria-hidden="true">›</i></span><span class="tile-number" id="cloudMetric">—</span><span class="tile-status" id="cloudStatus">—</span><span class="next-change" id="cloudNext"></span></button>
-        <button type="button" class="data-tile wide-tile" data-detail="light" aria-haspopup="dialog"><span class="tile-top">Światło tej nocy<i aria-hidden="true">›</i></span><span class="tile-number" id="darkMetric">—</span><span class="tile-status" id="darkSub">—</span><span class="next-change" id="darkNext"></span></button>
-      </div>
+      <div class="tile-grid" id="conditionTiles"></div>
       <p class="confidence" id="confidenceText">Pewność prognozy: obliczam…</p>
     </section>
     </div>
@@ -119,6 +113,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-  <script src="./app.js?v=10" defer></script>
+  <script type="module" src="./js/main.js?v=11"></script>
 </body>
 </html>
