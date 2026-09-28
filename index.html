@@ -8,7 +8,7 @@
   <title>Aurora Now</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23071217'/%3E%3Cpath d='M5 22c5-14 10 4 22-13-5 15-11 6-22 13Z' fill='%2368f7bb'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
 </head>
 <body>
   <main class="app-shell">
@@ -30,13 +30,14 @@
       </div>
       <div class="score-row">
         <div>
-          <p class="label">Szansa lokalna teraz</p>
+          <p class="label">Szansa na zobaczenie zorzy teraz</p>
           <strong class="score" id="score">—</strong><span class="percent">%</span>
         </div>
         <div class="quality" id="quality" hidden></div>
       </div>
       <h2 class="verdict" id="verdict">Sprawdzam, czy zobaczysz zorzę…</h2>
       <p class="summary" id="summary">Łączę aktywność zorzową, zachmurzenie i porę dnia dla wybranego miejsca.</p>
+      <button type="button" class="why-button" data-detail="score" aria-haspopup="dialog">Skąd ten wynik <span aria-hidden="true">›</span></button>
     </section>
 
     <section class="tonight-card" id="tonightCard" aria-label="Rekomendacja na dziś" hidden>
@@ -50,20 +51,31 @@
 
     <section class="section">
       <div class="section-title"><h2>Najbliższe godziny</h2><span id="forecastDate"></span></div>
-      <div class="hourly" id="hourly" aria-label="Prognoza godzinowa"></div>
+      <div class="forecast-card">
+        <div class="hourly" id="hourly" role="group" aria-label="Wybierz godzinę prognozy"></div>
+        <p class="hour-detail" id="hourDetail" aria-live="polite"></p>
+        <p class="outlook" id="outlook" hidden></p>
+      </div>
       <p class="tz-note" id="tzNote" hidden></p>
     </section>
 
-    <section class="metrics" aria-label="Warunki">
-      <article><span class="metric-icon">☁</span><p>Zachmurzenie</p><strong id="cloudMetric">—</strong></article>
-      <article><span class="metric-icon">◉</span><p>Aktywność</p><strong id="activityMetric">—</strong><small id="activitySub"></small></article>
-      <article><span class="metric-icon">☾</span><p>Ciemność</p><strong id="darkMetric">—</strong><small id="darkSub"></small></article>
+    <section class="section" aria-label="Aktywność zorzy">
+      <div class="section-title"><h2>Aktywność zorzy</h2><span>Teraz</span></div>
+      <div class="tile-grid">
+        <button type="button" class="data-tile" data-detail="mag" aria-haspopup="dialog"><span class="tile-top">Magnetometr<i aria-hidden="true">›</i></span><span class="tile-number"><span id="goesValue">—</span> <small>nT</small></span><span class="tile-status" id="goesStatus">—</span></button>
+        <button type="button" class="data-tile" data-detail="bz" aria-haspopup="dialog"><span class="tile-top">Pole słoneczne · Bz<i aria-hidden="true">›</i></span><span class="tile-number"><span id="bzValue">—</span> <small>nT</small></span><span class="tile-status" id="bzStatus">—</span></button>
+        <button type="button" class="data-tile" data-detail="kp" aria-haspopup="dialog"><span class="tile-top">Indeks Kp<i aria-hidden="true">›</i></span><span class="tile-number"><span id="kpValue">—</span> <small>/ 9</small></span><span class="tile-status" id="kpStatus">—</span></button>
+        <button type="button" class="data-tile" data-detail="wind" aria-haspopup="dialog"><span class="tile-top">Wiatr słoneczny<i aria-hidden="true">›</i></span><span class="tile-number"><span id="windValue">—</span> <small>km/s</small></span><span class="tile-status" id="windStatus">—</span></button>
+      </div>
     </section>
 
-    <section class="space-weather" aria-label="Pogoda kosmiczna">
-      <button class="space-chip" data-detail="kp"><span>Kp <i>i</i></span><strong id="kpValue">—</strong></button>
-      <button class="space-chip" data-detail="bz"><span>Bz <i>i</i></span><strong id="bzValue">—</strong><small> nT</small></button>
-      <p id="confidenceText">Pewność prognozy: obliczam…</p>
+    <section class="section" aria-label="Warunki obserwacji">
+      <div class="section-title"><h2>Warunki obserwacji</h2><span>Tej nocy</span></div>
+      <div class="tile-grid">
+        <button type="button" class="data-tile wide-tile" data-detail="cloud" aria-haspopup="dialog"><span class="tile-top">Zachmurzenie<i aria-hidden="true">›</i></span><span class="tile-number" id="cloudMetric">—</span><span class="tile-status" id="cloudStatus">—</span><span class="next-change" id="cloudNext"></span></button>
+        <button type="button" class="data-tile wide-tile" data-detail="light" aria-haspopup="dialog"><span class="tile-top">Światło tej nocy<i aria-hidden="true">›</i></span><span class="tile-number" id="darkMetric">—</span><span class="tile-status" id="darkSub">—</span><span class="next-change" id="darkNext"></span></button>
+      </div>
+      <p class="confidence" id="confidenceText">Pewność prognozy: obliczam…</p>
     </section>
     </div>
 
@@ -100,15 +112,13 @@
   <div class="sheet-backdrop" id="detailBackdrop" hidden></div>
   <section class="info-sheet" id="infoSheet" aria-modal="true" role="dialog" aria-labelledby="infoTitle" hidden>
     <div class="sheet-handle"></div>
-    <div class="sheet-header"><h2 id="infoTitle">Szczegóły</h2><button id="closeInfo" aria-label="Zamknij">×</button></div>
-    <div class="info-value" id="infoValue">—</div>
-    <p id="infoBody"></p>
-    <div class="info-scale" id="infoScale"></div>
-    <p class="source-note">Aktualne dane: NOAA Space Weather Prediction Center</p>
+    <div class="sheet-header"><h2 id="infoTitle">Szczegóły</h2><button id="closeInfo" aria-label="Zamknij szczegóły">×</button></div>
+    <div class="info-body" id="infoBody"></div>
+    <p class="source-note" id="infoSource"></p>
   </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-  <script src="./app.js?v=6" defer></script>
+  <script src="./app.js?v=9" defer></script>
 </body>
 </html>

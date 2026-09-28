@@ -5,13 +5,14 @@ Aurora Now to mobilna strona pomagająca sprawdzić, czy w wybranym miejscu moż
 ## Co można zrobić
 
 - Sprawdzić szacowaną lokalną szansę zobaczenia zorzy teraz i w najbliższych godzinach oraz wskazówkę dotyczącą najlepszego momentu obserwacji.
-- Zobaczyć zachmurzenie, aktywność, informację o ciemności oraz bieżące wartości Kp i Bz wraz z objaśnieniami.
+- Wybrać godzinę z prognozy i zobaczyć jej zachmurzenie, porę dnia i Księżyc.
+- Zobaczyć kafelki z magnetometrem, Bz, Kp, prędkością wiatru słonecznego, zachmurzeniem i światłem tej nocy. Po stuknięciu kafelek pokazuje szczegóły: wykresy magnetometru, Bz i wiatru z 2 godzin, prognozę Kp, warstwy chmur oraz osie Słońca i Księżyca z oknem najciemniejszego nieba.
 - Otworzyć mapę modelu zorzy NOAA OVATION z oznaczeniem wybranego miejsca.
 - Wyszukać inne miejscowości i zapisać je na swoim urządzeniu.
 
 ## Dane i interpretacja
 
-Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC, a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Aplikacja uwzględnia zorzę widoczną nad horyzontem, do około 1000 km od owalu. Chmury są ważone według wysokości: niskie zasłaniają najbardziej, wysokie najmniej. Na najbliższą godzinę aktywność pochodzi z modelu OVATION, a na dalsze godziny z trzydniowej prognozy Kp. Ciemność zależy od wysokości Słońca, czyli od zmierzchu, oraz od jasności i wysokości Księżyca, liczonych w przeglądarce. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
+Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC (Kp, Bz, prędkość i gęstość wiatru słonecznego, pole magnetyczne z satelity GOES), a zachmurzenie i godziny wschodu oraz zachodu słońca z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Aplikacja uwzględnia zorzę widoczną nad horyzontem, do około 1000 km od owalu. Chmury są ważone według wysokości: niskie zasłaniają najbardziej, wysokie najmniej. Na najbliższą godzinę aktywność pochodzi z modelu OVATION, a na dalsze godziny z trzydniowej prognozy Kp. Ciemność zależy od wysokości Słońca, czyli od zmierzchu, oraz od jasności i wysokości Księżyca, liczonych w przeglądarce. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji** wyliczanym z tych danych, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
 
 ## Projekt
 
