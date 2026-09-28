@@ -37,4 +37,4 @@ tests/             testy modelu w Node
 
 Katalog `model/` nie korzysta z DOM, więc da się go testować w Node: `npm test` (Node 18 lub nowszy).
 
-Lista znanych problemów i planowanych poprawek znajduje się w pliku `UWAGI.md`.
+Lista znanych problemów i planowanych poprawek znajduje się w pliku `UWAGI.md`, a opis projektu, ustaleń i historii zmian dla agentów w `CLAUDE.md`.
