@@ -30,9 +30,11 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [x] **Uszkodzone zapisane miejsca zatrzymywały aplikację.** Odczyt i zapis w `localStorage` są teraz w `try/catch`, a niepoprawne wpisy są pomijane.
 - [x] **Awaria Open-Meteo ukrywała dane NOAA.** Bez prognozy pogody aplikacja nadal pokazuje aktywność, Kp i Bz oraz wyjaśnia, czego brakuje.
 - [ ] **Kierunek patrzenia zawsze „na północ”.** Można liczyć kierunek do najsilniejszej widocznej aktywności w owalu.
-- [ ] **Szczegóły po stuknięciu w kafelek.** Pomysł z innej aplikacji: rozbicie wyniku na paski, czyli zasięg owalu, czyste niebo i brak Księżyca. Do tego dane do weryfikacji: Kp teraz i Kp potrzebne dla miejsca, szerokość magnetyczna, granica owalu, chmury niskie i wysokie, Księżyc i to, czy jest nad horyzontem. Aplikacja liczy już większość tych wartości. Kp potrzebne to najmniejsze Kp, przy którym widoczna aktywność przekracza próg.
+- [ ] **Szczegóły po stuknięciu w kafelek.** Kafelki i panele szczegółów są już na stronie głównej (układ z `example/`). Zostało rozbicie wyniku na paski i Kp potrzebne dla miejsca. Pierwotny pomysł z innej aplikacji: rozbicie wyniku na paski, czyli zasięg owalu, czyste niebo i brak Księżyca. Do tego dane do weryfikacji: Kp teraz i Kp potrzebne dla miejsca, szerokość magnetyczna, granica owalu, chmury niskie i wysokie, Księżyc i to, czy jest nad horyzontem. Aplikacja liczy już większość tych wartości. Kp potrzebne to najmniejsze Kp, przy którym widoczna aktywność przekracza próg.
 - [ ] **Czytelny kod i testy.** Większość logiki siedzi w bardzo długich liniach. Warto sformatować kod i dodać testy wzoru na szansę w Node, na wzór sprawdzeń robionych podczas przeglądu.
 - [ ] **Instalacja jako aplikacja.** Manifest i service worker pozwolą dodać stronę do ekranu głównego i pokazać ostatnią prognozę bez internetu.
+
+- [ ] **Magnetometr na stronie głównej.** Prototyp z `example/` ma kafelek magnetometru. Trzeba wybrać stację i źródło danych, np. FMI/IMAGE albo Tromsø. Na razie jego miejsce zajmuje kafelek zasięgu zorzy z modelu OVATION.
 
 ## Dokumentacja i konfiguracja
 
