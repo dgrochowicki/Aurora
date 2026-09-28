@@ -1,17 +1,9 @@
 # Aurora — interaktywny prototyp
 
-## Uruchomienie
-
-1. Rozpakuj ZIP.
-2. Otwórz `index.html` w aktualnej przeglądarce Chrome, Safari, Firefox lub Edge.
-3. Klikaj godziny prognozy oraz kafelki, aby otwierać szczegóły.
-
-Nie musisz instalować Node.js ani uruchamiać serwera. Połączenie z internetem jest potrzebne do pobrania ikon i bibliotek pomocniczych z CDN.
-
 ## Zawartość
 
 - `index.html` — kompletna wersja do uruchomienia w przeglądarce.
-- `source/interface.html` — edytowalne źródło interfejsu: HTML, CSS, JavaScript i wykresy SVG. Jest to fragment, a nie samodzielny dokument HTML.
+- `interface.html` — edytowalne źródło interfejsu: HTML, CSS, JavaScript i wykresy SVG. Jest to fragment, a nie samodzielny dokument HTML.
 
 Wersja obejmuje duży procent szansy, prognozę godzinową z opisem wewnątrz karty, cztery kafelki aktywności, dwa kafelki warunków w jednym wierszu oraz panele szczegółów otwierane od dołu. Kafelek światła zawiera osie czasu Słońca i Księżyca. Panel zamkniesz przyciskiem, kliknięciem tła lub klawiszem Escape.
 
