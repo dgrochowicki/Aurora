@@ -1,0 +1,26 @@
+/* Tokeny: kolory i czcionka. Nowy styl UI zaczyna się tutaj. */
+:root {
+  color-scheme: dark;
+  --bg: #071217;
+  --text: #f2faf7;
+  --muted: #91aaa6;
+  --green: #68f7bb;
+  --line: rgba(255, 255, 255, 0.09);
+  --surface: rgba(13, 32, 37, 0.78);
+  --sheet: #0c1b20;
+  --chip: #173036;
+  --field: #122a30;
+  --on-accent: #062117;
+  --warn: #ffc867;
+  --sky-day: #c5ab72;
+  --sky-twilight: #4f6378;
+  --sky-night: #0a1620;
+  --moon-up: #899caf;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
