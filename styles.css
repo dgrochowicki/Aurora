@@ -59,3 +59,10 @@
 .dark-window strong{font-size:.82rem}
 .dark-window p{font-size:.76rem!important;margin:4px 0 0}
 .next-change:empty{display:none}
+.why-button{position:relative;margin-top:16px;border:1px solid rgba(104,247,187,.25);background:rgba(4,20,20,.38);color:var(--text);border-radius:999px;padding:8px 13px;font-size:.76rem;cursor:pointer}
+.why-button span{color:var(--green);margin-left:3px}
+.factor{padding:12px 0;border-bottom:1px solid var(--line)}
+.factor-head{display:flex;justify-content:space-between;gap:10px;font-size:.84rem}
+.factor-bar{height:7px;border-radius:7px;background:#173036;margin:8px 0 6px;overflow:hidden}
+.factor-bar i{display:block;height:100%;border-radius:7px;background:var(--green)}
+.factor small{color:var(--muted);font-size:.72rem}

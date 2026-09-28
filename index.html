@@ -8,7 +8,7 @@
   <title>Aurora Now</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23071217'/%3E%3Cpath d='M5 22c5-14 10 4 22-13-5 15-11 6-22 13Z' fill='%2368f7bb'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="./styles.css?v=7" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
 </head>
 <body>
   <main class="app-shell">
@@ -37,6 +37,7 @@
       </div>
       <h2 class="verdict" id="verdict">Sprawdzam, czy zobaczysz zorzę…</h2>
       <p class="summary" id="summary">Łączę aktywność zorzową, zachmurzenie i porę dnia dla wybranego miejsca.</p>
+      <button type="button" class="why-button" data-detail="score" aria-haspopup="dialog">Skąd ten wynik <span aria-hidden="true">›</span></button>
     </section>
 
     <section class="tonight-card" id="tonightCard" aria-label="Rekomendacja na dziś" hidden>
@@ -118,6 +119,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-  <script src="./app.js?v=8" defer></script>
+  <script src="./app.js?v=9" defer></script>
 </body>
 </html>
