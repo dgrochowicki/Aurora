@@ -48,3 +48,13 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - **Godziny dla odległych miejsc.** Pokazujemy czas wybranego miejsca. Gdy strefa różni się od strefy użytkownika, pod listą godzin jest informacja o różnicy, a przy najlepszym momencie podajemy też czas użytkownika. Pierwszy kafelek ma etykietę „Teraz”.
 - **Wersja skryptu.** Przy zmianach w `app.js` podbijamy wersję w `index.html`, np. `app.js?v=3`, zwłaszcza gdy zmienia się też HTML.
 - **Skala wyniku jest dobrana ręcznie.** Wynik to widoczna aktywność × ciemność × część czystego nieba. Widoczność maleje liniowo do zera w odległości 1000 km. Chmury niskie zasłaniają w 100%, średnie w 85%, wysokie w 40%. Aktywność z Kp naśladuje profil modelu OVATION: owal przesuwa się o 2° na punkt Kp. Ciemność: 0,15 w zmierzchu cywilnym, 0,7 przy -12°, 1 poniżej -18°. Księżyc w pełni powyżej 30° obniża wynik o połowę. Te liczby warto poprawiać na podstawie prawdziwych obserwacji.
+- **Podgląd na żywo.** Używamy raw.githack z linkiem przypiętym do commitu, np. `https://raw.githack.com/dgrochowicki/Aurora/<pełny-hash-commitu>/index.html`. Link do gałęzi potrafi przez kilka minut po pushu mieszać nowy `index.html` ze starym `app.js`, a wtedy strona pokazuje same kreski.
+- **Wykresy są rysowane w aplikacji.** Magnetometr (GOES, składowa Hp), Bz i prędkość wiatru słonecznego to liczby z plików NOAA z ostatnich 2 godzin, a SVG rysuje funkcja `lineChart()` w `app.js`.
+
+## Plan dalszych prac
+
+Strona główna ma już układ z prototypu w `example/`: kafelki danych i panele szczegółów po stuknięciu. Kolejne kroki, w tej kolejności:
+
+1. **Styl UI.** Autor przygotowuje własny styl, bliski prototypowi, ale ze zmianami. Na razie zostają obecne ciemne kolory. Zmieniamy CSS, a logikę w `app.js` ruszamy tylko wtedy, gdy wymaga tego układ.
+2. **Wykresy.** Kolorowe strefy tła (np. Bz poniżej zera, progi wiatru 500 i 700 km/s), znacznik „teraz” z ostatnią wartością, odczyt po dotknięciu, przełącznik zakresu 2 h / 6 h i czytelniejsze osie.
+3. **Wyjaśnienia w panelach, na koniec.** Każdy panel w tym samym układzie: co to jest, co to znaczy teraz (zdanie zależne od wartości), jak czytać wykres, skala z progami.
