@@ -61,7 +61,7 @@
     <section class="section" aria-label="Aktywność zorzy">
       <div class="section-title"><h2>Aktywność zorzy</h2><span>Teraz</span></div>
       <div class="tile-grid">
-        <button type="button" class="data-tile" data-detail="activity" aria-haspopup="dialog"><span class="tile-top">Zasięg zorzy<i aria-hidden="true">›</i></span><span class="tile-number" id="activityMetric">—</span><span class="tile-status" id="activitySub">Model OVATION</span></button>
+        <button type="button" class="data-tile" data-detail="mag" aria-haspopup="dialog"><span class="tile-top">Magnetometr<i aria-hidden="true">›</i></span><span class="tile-number"><span id="goesValue">—</span> <small>nT</small></span><span class="tile-status" id="goesStatus">—</span></button>
         <button type="button" class="data-tile" data-detail="bz" aria-haspopup="dialog"><span class="tile-top">Pole słoneczne · Bz<i aria-hidden="true">›</i></span><span class="tile-number"><span id="bzValue">—</span> <small>nT</small></span><span class="tile-status" id="bzStatus">—</span></button>
         <button type="button" class="data-tile" data-detail="kp" aria-haspopup="dialog"><span class="tile-top">Indeks Kp<i aria-hidden="true">›</i></span><span class="tile-number"><span id="kpValue">—</span> <small>/ 9</small></span><span class="tile-status" id="kpStatus">—</span></button>
         <button type="button" class="data-tile" data-detail="wind" aria-haspopup="dialog"><span class="tile-top">Wiatr słoneczny<i aria-hidden="true">›</i></span><span class="tile-number"><span id="windValue">—</span> <small>km/s</small></span><span class="tile-status" id="windStatus">—</span></button>
@@ -118,6 +118,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-  <script src="./app.js?v=7" defer></script>
+  <script src="./app.js?v=8" defer></script>
 </body>
 </html>

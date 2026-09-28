@@ -34,7 +34,7 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [ ] **Czytelny kod i testy.** Większość logiki siedzi w bardzo długich liniach. Warto sformatować kod i dodać testy wzoru na szansę w Node, na wzór sprawdzeń robionych podczas przeglądu.
 - [ ] **Instalacja jako aplikacja.** Manifest i service worker pozwolą dodać stronę do ekranu głównego i pokazać ostatnią prognozę bez internetu.
 
-- [ ] **Magnetometr na stronie głównej.** Prototyp z `example/` ma kafelek magnetometru. Trzeba wybrać stację i źródło danych, np. FMI/IMAGE albo Tromsø. Na razie jego miejsce zajmuje kafelek zasięgu zorzy z modelu OVATION.
+- [ ] **Magnetometr naziemny.** Kafelek magnetometru pokazuje teraz składową Hp z satelity GOES. Pomiar regionalny, jak w prototypie z `example/`, wymagałby stacji naziemnej, np. z sieci IMAGE/FMI.
 
 ## Dokumentacja i konfiguracja
 
