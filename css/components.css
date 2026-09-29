@@ -31,11 +31,9 @@
   transition: var(--press);
 }
 .data-tile:active,
-.hero-card:has(.hero-link:active) {
-  transform: scale(0.97);
-}
+.hero-card:has(.hero-link:active),
 .hour:active {
-  transform: scale(0.94);
+  transform: scale(var(--press-scale));
 }
 
 /* Karta szansy: zielona poświata w lewym dolnym rogu, cała karta otwiera „Skąd ten wynik”. */

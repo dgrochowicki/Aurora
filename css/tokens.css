@@ -29,6 +29,7 @@
   --text-inset: 4px;
   --gap: 12px;
   --radius: 20px;
+  --press-scale: 0.94;
   --press: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
 
   font-family:
