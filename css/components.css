@@ -285,6 +285,16 @@
 .search-field {
   flex: none;
 }
+/* Odstęp pod nagłówkiem, a po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
+.info-sheet .sheet-header {
+  margin-bottom: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.info-sheet.scrolled .sheet-header {
+  border-bottom-color: var(--line);
+}
 .sheet-scroll {
   flex: 1 1 auto;
   min-height: 0;

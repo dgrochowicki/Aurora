@@ -63,6 +63,7 @@ function openDetail(key, opener) {
   els.infoBody.innerHTML = d.html;
   els.infoSource.textContent = d.source;
   $("#infoScroll").scrollTop = 0;
+  $("#infoSheet").classList.remove("scrolled");
   info.open(opener);
   $("#closeInfo").focus({ preventScroll: true });
 }

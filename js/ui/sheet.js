@@ -50,6 +50,9 @@ export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
       opener = null;
     },
   };
+  // Po przewinięciu treści nagłówek dostaje linię oddzielającą (.scrolled).
+  const scroller = sheet.querySelector(".sheet-scroll");
+  if (scroller) scroller.onscroll = () => sheet.classList.toggle("scrolled", scroller.scrollTop > 0);
   backdrop.onclick = () => api.close();
   closeButton.onclick = () => api.close();
   return api;
