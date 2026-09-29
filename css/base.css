@@ -38,6 +38,14 @@ input {
   font: inherit;
   -webkit-tap-highlight-color: transparent;
 }
+/* Przytrzymanie palca na przycisku lub karcie nie zaznacza tekstu i nie otwiera menu kopiowania. */
+button,
+.card,
+.bottom-nav {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 .app-shell {
   width: min(100%, 560px);
   margin: 0 auto;
