@@ -6,7 +6,11 @@ const CLOSE_MS = 280;
 const open = [];
 
 // Gdy panel jest otwarty, reszta strony nie przyjmuje fokusu ani kliknięć.
-const setInert = (on) => [$(".app-shell"), $(".bottom-nav")].forEach((e) => (e.inert = on));
+// Klasa sheet-open blokuje też przewijanie strony pod panelem.
+const setInert = (on) => {
+  [$(".app-shell"), $(".bottom-nav")].forEach((e) => (e.inert = on));
+  document.documentElement.classList.toggle("sheet-open", on);
+};
 
 export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
   let opener = null,

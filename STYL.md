@@ -50,6 +50,7 @@ Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7
 
 - Wciśnięcie karty, kafelka lub godziny płynnie ją zmniejsza (`--press`). Na iOS działa dzięki nasłuchiwaniu `touchstart` w `main.js`.
 - Panele wysuwają się od dołu (0,4 s), a tło się przyciemnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
+- Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
 
 ## Do ustalenia
 

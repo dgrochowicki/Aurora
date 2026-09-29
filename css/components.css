@@ -244,6 +244,7 @@
 .sheet-backdrop.open {
   opacity: 1;
 }
+/* Nagłówek z ✕ stoi w miejscu, a przewija się tylko .sheet-scroll. Wysokość w dvh, bo na iPhonie vh nie uwzględnia paska adresu. */
 .info-sheet,
 .search-sheet {
   position: fixed;
@@ -251,7 +252,9 @@
   left: 50%;
   bottom: 0;
   width: min(100%, 560px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--sheet);
   border-radius: 28px 28px 0 0;
   border: 1px solid var(--line);
@@ -263,13 +266,36 @@
   transform: translate(-50%, 0);
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
+.info-sheet[hidden],
+.search-sheet[hidden] {
+  display: none;
+}
 .info-sheet {
   max-height: 86vh;
-  padding: 9px 20px calc(30px + env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 40px - env(safe-area-inset-top));
+  padding: 9px 20px 0;
 }
 .search-sheet {
   max-height: 78vh;
-  padding: 9px 18px calc(30px + env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 40px - env(safe-area-inset-top));
+  padding: 9px 18px 0;
+}
+.sheet-handle,
+.sheet-header,
+.search-field {
+  flex: none;
+}
+.sheet-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(30px + env(safe-area-inset-bottom));
+}
+/* Strona pod otwartym panelem się nie przewija. */
+html.sheet-open,
+html.sheet-open body {
+  overflow: hidden;
 }
 @media (prefers-reduced-motion: reduce) {
   .info-sheet,
