@@ -1,12 +1,11 @@
 // Pasek godzin: przyciski z godziną, ikoną pogody i szansą. Wybrana godzina ma aria-pressed="true".
-import { fmtScore } from "../util.js";
 import { weatherIcon } from "./icons.js";
 
 export function renderHours(container, rows) {
   container.innerHTML = rows
     .map(
       (r, i) =>
-        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${fmtScore(r.score)}%</strong></button>`,
+        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
     )
     .join("");
 }

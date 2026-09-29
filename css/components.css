@@ -41,7 +41,8 @@
 /* Karta szansy: zielona poświata w lewym dolnym rogu, cała karta otwiera „Skąd ten wynik”. */
 .hero-card {
   padding: 20px;
-  background: radial-gradient(ellipse 210px 220px at 0 100%, var(--glow), rgba(5, 128, 95, 0.35) 45%, transparent 75%), transparent;
+  /* Bez powtarzania: inaczej poświata wraca pod górną i lewą krawędzią obwódki. */
+  background: radial-gradient(ellipse 260px 290px at 0 100%, var(--glow), rgba(5, 128, 95, 0.45) 42%, rgba(5, 128, 95, 0.12) 56%, transparent 70%) no-repeat border-box;
 }
 .hero-link {
   width: 100%;

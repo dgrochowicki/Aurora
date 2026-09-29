@@ -1,5 +1,5 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
-import { $, fmtNum, fmtScore, localHM, localMs, browserOffset } from "../util.js";
+import { $, fmtNum, localHM, localMs, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
 import { buildForecast, activityOnly, cloudChange, outlookText, dayLabel, nightTimeline } from "../model/forecast.js";
 import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel, moonTileLabel } from "../labels.js";
@@ -116,7 +116,7 @@ export function renderForecast(loc, w, grid, space) {
     night = nightTimeline(loc, now, offset);
   state = { loc, grid, space, rows, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
-  els.score.textContent = `${fmtScore(first.score)}%`;
+  els.score.textContent = `${first.score}%`;
   renderSpaceTiles(space);
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
   const cloudNow = Math.round(first.cloud);

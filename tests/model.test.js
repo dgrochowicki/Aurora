@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
 import { buildForecast, cloudChange, dayLabel, nightTimeline } from "../js/model/forecast.js";
-import { fmtNum, fmtScore } from "../js/util.js";
+import { fmtNum } from "../js/util.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
 const hour = (h) => ({ cloud_cover: [h.total], cloud_cover_low: [h.low], cloud_cover_mid: [h.mid], cloud_cover_high: [h.high] });
@@ -90,6 +90,4 @@ test("data w nagłówku liczona w strefie miejsca", () => {
 
 test("formatowanie liczb po polsku", () => {
   assert.equal(fmtNum(-2.34), "−2,3");
-  assert.equal(fmtScore(0), "<1");
-  assert.equal(fmtScore(12), "12");
 });

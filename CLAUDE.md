@@ -89,6 +89,6 @@ Od najstarszych:
    - podział na `css/` i `js/` jak w sekcji „Struktura”, komponenty w `js/ui/`, kafelki z konfiguracji;
    - testy modelu w `tests/`. Wygląd bez zmian, potwierdzony zrzutami ekranu.
 4. **Drobne poprawki z przeglądu 29.09.2026:** odświeżanie nie anuluje ustalania lokalizacji, czyszczenie notki o strefie i daty, `.gitignore`.
-5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Szczegóły w `STYL.md`.
+5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Wynik bez „<1%”: pokazujemy zaokrągloną liczbę, także 0%. Szczegóły w `STYL.md`.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.
