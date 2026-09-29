@@ -24,8 +24,10 @@
 * {
   box-sizing: border-box;
 }
+/* Safari na iOS bierze kolor paska adresu z tła html (theme-color pomija), więc html ma kolor góry strony.
+   Gradient i właściwe tło rysuje body. */
 html {
-  background: var(--bg);
+  background: var(--bg-top);
 }
 body {
   margin: 0;
