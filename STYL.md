@@ -1,6 +1,6 @@
 # Styl UI
 
-Ustalenia z autorem dotyczące wyglądu. Makieta strony głównej: `Research/Aurora_main_00.png` (lokalnie u autora, poza repo). Projektujemy na telefon o szerokości 402 px. Wersja na desktop na razie zostaje w ramce „telefonu”.
+Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` (strona główna) i `Aurora_main_01.png` (z menu), lokalnie u autora, poza repo. Projektujemy na telefon o szerokości 402 px. Wersja na desktop na razie zostaje w ramce „telefonu”.
 
 ## Odstępy
 
@@ -38,6 +38,10 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 | Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
+## Karta szansy
+
+Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką.
+
 ## Kafelek
 
 Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, odstęp 20 px, metryka (ikona 24×24, liczba, opis, co 4 px), odstęp 20 px i opis zmiany. Ikony pochodzą z zestawu Phosphor (styl fill), a kod jest w `js/ui/icons.js`.
@@ -57,7 +61,6 @@ Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7
 - Dwa pływające przyciski 72×48, zaokrąglenie 24, 24 px od krawędzi i od dołu, tło `--fab` (#103C36, 88%) z rozmyciem. Globus otwiera mapę, strzałka ekran miejsc.
 - Mapa na pełnym ekranie, ✕ (44 px) w prawym górnym rogu, legenda w karcie na dole.
 - Ekran miejsc na pełnym ekranie, bez ✕: na górze wyszukiwarka, potem oglądane miejsce („Teraz”), „Moja lokalizacja” i zapisane miejsca. Zamyka go wybór miejsca albo Escape. Stuknięcie w nazwę miejsca w nagłówku też go otwiera.
-- Poświata karty szansy jest w lewym dolnym rogu. Wersja pod środkiem była za słaba.
 
 ## Do ustalenia
 
@@ -65,4 +68,6 @@ Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Wygląd karty „Najlepszy moment”. Na razie ma styl kafelka.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów, mapa i lista miejsc mają jeszcze stary styl.
+- Panele szczegółów mają jeszcze stary styl (tło #0C1B20, pola #122A30, szary #91AAA6). Autor zaprojektuje je sam; do tego czasu nie ujednolicamy.
+- Wyróżnienie najlepszej godziny albo kilku godzin w pasku.
+- Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
