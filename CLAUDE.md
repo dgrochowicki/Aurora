@@ -1,6 +1,6 @@
 # Aurora Now: wiedza dla agentów
 
-Plik czytany na starcie każdej sesji. Opisuje projekt, ustalenia z autorem i historię zmian. Lista zadań i znanych problemów jest w `UWAGI.md`, a opis dla użytkowników w `README.md`.
+Plik czytany na starcie każdej sesji. Opisuje projekt, ustalenia z autorem i historię zmian. Lista zadań i znanych problemów jest w `UWAGI.md`, ustalenia dotyczące wyglądu w `STYL.md`, a opis dla użytkowników w `README.md`.
 
 ## Projekt w skrócie
 
@@ -15,7 +15,7 @@ Mobilna strona po polsku, która pokazuje szansę zobaczenia zorzy polarnej w wy
 
 ```
 index.html            szkielet strony, kontenery kafelków (#activityTiles, #conditionTiles), panele
-css/tokens.css        kolory i czcionka (zmienne CSS); nowy styl UI zaczyna się tutaj
+css/tokens.css        kolory, odstępy i czcionka (zmienne CSS), wartości z makiety autora
 css/base.css          reset, układ, nagłówek, sekcje, dolna nawigacja, toast
 css/components.css    karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
 js/main.js            start, loadLocation(), geolokalizacja, nawigacja, odświeżanie co 5 min
@@ -26,7 +26,7 @@ js/data/places.js     Open-Meteo (pogoda, geokodowanie), BigDataCloud, localStor
 js/model/sky.js       Słońce i Księżyc (wzory SunCalc), ciemność, pora dnia, szerokość geomagnetyczna
 js/model/aurora.js    widoczna aktywność (OVATION w promieniu 1000 km, Kp), część czystego nieba
 js/model/forecast.js  buildForecast() dla 12 godzin, zmiana chmur, opis nocy, oś nocy 16:00–10:00
-js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast
+js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
 js/views/home.js      strona główna, konfiguracja kafelków (ACTIVITY_TILES, CONDITION_TILES)
 js/views/details.js   treść paneli szczegółów (DETAILS: score, mag, bz, kp, wind, cloud, light)
 js/views/map.js       mapa Leaflet z modelem OVATION
@@ -89,5 +89,6 @@ Od najstarszych:
    - podział na `css/` i `js/` jak w sekcji „Struktura”, komponenty w `js/ui/`, kafelki z konfiguracji;
    - testy modelu w `tests/`. Wygląd bez zmian, potwierdzony zrzutami ekranu.
 4. **Drobne poprawki z przeglądu 29.09.2026:** odświeżanie nie anuluje ustalania lokalizacji, czyszczenie notki o strefie i daty, `.gitignore`.
+5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Szczegóły w `STYL.md`.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

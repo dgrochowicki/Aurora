@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
-import { buildForecast, cloudChange, dateRange, nightTimeline } from "../js/model/forecast.js";
+import { buildForecast, cloudChange, dayLabel, nightTimeline } from "../js/model/forecast.js";
 import { fmtNum, fmtScore } from "../js/util.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
@@ -82,9 +82,10 @@ test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
 });
 
-test("zakres dat na przełomie miesięcy pokazuje oba miesiące", () => {
-  const rows = [{ ms: Date.parse("2026-09-30T20:00:00Z") }, { ms: Date.parse("2026-10-01T07:00:00Z") }];
-  assert.equal(dateRange(rows, 0), "30 wrz → 1 paź");
+test("data w nagłówku liczona w strefie miejsca", () => {
+  const ms = Date.parse("2026-09-30T23:30:00Z");
+  assert.equal(dayLabel(ms, 0), "Środa, 30 września");
+  assert.equal(dayLabel(ms, 2 * 3600000), "Czwartek, 1 października");
 });
 
 test("formatowanie liczb po polsku", () => {

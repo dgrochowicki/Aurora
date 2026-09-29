@@ -61,6 +61,6 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 
 Strona główna ma już układ z prototypu w `example/`: kafelki danych i panele szczegółów po stuknięciu. Kolejne kroki, w tej kolejności:
 
-1. **Styl UI.** Autor przygotowuje własny styl, bliski prototypowi, ale ze zmianami. Na razie zostają obecne ciemne kolory. Zmieniamy głównie `css/tokens.css` i `css/components.css`, a komponenty w `js/ui/` tylko wtedy, gdy wymaga tego układ.
+1. **Styl UI.** Strona główna ma już styl z makiety autora (`STYL.md`). Zostały menu, panele szczegółów, mapa i lista miejsc.
 2. **Wykresy.** Kolorowe strefy tła (np. Bz poniżej zera, progi wiatru 500 i 700 km/s), znacznik „teraz” z ostatnią wartością, odczyt po dotknięciu, przełącznik zakresu 2 h / 6 h i czytelniejsze osie.
 3. **Wyjaśnienia w panelach, na koniec.** Każdy panel w tym samym układzie: co to jest, co to znaczy teraz (zdanie zależne od wartości), jak czytać wykres, skala z progami.

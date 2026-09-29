@@ -2,8 +2,8 @@
 
 export const activityLabel = (a) => (a < 10 ? "Niska" : a < 35 ? "Umiarkowana" : "Wysoka");
 
-export const cloudLabel = (c) =>
-  c < 20 ? "Bezchmurnie" : c < 50 ? "Częściowe zachmurzenie" : c < 80 ? "Dużo chmur" : "Pełne zachmurzenie";
+// Wielkość zachmurzenia. Progi tymczasowe, do potwierdzenia przez autora.
+export const cloudLabel = (c) => (c < 10 ? "Brak" : c < 30 ? "Małe" : c < 60 ? "Umiarkowane" : c < 80 ? "Duże" : "Bardzo duże");
 
 export const bzLabel = (v) =>
   v <= -10 ? "Silnie na południe" : v <= -3 ? "Na południe · sprzyja" : v < 3 ? "Blisko zera" : "Na północ";
@@ -21,3 +21,7 @@ export function moonLabel(sky) {
   if (sky.moonAlt <= 0) return "Księżyc pod horyzontem";
   return `Księżyc ${Math.round(sky.moonIllum * 100)}% • ${sky.moonAlt < 15 ? "nisko" : "wysoko"}`;
 }
+
+// Krótszy opis do kafelka „Światło w nocy”.
+export const moonTileLabel = (sky) =>
+  sky.moonAlt <= 0 ? "Księżyc pod horyzontem" : `Księżyc ${Math.round(sky.moonIllum * 100)}% tarczy`;

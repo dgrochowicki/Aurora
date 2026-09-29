@@ -1,5 +1,5 @@
 // Start aplikacji: wybór miejsca, pobieranie danych, nawigacja i odświeżanie.
-import { $, fmtCoords } from "./util.js";
+import { $ } from "./util.js";
 import { getAuroraGrid, getSpaceWeather, noaaStale } from "./data/noaa.js";
 import { FALLBACK, getWeather, reverseGeocode } from "./data/places.js";
 import { initHome, renderForecast, renderSpaceOnly, clearHome, showLoading } from "./views/home.js";
@@ -30,7 +30,6 @@ async function loadLocation(loc, { quiet = false } = {}) {
   if (!quiet) {
     choiceSeq++;
     $("#locationName").textContent = loc.name;
-    $("#coords").textContent = fmtCoords(loc.lat, loc.lon);
     if (moved) clearHome();
     showLoading();
     renderPlaces();
@@ -94,6 +93,8 @@ Object.entries(nav).forEach(([key, el]) => (el.onclick = () => switchView(key)))
 locate();
 renderPlaces();
 setInterval(refresh, REFRESH_EVERY);
+// Safari na iOS włącza :active (efekt wciśnięcia kafelka) tylko wtedy, gdy strona nasłuchuje dotyku.
+document.addEventListener("touchstart", () => {}, { passive: true });
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && noaaStale()) refresh();
 });

@@ -1,16 +1,16 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
 import { $, fmtNum, fmtScore, localHM, localMs, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
-import { buildForecast, activityOnly, cloudChange, outlookText, dateRange, nightTimeline } from "../model/forecast.js";
-import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel } from "../labels.js";
+import { buildForecast, activityOnly, cloudChange, outlookText, dayLabel, nightTimeline } from "../model/forecast.js";
+import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel, moonTileLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
+import { weatherIcon, phaseIcon } from "../ui/icons.js";
 import { DETAILS } from "./details.js";
 
 const els = {
   score: $("#score"),
-  status: $("#statusText"),
   verdict: $("#verdict"),
   summary: $("#summary"),
   updated: $("#updatedText"),
@@ -22,7 +22,7 @@ const els = {
   hourly: $("#hourly"),
   hourDetail: $("#hourDetail"),
   outlook: $("#outlook"),
-  date: $("#forecastDate"),
+  today: $("#todayText"),
   tzNote: $("#tzNote"),
   activityTiles: $("#activityTiles"),
   conditionTiles: $("#conditionTiles"),
@@ -35,13 +35,13 @@ const els = {
 // Kafelki w kolejności z prototypu. Klucz to też nazwa panelu szczegółów w DETAILS.
 const ACTIVITY_TILES = [
   { key: "mag", label: "Magnetometr", unit: "nT" },
-  { key: "bz", label: "Pole słoneczne · Bz", unit: "nT" },
+  { key: "bz", label: "Pole wiatru · Bz", unit: "nT" },
   { key: "kp", label: "Indeks Kp", unit: "/ 9" },
   { key: "wind", label: "Wiatr słoneczny", unit: "km/s" },
 ];
 const CONDITION_TILES = [
-  { key: "cloud", label: "Zachmurzenie", unit: "%", tight: true, wide: true },
-  { key: "light", label: "Światło tej nocy", wide: true },
+  { key: "cloud", label: "Zachmurzenie", unit: "%", tight: true, icon: true, wide: true },
+  { key: "light", label: "Światło w nocy", icon: true, wide: true },
 ];
 
 // Ostatnio pokazana prognoza. Z niej budujemy panele szczegółów.
@@ -79,15 +79,14 @@ export function clearHome() {
   clearPlaceTime();
 }
 
-// Strefa i data należą do prognozy pogody konkretnego miejsca.
+// Strefa i data należą do konkretnego miejsca.
 function clearPlaceTime() {
   els.tzNote.hidden = true;
   els.tzNote.textContent = "";
-  els.date.textContent = "";
+  els.today.textContent = "";
 }
 
 export const showLoading = () => {
-  els.status.textContent = "Aktualizuję prognozę";
   els.score.textContent = "—";
 };
 
@@ -117,21 +116,26 @@ export function renderForecast(loc, w, grid, space) {
     night = nightTimeline(loc, now, offset);
   state = { loc, grid, space, rows, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
-  els.score.textContent = fmtScore(first.score);
+  els.score.textContent = `${fmtScore(first.score)}%`;
   renderSpaceTiles(space);
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
   const cloudNow = Math.round(first.cloud);
-  setTile(els.conditionTiles, "cloud", { value: String(cloudNow), status: cloudLabel(cloudNow), next: change?.short || "Bez większych zmian" });
-  setTile(els.conditionTiles, "light", { value: phaseAt(now, loc), status: moonLabel(nowSky), next: night.nextText });
+  const phase = phaseAt(now, loc);
+  setTile(els.conditionTiles, "cloud", {
+    value: String(cloudNow),
+    icon: weatherIcon(first.night, cloudNow),
+    status: cloudLabel(cloudNow),
+    next: change?.short || "Bez większych zmian",
+  });
+  setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), next: night.nextText });
 
   const diffH = (browserOffset() - offset) / 3600000;
-  els.updated.textContent = `Aktualizacja ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })} · szacunek`;
+  showUpdated(now, offset);
   els.tzNote.hidden = diffH === 0;
   els.tzNote.textContent =
     diffH === 0
       ? ""
       : `Godziny według czasu miejsca (${tz}). U Ciebie jest o ${Math.abs(diffH).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} h ${diffH > 0 ? "później" : "wcześniej"}.`;
-  els.date.textContent = dateRange(rows.length ? rows : [{ ms: now }], offset);
 
   renderHours(els.hourly, rows);
   selectHour(state.sel);
@@ -145,6 +149,8 @@ export function renderForecast(loc, w, grid, space) {
 export function renderSpaceOnly(loc, grid, space) {
   const act = activityOnly(loc, grid, space);
   state = { loc, grid, space, rows: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
+  // Bez prognozy pogody nie znamy strefy miejsca, więc datę podajemy według przeglądarki.
+  showUpdated(Date.now(), browserOffset());
   renderSpaceTiles(space);
   setTile(els.conditionTiles, "cloud", { status: "Brak prognozy pogody" });
   setTile(els.conditionTiles, "light", { status: "Brak danych" });
@@ -152,10 +158,15 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
   clearPlaceTime();
-  els.status.textContent = "Brak prognozy pogody";
   els.verdict.textContent = "Nie znamy teraz zachmurzenia";
   els.summary.textContent = `Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
   els.tonightCard.hidden = true;
+}
+
+// Data w czasie miejsca i godzina pobrania danych w czasie użytkownika.
+function showUpdated(now, offset) {
+  els.today.textContent = dayLabel(now, offset);
+  els.updated.textContent = `Aktualizacja ${new Date(now).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 // Linia pod godzinami opisuje wybraną godzinę: chmury, porę dnia i Księżyc.
@@ -189,50 +200,40 @@ function renderGuidance(loc, best, space, grid, offset, diffH) {
 }
 
 function renderVerdict(first, best, activity) {
-  let status,
-    verdict,
+  let verdict,
     reason,
     showWindow = false;
   if (activity < 8 && best.score < 10) {
-    status = "Brak aktywności";
     verdict = "Dziś zorzy nie zobaczysz";
     reason = "Aktywność zorzowa jest zbyt niska dla Twojej lokalizacji.";
   } else if (!first.night && best.score < 10) {
-    status = "Teraz jest jasno";
     verdict = "Dziś w nocy szanse będą niskie";
     reason = "Nawet po zmroku przewidywana aktywność, chmury lub Księżyc nie dają dobrej szansy.";
   } else if (!first.night && best.score >= 10) {
-    status = "Możliwa dziś w nocy";
     verdict = "Zorza może być widoczna po zmroku";
     reason = "Teraz jest za jasno. Poniżej pokazujemy najlepszy przewidywany przedział.";
     showWindow = true;
   } else if (first.cover >= 75 && first.act >= 8) {
-    status = "Zorza aktywna";
     verdict = "Zorzę zasłaniają teraz chmury";
     reason = `Zachmurzenie wynosi ${Math.round(first.cloud)}%. Sprawdź późniejsze godziny.`;
     showWindow = best.score >= 10;
   } else if (first.score >= 70) {
-    status = "Bardzo dobre warunki";
     verdict = "Wyjdź teraz — zorza jest aktywna";
     reason = "Warunki sprzyjają obserwacji gołym okiem.";
     showWindow = true;
   } else if (first.score >= 40) {
-    status = "Dobre warunki";
     verdict = "Zorza może być widoczna gołym okiem";
     reason = "Patrz w stronę wskazaną poniżej, z dala od świateł miasta.";
     showWindow = true;
   } else if (first.score >= 14) {
-    status = "Zorza możliwa";
     verdict = "Zorza może być widoczna przez aparat";
     reason = "Gołym okiem może być bardzo słaba. Spróbuj trybu nocnego.";
     showWindow = true;
   } else {
-    status = "Niska widoczność";
     verdict = "Zorza jest aktywna, ale trudno ją teraz zobaczyć";
     reason = first.cover >= 50 ? "Przeszkodą jest duże zachmurzenie." : "Aktywność jest jeszcze zbyt słaba dla obserwacji gołym okiem.";
     showWindow = best.score >= 10;
   }
-  els.status.textContent = status;
   els.verdict.textContent = verdict;
   els.summary.textContent = reason;
   els.tonightCard.hidden = !showWindow;
