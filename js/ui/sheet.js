@@ -1,4 +1,5 @@
-// Panel wysuwany od dołu z tłem. Ten sam mechanizm obsługuje wyszukiwarkę miejsc i panele szczegółów.
+// Panel wysuwany od dołu. Ten sam mechanizm obsługuje panele szczegółów, mapę i ekran miejsc.
+// backdrop i closeButton są opcjonalne: ekran miejsc zajmuje cały ekran i zamyka się wyborem miejsca albo klawiszem Escape.
 import { $ } from "../util.js";
 
 // Czas animacji zamykania, taki sam jak w CSS (.sheet). Po nim panel dostaje hidden.
@@ -8,7 +9,7 @@ const open = [];
 // Gdy panel jest otwarty, reszta strony nie przyjmuje fokusu ani kliknięć.
 // Klasa sheet-open blokuje też przewijanie strony pod panelem.
 const setInert = (on) => {
-  [$(".app-shell"), $(".bottom-nav")].forEach((e) => (e.inert = on));
+  [$(".app-shell"), $(".fab-bar")].forEach((e) => (e.inert = on));
   document.documentElement.classList.toggle("sheet-open", on);
 };
 
@@ -25,11 +26,11 @@ export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
       shown = true;
       clearTimeout(hideTimer);
       sheet.hidden = false;
-      backdrop.hidden = false;
+      if (backdrop) backdrop.hidden = false;
       // Odczyt wymiaru zapisuje stan początkowy (panel pod ekranem), żeby przejście do .open było animowane.
       void sheet.offsetHeight;
       sheet.classList.add("open");
-      backdrop.classList.add("open");
+      backdrop?.classList.add("open");
       if (!open.includes(api)) open.push(api);
       setInert(true);
       onOpen?.();
@@ -38,10 +39,10 @@ export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
       if (!shown) return;
       shown = false;
       sheet.classList.remove("open");
-      backdrop.classList.remove("open");
+      backdrop?.classList.remove("open");
       hideTimer = setTimeout(() => {
         sheet.hidden = true;
-        backdrop.hidden = true;
+        if (backdrop) backdrop.hidden = true;
       }, CLOSE_MS);
       open.splice(open.indexOf(api), 1);
       if (!open.length) setInert(false);
@@ -53,8 +54,8 @@ export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
   // Po przewinięciu treści nagłówek dostaje linię oddzielającą (.scrolled).
   const scroller = sheet.querySelector(".sheet-scroll");
   if (scroller) scroller.onscroll = () => sheet.classList.toggle("scrolled", scroller.scrollTop > 0);
-  backdrop.onclick = () => api.close();
-  closeButton.onclick = () => api.close();
+  if (backdrop) backdrop.onclick = () => api.close();
+  if (closeButton) closeButton.onclick = () => api.close();
   return api;
 }
 

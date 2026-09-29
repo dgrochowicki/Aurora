@@ -1,22 +1,44 @@
-// Mapa modelu OVATION (Leaflet, ładowany osobnym skryptem jako window.L).
+// Mapa modelu OVATION na pełnym ekranie (Leaflet, ładowany osobnym skryptem jako window.L). Zamyka się ✕ albo Escape.
 import { $, esc, clamp } from "../util.js";
 import { getAuroraGrid } from "../data/noaa.js";
+import { createSheet } from "../ui/sheet.js";
+import { icon } from "../ui/icons.js";
 
 const note = $("#mapNote");
-let map, auroraLayer, locationMarker, mapLoc;
+let map, auroraLayer, locationMarker, mapLoc, getCurrent = () => null;
+
+const sheet = createSheet({
+  sheet: $("#mapSheet"),
+  backdrop: $("#mapBackdrop"),
+  closeButton: $("#closeMap"),
+  onOpen: () => showMap(getCurrent()),
+});
 
 function intensityColor(v) {
   return v >= 70 ? "#ff6d5a" : v >= 40 ? "#ffe45b" : v >= 18 ? "#b4ff63" : "#52d9ba";
 }
 
-export async function showMap(current) {
+// current: funkcja zwracająca bieżące miejsce, żeby mapa pokazywała znacznik tam, gdzie prognoza.
+export function initMap({ current }) {
+  getCurrent = current;
+  $("#closeMap").innerHTML = icon("x");
+}
+
+export const openMap = (opener) => sheet.open(opener);
+
+// Po odświeżeniu danych przerysowujemy mapę tylko wtedy, gdy jest otwarta.
+export function refreshMap(current) {
+  if (sheet.isOpen) showMap(current);
+}
+
+async function showMap(current) {
   if (!window.L) {
     note.textContent = "Mapa nie mogła się załadować. Sprawdź połączenie.";
     return;
   }
   const L = window.L;
   if (!map) {
-    map = L.map("auroraMap", { zoomControl: true, worldCopyJump: true }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
+    map = L.map("auroraMap", { zoomControl: false, worldCopyJump: true }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
   }
   setTimeout(() => map.invalidateSize(), 50);
@@ -26,7 +48,7 @@ export async function showMap(current) {
       .addTo(map)
       .bindPopup(esc(current.name));
     if (mapLoc !== current) {
-      map.panTo([current.lat, current.lon]);
+      map.setView([current.lat, current.lon], map.getZoom());
       mapLoc = current;
     }
   }

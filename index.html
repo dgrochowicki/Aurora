@@ -8,21 +8,17 @@
   <title>Aurora Now</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23071217'/%3E%3Cpath d='M5 22c5-14 10 4 22-13-5 15-11 6-22 13Z' fill='%2368f7bb'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="./css/tokens.css?v=15" />
-  <link rel="stylesheet" href="./css/base.css?v=17" />
-  <link rel="stylesheet" href="./css/components.css?v=17" />
+  <link rel="stylesheet" href="./css/tokens.css?v=16" />
+  <link rel="stylesheet" href="./css/base.css?v=19" />
+  <link rel="stylesheet" href="./css/components.css?v=18" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div class="topbar-row">
-        <h1 id="locationName">Szczecin</h1>
-        <button class="icon-button" id="locateBtn" aria-label="Użyj mojej lokalizacji" title="Moja lokalizacja">⌖</button>
-      </div>
+      <h1><button type="button" class="place-name" id="locationName" aria-haspopup="dialog">Szczecin</button></h1>
       <div class="topbar-meta"><span id="todayText"></span><span id="updatedText"></span></div>
     </header>
 
-    <div class="view active" id="forecastView">
     <section class="hero-card card" aria-live="polite">
       <button type="button" class="card-title hero-link" data-detail="score" aria-haspopup="dialog">Szansa na zorzę</button>
       <strong class="score" id="score">—</strong>
@@ -56,42 +52,37 @@
       <div class="tile-grid" id="conditionTiles"></div>
       <p class="confidence note" id="confidenceText">Pewność prognozy: obliczam…</p>
     </section>
-    </div>
-
-    <section class="view map-view" id="mapView" hidden>
-      <div class="view-heading"><div><p class="eyebrow">AKTUALNY MODEL</p><h2>Mapa zorzy</h2></div><span class="live-badge">NOAA OVATION</span></div>
-      <p class="view-copy">Kolorowe punkty pokazują aktualną przewidywaną intensywność zorzy. Przybliż mapę, aby sprawdzić wybrany obszar.</p>
-      <div id="auroraMap" aria-label="Mapa aktualnej aktywności zorzy"></div>
-      <div class="map-legend"><span>Niska</span><i></i><span>Wysoka</span></div>
-      <div class="map-note" id="mapNote">Ładowanie aktualnego modelu NOAA…</div>
-    </section>
-
-    <section class="view places-section" id="placesView" hidden>
-      <div class="view-heading"><div><p class="eyebrow">LOKALIZACJE</p><h2>Twoje miejsca</h2></div><button class="add-place" id="addPlaceBtn">＋ Dodaj</button></div>
-      <p class="view-copy">Wybierz miejsce, aby zobaczyć dla niego aktualną prognozę.</p>
-      <div class="places" id="places"></div>
-    </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Główna nawigacja">
-    <button id="mapBtn" class="nav-button"><span>⌁</span>Mapa</button>
-    <button id="homeBtn" class="nav-button active"><span>◉</span>Prognoza</button>
-    <button id="savedBtn" class="nav-button"><span>♡</span>Miejsca</button>
-  </nav>
+  <div class="fab-bar">
+    <button type="button" class="fab" id="mapBtn" aria-label="Mapa zorzy" aria-haspopup="dialog"></button>
+    <button type="button" class="fab" id="placesBtn" aria-label="Zmień miejsce" aria-haspopup="dialog"></button>
+  </div>
 
-  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
-  <section class="search-sheet" id="searchSheet" aria-modal="true" role="dialog" aria-labelledby="searchTitle" hidden>
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h2 id="searchTitle">Dodaj lokalizację</h2><button id="closeSearch" aria-label="Zamknij">×</button></div>
-    <label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="Wpisz miasto lub miejscowość" autocomplete="off" /></label>
+  <section class="places-sheet sheet" id="placesSheet" aria-modal="true" role="dialog" aria-labelledby="placesTitle" hidden>
+    <div class="places-head">
+      <h2 id="placesTitle">Wybierz miejsce</h2>
+      <label class="search-field"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Wpisz miasto lub miejscowość" autocomplete="off" aria-label="Szukaj miejsca" /></label>
+    </div>
     <div class="sheet-scroll">
-      <p class="search-hint" id="searchHint">Wpisz co najmniej 2 znaki.</p>
+      <p class="search-hint" id="searchHint" hidden></p>
       <div class="search-results" id="searchResults"></div>
+      <div class="places" id="places"></div>
+    </div>
+  </section>
+
+  <div class="sheet-backdrop" id="mapBackdrop" hidden></div>
+  <section class="map-sheet sheet" id="mapSheet" aria-modal="true" role="dialog" aria-label="Mapa zorzy" hidden>
+    <div id="auroraMap" aria-label="Mapa aktualnej aktywności zorzy"></div>
+    <button type="button" class="map-close" id="closeMap" aria-label="Zamknij mapę"></button>
+    <div class="map-panel">
+      <div class="map-legend"><span>Niska</span><i></i><span>Wysoka</span></div>
+      <div class="map-note" id="mapNote">Ładowanie aktualnego modelu NOAA…</div>
     </div>
   </section>
 
   <div class="sheet-backdrop" id="detailBackdrop" hidden></div>
-  <section class="info-sheet" id="infoSheet" aria-modal="true" role="dialog" aria-labelledby="infoTitle" hidden>
+  <section class="info-sheet sheet" id="infoSheet" aria-modal="true" role="dialog" aria-labelledby="infoTitle" hidden>
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h2 id="infoTitle">Szczegóły</h2><button id="closeInfo" aria-label="Zamknij szczegóły">×</button></div>
     <div class="sheet-scroll" id="infoScroll">
@@ -102,6 +93,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-  <script type="module" src="./js/main.js?v=16"></script>
+  <script type="module" src="./js/main.js?v=17"></script>
 </body>
 </html>

@@ -52,9 +52,16 @@ Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7
 - Panele wysuwają się od dołu (0,4 s), a tło się przyciemnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
 - Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
 
+## Menu, mapa i miejsca
+
+- Dwa pływające przyciski 72×48, zaokrąglenie 24, 24 px od krawędzi i od dołu, tło `--fab` (#103C36, 88%) z rozmyciem. Globus otwiera mapę, strzałka ekran miejsc.
+- Mapa na pełnym ekranie, ✕ (44 px) w prawym górnym rogu, legenda w karcie na dole.
+- Ekran miejsc na pełnym ekranie, bez ✕: na górze wyszukiwarka, potem oglądane miejsce („Teraz”), „Moja lokalizacja” i zapisane miejsca. Zamyka go wybór miejsca albo Escape. Stuknięcie w nazwę miejsca w nagłówku też go otwiera.
+- Poświata karty szansy jest pod środkiem dolnej krawędzi (makieta z 29.09).
+
 ## Do ustalenia
 
-- Menu na dole: może dwie pływające ikony. Zmiana miejsca będzie w menu, a do tego czasu zostaje przycisk ⌖ w nagłówku.
+- Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Wygląd karty „Najlepszy moment”. Na razie ma styl kafelka.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
 - Panele szczegółów, mapa i lista miejsc mają jeszcze stary styl.
