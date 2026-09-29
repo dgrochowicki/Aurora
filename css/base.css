@@ -24,15 +24,15 @@
 * {
   box-sizing: border-box;
 }
-/* Safari na iOS bierze kolor paska adresu z tła html (theme-color pomija), więc html ma kolor góry strony.
-   Gradient i właściwe tło rysuje body. */
+/* Safari na iOS bierze kolor paska adresu z koloru tła strony (theme-color pomija), więc html i body mają kolor góry.
+   Ciemny dół rysuje sam gradient, który pokrywa całe body. */
 html {
   background: var(--bg-top);
 }
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px) no-repeat, var(--bg);
+  background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px, var(--bg) 100%) var(--bg-top);
   color: var(--text);
 }
 button,

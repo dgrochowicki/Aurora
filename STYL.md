@@ -14,7 +14,7 @@ Ustalenia z autorem dotyczące wyglądu. Makieta strony głównej: `Research/Aur
 | Token | Wartość | Użycie |
 |---|---|---|
 | `--bg` | #091216 | tło strony |
-| `--bg-top` | #012F2C | gradient u góry strony, do 600 px |
+| `--bg-top` | #002F2B | gradient u góry strony, do 600 px |
 | `--text` | #FFFFFF | liczby i tytuły sekcji |
 | `--sub` | #AFC7C2 | tytuły kart, opisy wartości |
 | `--sub-65` | #AFC7C2 65% | notki, opis zmiany w kafelku, data w nagłówku |
