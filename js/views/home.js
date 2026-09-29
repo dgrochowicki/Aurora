@@ -76,6 +76,14 @@ export function clearHome() {
   els.hourDetail.textContent = "";
   els.outlook.hidden = true;
   els.tonightCard.hidden = true;
+  clearPlaceTime();
+}
+
+// Strefa i data należą do prognozy pogody konkretnego miejsca.
+function clearPlaceTime() {
+  els.tzNote.hidden = true;
+  els.tzNote.textContent = "";
+  els.date.textContent = "";
 }
 
 export const showLoading = () => {
@@ -143,6 +151,7 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourly.innerHTML = "";
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
+  clearPlaceTime();
   els.status.textContent = "Brak prognozy pogody";
   els.verdict.textContent = "Nie znamy teraz zachmurzenia";
   els.summary.textContent = `Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;

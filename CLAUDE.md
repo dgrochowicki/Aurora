@@ -88,5 +88,6 @@ Od najstarszych:
    - poprawki: czyszczenie kafelków po zmianie miejsca, błędy w kodzie nie udają braku pogody, wyścig w wyszukiwarce, daty na przełomie miesięcy, odświeżanie po nieudanym starcie, „null% chmur”, Escape i nieaktywne tło pod panelem;
    - podział na `css/` i `js/` jak w sekcji „Struktura”, komponenty w `js/ui/`, kafelki z konfiguracji;
    - testy modelu w `tests/`. Wygląd bez zmian, potwierdzony zrzutami ekranu.
+4. **Drobne poprawki z przeglądu 29.09.2026:** odświeżanie nie anuluje ustalania lokalizacji, czyszczenie notki o strefie i daty, `.gitignore`.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

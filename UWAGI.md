@@ -41,7 +41,13 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [x] **README wskazywało katalog `dist/`.** Pliki leżą w katalogu głównym.
 - [x] **README nie wymieniało BigDataCloud.** Serwis jest używany do ustalania nazwy miejsca z lokalizacji.
 - [ ] **Leaflet z unpkg bez sumy kontrolnej.** Warto dodać atrybut `integrity` albo przejść na cdnjs.
-- [ ] **Katalog `.vscode/` jest nieśledzony.** Zawiera lokalne ustawienia, więc lepiej dodać go do `.gitignore`.
+- [x] **Katalog `.vscode/` jest nieśledzony.** Zawiera lokalne ustawienia, więc lepiej dodać go do `.gitignore`.
+
+## Przegląd z 29.09.2026
+
+- [x] **Odświeżanie anulowało lokalizację.** Ciche odświeżanie co 5 minut w trakcie ustalania lokalizacji powodowało, że zostawał Szczecin. Teraz lokalizację anuluje tylko wybór innego miejsca.
+- [x] **Stara notka o strefie czasowej.** Po zmianie miejsca bez prognozy pogody zostawała notka o strefie i data poprzedniego miejsca.
+- [ ] **Nachodzące podpisy osi Bz.** Gdy Bz jest blisko zera, podpis „0” nakłada się na wartość skrajną. Do zrobienia razem z wykresami.
 
 ## Ustalenia
 

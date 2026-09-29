@@ -11,8 +11,10 @@ const REFRESH_EVERY = 5 * 60 * 1000;
 const views = { forecast: $("#forecastView"), map: $("#mapView"), places: $("#placesView") };
 const nav = { forecast: $("#homeBtn"), map: $("#mapBtn"), places: $("#savedBtn") };
 
+// loadSeq rośnie przy każdym ładowaniu, choiceSeq tylko przy zmianie miejsca, a nie przy cichym odświeżaniu.
 let current = null,
-  loadSeq = 0;
+  loadSeq = 0,
+  choiceSeq = 0;
 
 function switchView(name) {
   Object.entries(views).forEach(([key, el]) => (el.hidden = key !== name));
@@ -26,6 +28,7 @@ async function loadLocation(loc, { quiet = false } = {}) {
     moved = current !== loc;
   current = loc;
   if (!quiet) {
+    choiceSeq++;
     $("#locationName").textContent = loc.name;
     $("#coords").textContent = fmtCoords(loc.lat, loc.lon);
     if (moved) clearHome();
@@ -51,7 +54,7 @@ async function loadLocation(loc, { quiet = false } = {}) {
 // Najpierw Szczecin, a gdy przeglądarka poda lokalizację, przełączamy się na nią.
 function locate() {
   if (!current) loadLocation(FALLBACK);
-  const startSeq = loadSeq;
+  const startChoice = choiceSeq;
   if (!navigator.geolocation) {
     toast("Lokalizacja jest niedostępna — pokazuję Szczecin");
     return;
@@ -61,8 +64,8 @@ function locate() {
       const lat = p.coords.latitude,
         lon = p.coords.longitude,
         n = await reverseGeocode(lat, lon);
-      // Użytkownik wybrał w międzyczasie inne miejsce.
-      if (loadSeq !== startSeq) return;
+      // Użytkownik wybrał w międzyczasie inne miejsce. Samo odświeżenie danych nie anuluje lokalizacji.
+      if (choiceSeq !== startChoice) return;
       loadLocation({ name: n?.name || "Twoja lokalizacja", country: n?.country || "", lat, lon, isGeo: true });
     },
     () => toast("Brak dostępu do lokalizacji — pokazuję Szczecin"),
