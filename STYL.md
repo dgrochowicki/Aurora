@@ -34,13 +34,17 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 | Tytuł sekcji | 15 | semibold | biały |
 | Tytuł karty i kafelka | 13 | medium | `--sub` |
 | Wynik w karcie szansy | 64 | medium | biały |
-| Wartość w kafelku | 21 | medium | biały, jednostka tak samo |
-| Opis wartości | 15 | regular | `--sub` |
+| Wartość w kafelku | 21 / linia 27 | medium | biały, jednostka tak samo |
+| Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
 ## Kafelek
 
 Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, odstęp 20 px, metryka (ikona 24×24, liczba, opis, co 4 px), odstęp 20 px i opis zmiany. Ikony pochodzą z zestawu Phosphor (styl fill), a kod jest w `js/ui/icons.js`.
+
+## Godziny
+
+Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki. Wyróżnienie najlepszej godziny (lub kilku) autor zaprojektuje osobno.
 
 ## Ruch
 

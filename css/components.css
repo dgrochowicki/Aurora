@@ -68,7 +68,7 @@
 .summary {
   margin: 24px 0 0;
   font-size: 0.9375rem;
-  line-height: 1.33;
+  line-height: 20px;
   color: var(--sub);
 }
 
@@ -86,12 +86,14 @@
   display: block;
   margin-top: 12px;
   font-size: 1.3125rem;
+  line-height: 27px;
   font-weight: 500;
 }
 .tonight-main > span {
   display: block;
   margin-top: 4px;
   font-size: 0.9375rem;
+  line-height: 20px;
   color: var(--sub);
 }
 .direction {
@@ -127,28 +129,34 @@
 .hourly::-webkit-scrollbar {
   display: none;
 }
+/* Wymiary z Figmy: 70×123, padding 20/16, gap 12. Wybrana godzina ma tło i obwódkę kafelka, pozostałe słabsze tło bez obwódki.
+   Bez backdrop-filter z Figmy: pod pigułkami jest jednolite tło, a w przewijanym pasku Chromium rysował je wtedy jako puste prostokąty. */
 .hour {
   flex: 0 0 70px;
+  height: 123px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
-  padding: 20px 0;
-  border: 1px solid var(--card-border);
-  border-radius: 35px;
+  gap: 12px;
+  padding: 20px 16px;
+  border: 1px solid transparent;
+  border-radius: 30px;
   background: var(--card-soft);
   color: var(--text);
 }
 .hour[aria-pressed="true"] {
   background: var(--card);
-  border-color: var(--card-selected-border);
+  border-color: var(--card-border);
 }
 .hour time {
   font-size: 0.8125rem;
+  white-space: nowrap;
   color: var(--sub);
 }
 .hour strong {
   font-size: 0.9375rem;
+  line-height: 20px;
   font-weight: 500;
 }
 .icon {
@@ -200,12 +208,15 @@
 .tile-icon:empty {
   display: none;
 }
+/* Wysokości linii z Figmy: 21 px → 27 px, 15 px → 20 px. */
 .tile-number {
   font-size: 1.3125rem;
+  line-height: 27px;
   font-weight: 500;
 }
 .tile-status {
   font-size: 0.9375rem;
+  line-height: 20px;
   color: var(--sub);
 }
 .next-change {

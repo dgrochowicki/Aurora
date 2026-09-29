@@ -65,6 +65,7 @@ input {
   gap: 12px;
   margin-top: 6px;
   font-size: 0.9375rem;
+  line-height: 20px;
   color: var(--sub-65);
 }
 .eyebrow {
