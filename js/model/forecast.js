@@ -73,7 +73,7 @@ export function cloudChange(rows) {
     const r = rows.slice(1).find((r) => r.cloud < 30);
     return r
       ? { short: `Przejaśnienia ok. ${at(r)}`, sentence: `Około ${at(r)} niebo powinno się przejaśnić.` }
-      : { short: "Bez przejaśnień w 12 godz.", sentence: "W najbliższych godzinach nie widać przejaśnień." };
+      : { short: "Bez przejaśnień przez najbliższe 12 h", sentence: "W najbliższych godzinach nie widać przejaśnień." };
   }
   const r = rows.slice(1).find((r) => r.cloud >= 70);
   return r ? { short: `Chmury od ok. ${at(r)}`, sentence: `Około ${at(r)} napłyną chmury.` } : null;
@@ -91,14 +91,12 @@ export function outlookText(best, maxAct, change) {
   return parts.join(" ");
 }
 
-// Zakres dat prognozy w czasie miejsca, np. „28 → 29 wrz” albo „30 wrz → 1 paź”.
-export function dateRange(rows, offset) {
-  const f = (ms) =>
-    new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(ms + offset));
-  const a = f(rows[0].ms),
-    b = f(rows[rows.length - 1].ms);
-  const sameMonth = a.replace(/^\d+\s*/, "") === b.replace(/^\d+\s*/, "");
-  return a === b ? a : `${sameMonth ? a.replace(/\s.*/, "") : a} → ${b}`;
+// Dzisiejsza data w czasie miejsca, np. „Środa, 30 września”.
+export function dayLabel(ms, offset) {
+  const s = new Intl.DateTimeFormat("pl-PL", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(
+    new Date(ms + offset),
+  );
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // Oś nocy od 16:00 do 10:00 czasu miejsca, co 5 minut: Słońce, Księżyc i okna pełnej ciemności.
@@ -153,7 +151,7 @@ export function nightTimeline(loc, now, offset) {
       ? `Ciemniej po ${hm(next.from)}`
       : dark.length
         ? "Najciemniejsza pora minęła"
-        : "Brak pełnej ciemności";
+        : "Brak pełnej ciemności tej nocy";
   return {
     start,
     end,

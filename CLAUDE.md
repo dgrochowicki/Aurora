@@ -1,6 +1,6 @@
 # Aurora Now: wiedza dla agentów
 
-Plik czytany na starcie każdej sesji. Opisuje projekt, ustalenia z autorem i historię zmian. Lista zadań i znanych problemów jest w `UWAGI.md`, a opis dla użytkowników w `README.md`.
+Plik czytany na starcie każdej sesji. Opisuje projekt, ustalenia z autorem i historię zmian. Lista zadań i znanych problemów jest w `UWAGI.md`, ustalenia dotyczące wyglądu w `STYL.md`, a opis dla użytkowników w `README.md`.
 
 ## Projekt w skrócie
 
@@ -15,10 +15,10 @@ Mobilna strona po polsku, która pokazuje szansę zobaczenia zorzy polarnej w wy
 
 ```
 index.html            szkielet strony, kontenery kafelków (#activityTiles, #conditionTiles), panele
-css/tokens.css        kolory i czcionka (zmienne CSS); nowy styl UI zaczyna się tutaj
+css/tokens.css        kolory, odstępy i czcionka (zmienne CSS), wartości z makiety autora
 css/base.css          reset, układ, nagłówek, sekcje, dolna nawigacja, toast
 css/components.css    karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
-js/main.js            start, loadLocation(), geolokalizacja, nawigacja, odświeżanie co 5 min
+js/main.js            start, loadLocation(), geolokalizacja, pływające przyciski mapy i miejsc, odświeżanie co 5 min
 js/util.js            $, esc, fmtNum (polski zapis), fetchJSON, localMs/localHM (czas miejsca)
 js/labels.js          słowne opisy wartości i progi (Kp, Bz, wiatr, GOES, chmury, Księżyc)
 js/data/noaa.js       OVATION, Kp, prognoza Kp, Bz, wiatr słoneczny, magnetometr GOES; cache 5 min
@@ -26,11 +26,11 @@ js/data/places.js     Open-Meteo (pogoda, geokodowanie), BigDataCloud, localStor
 js/model/sky.js       Słońce i Księżyc (wzory SunCalc), ciemność, pora dnia, szerokość geomagnetyczna
 js/model/aurora.js    widoczna aktywność (OVATION w promieniu 1000 km, Kp), część czystego nieba
 js/model/forecast.js  buildForecast() dla 12 godzin, zmiana chmur, opis nocy, oś nocy 16:00–10:00
-js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast
+js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
 js/views/home.js      strona główna, konfiguracja kafelków (ACTIVITY_TILES, CONDITION_TILES)
 js/views/details.js   treść paneli szczegółów (DETAILS: score, mag, bz, kp, wind, cloud, light)
-js/views/map.js       mapa Leaflet z modelem OVATION
-js/views/places.js    lista miejsc i wyszukiwarka
+js/views/map.js       mapa Leaflet z modelem OVATION na pełnym ekranie, zamykana ✕
+js/views/places.js    ekran wyboru miejsca na pełnym ekranie: wyszukiwarka, moja lokalizacja, zapisane miejsca
 tests/model.test.js   testy modelu
 ```
 
@@ -38,7 +38,7 @@ Zasady podziału:
 - `js/model/` nie dotyka DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
 - Tekst i progi opisów wartości są w `labels.js`, żeby kafelek i panel mówiły to samo.
 - Nowy kafelek to wpis w `ACTIVITY_TILES` albo `CONDITION_TILES` w `home.js`, funkcja w `DETAILS` w `details.js` i wywołanie `setTile()`.
-- Oba panele wysuwane od dołu (szczegóły i wyszukiwarka) używają `createSheet()` z `ui/sheet.js`, który obsługuje Escape, powrót fokusu i nieaktywne tło.
+- Wszystkie panele (szczegóły, mapa, ekran miejsc) używają `createSheet()` z `ui/sheet.js` i klasy `.sheet`. Obsługuje on animację, Escape, powrót fokusu, nieaktywne tło i blokadę przewijania strony.
 
 ## Źródła danych
 
@@ -59,7 +59,7 @@ Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z l
 
 - Rozmawiamy po polsku. Komentarze w kodzie, commity i opisy pull requestów też po polsku.
 - Autor pracuje z różnych komputerów i sesji, więc wszystko ma trafiać na GitHub. Zmiany idą przez pull request do `main`. Autor zwykle prosi o scalenie od razu po sprawdzeniu podglądu.
-- Mapa, lista miejsc i dolna nawigacja zostają. Przebudowa dotyczy strony głównej i prezentacji danych.
+- Zamiast dolnej nawigacji są dwa pływające przyciski: mapa (pełny ekran, ✕) i miejsca (pełny ekran, zamykany tylko wyborem miejsca albo Escape). Nazwa miejsca w nagłówku też otwiera ekran miejsc.
 - Magnetometr ma być w kafelkach jak w prototypie. Autor wybrał GOES z NOAA, bo stacje naziemne (FMI/IMAGE) wymagają innego źródła.
 - Kolejność dalszych prac (szczegóły w `UWAGI.md`, „Plan dalszych prac”):
   1. **Styl UI od autora.** Bliski prototypowi, ale ze zmianami. Czekamy, aż go pokaże. Zmieniamy głównie `css/tokens.css` i `css/components.css`.
@@ -88,5 +88,8 @@ Od najstarszych:
    - poprawki: czyszczenie kafelków po zmianie miejsca, błędy w kodzie nie udają braku pogody, wyścig w wyszukiwarce, daty na przełomie miesięcy, odświeżanie po nieudanym starcie, „null% chmur”, Escape i nieaktywne tło pod panelem;
    - podział na `css/` i `js/` jak w sekcji „Struktura”, komponenty w `js/ui/`, kafelki z konfiguracji;
    - testy modelu w `tests/`. Wygląd bez zmian, potwierdzony zrzutami ekranu.
+4. **Drobne poprawki z przeglądu 29.09.2026:** odświeżanie nie anuluje ustalania lokalizacji, czyszczenie notki o strefie i daty, `.gitignore`.
+5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Wynik bez „<1%”: pokazujemy zaokrągloną liczbę, także 0%. Szczegóły w `STYL.md`.
+6. **Menu z dwóch przycisków** (29.09.2026): mapa i ekran miejsc na pełnym ekranie zamiast dolnej nawigacji, widoku „Miejsca” i przycisku ⌖.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

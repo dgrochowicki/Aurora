@@ -1,12 +1,11 @@
-// Pasek godzin: przyciski z szansą i zachmurzeniem. Wybrana godzina ma aria-pressed="true".
-import { fmtScore } from "../util.js";
+// Pasek godzin: przyciski z godziną, ikoną pogody i szansą. Wybrana godzina ma aria-pressed="true".
+import { weatherIcon } from "./icons.js";
 
 export function renderHours(container, rows) {
-  const max = Math.max(...rows.map((r) => r.score));
   container.innerHTML = rows
     .map(
       (r, i) =>
-        `<button type="button" class="hour ${r.score === max && max > 10 ? "best" : ""}" data-i="${i}" aria-pressed="false"><time>${r.label}</time><span class="weather" aria-hidden="true">${r.night ? (r.cover > 70 ? "☁" : "☾") : "☀"}</span><strong>${fmtScore(r.score)}%</strong><small>${r.cloud}% chmur</small></button>`,
+        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
     )
     .join("");
 }

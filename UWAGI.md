@@ -41,7 +41,13 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 - [x] **README wskazywało katalog `dist/`.** Pliki leżą w katalogu głównym.
 - [x] **README nie wymieniało BigDataCloud.** Serwis jest używany do ustalania nazwy miejsca z lokalizacji.
 - [ ] **Leaflet z unpkg bez sumy kontrolnej.** Warto dodać atrybut `integrity` albo przejść na cdnjs.
-- [ ] **Katalog `.vscode/` jest nieśledzony.** Zawiera lokalne ustawienia, więc lepiej dodać go do `.gitignore`.
+- [x] **Katalog `.vscode/` jest nieśledzony.** Zawiera lokalne ustawienia, więc lepiej dodać go do `.gitignore`.
+
+## Przegląd z 29.09.2026
+
+- [x] **Odświeżanie anulowało lokalizację.** Ciche odświeżanie co 5 minut w trakcie ustalania lokalizacji powodowało, że zostawał Szczecin. Teraz lokalizację anuluje tylko wybór innego miejsca.
+- [x] **Stara notka o strefie czasowej.** Po zmianie miejsca bez prognozy pogody zostawała notka o strefie i data poprzedniego miejsca.
+- [ ] **Nachodzące podpisy osi Bz.** Gdy Bz jest blisko zera, podpis „0” nakłada się na wartość skrajną. Do zrobienia razem z wykresami.
 
 ## Ustalenia
 
@@ -55,6 +61,6 @@ Lista problemów znalezionych podczas przeglądu projektu 24.09.2026. Zaznaczone
 
 Strona główna ma już układ z prototypu w `example/`: kafelki danych i panele szczegółów po stuknięciu. Kolejne kroki, w tej kolejności:
 
-1. **Styl UI.** Autor przygotowuje własny styl, bliski prototypowi, ale ze zmianami. Na razie zostają obecne ciemne kolory. Zmieniamy głównie `css/tokens.css` i `css/components.css`, a komponenty w `js/ui/` tylko wtedy, gdy wymaga tego układ.
+1. **Styl UI.** Strona główna i menu mają już styl z makiety autora (`STYL.md`). Zostały panele szczegółów oraz projekt ekranu miejsc i mapy.
 2. **Wykresy.** Kolorowe strefy tła (np. Bz poniżej zera, progi wiatru 500 i 700 km/s), znacznik „teraz” z ostatnią wartością, odczyt po dotknięciu, przełącznik zakresu 2 h / 6 h i czytelniejsze osie.
 3. **Wyjaśnienia w panelach, na koniec.** Każdy panel w tym samym układzie: co to jest, co to znaczy teraz (zdanie zależne od wartości), jak czytać wykres, skala z progami.

@@ -14,8 +14,6 @@ export const fmtCoords = (lat, lon) =>
 // Liczba w polskim zapisie: przecinek dziesiętny i prawdziwy znak minus.
 export const fmtNum = (v, d = 1) => v.toFixed(d).replace("-", "−").replace(".", ",");
 
-export const fmtScore = (s) => (s < 1 ? "<1" : String(s));
-
 // Open-Meteo zwraca czas lokalny miejsca bez strefy. Czytamy go jako UTC, żeby wynik nie zależał od strefy przeglądarki.
 export const localMs = (t) => Date.parse(t + "Z");
 export const localHM = (ms) => new Date(ms).toISOString().slice(11, 16);

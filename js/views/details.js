@@ -1,5 +1,5 @@
 // Treść paneli szczegółów po stuknięciu w kafelek. Każda funkcja dostaje stan strony głównej i zwraca {title, source, html}.
-import { fmtNum, fmtScore, localHM, browserOffset } from "../util.js";
+import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel } from "../labels.js";
 import { lineChart } from "../ui/chart.js";
@@ -30,7 +30,7 @@ export const DETAILS = {
       title: "Skąd ten wynik",
       source: "NOAA SWPC · model OVATION i Kp · Open-Meteo · obliczenia w przeglądarce",
       html:
-        (first ? infoValue(`${fmtScore(first.score)}<small>%</small>`) : '<div class="info-value">—</div>') +
+        (first ? infoValue(`${first.score}<small>%</small>`) : '<div class="info-value">—</div>') +
         "<p>Szansa to iloczyn trzech części: aktywności zorzy w zasięgu wzroku, ciemności nieba i części nieba wolnej od chmur. Gdy którakolwiek jest bliska zera, cała szansa też spada do zera.</p>" +
         factors +
         infoRows([

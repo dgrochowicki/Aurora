@@ -1,129 +1,103 @@
 /* Podstawa: reset, układ strony, nagłówek, sekcje, dolna nawigacja i komunikaty. */
-.view[hidden] {
-  display: none;
-}
-.view-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 7px;
-}
-.view-heading h2 {
-  font-size: 1.65rem;
-  margin: 0;
-}
-.view-copy {
-  color: var(--muted);
-  font-size: 0.86rem;
-  line-height: 1.55;
-  margin: 12px 0 19px;
-}
 * {
   box-sizing: border-box;
 }
+/* Safari na iOS bierze kolor paska adresu z koloru tła strony (theme-color pomija), więc html i body mają kolor góry.
+   Ciemny dół rysuje sam gradient, który pokrywa całe body. */
 html {
-  background: var(--bg);
+  background: var(--bg-top);
 }
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at 50% -12%, #164840 0, transparent 35%), var(--bg);
+  background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px, var(--bg) 100%) var(--bg-top);
   color: var(--text);
 }
 button,
 input {
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Przytrzymanie palca na przycisku lub karcie nie zaznacza tekstu i nie otwiera menu kopiowania. */
+button,
+.card {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .app-shell {
   width: min(100%, 560px);
   margin: 0 auto;
-  padding: calc(22px + env(safe-area-inset-top)) 18px calc(108px + env(safe-area-inset-bottom));
+  padding: calc(56px + env(safe-area-inset-top)) var(--gutter) calc(108px + env(safe-area-inset-bottom));
 }
 .topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-.eyebrow {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: var(--green);
-  margin: 0 0 5px;
+  padding-inline: var(--text-inset);
+  margin-bottom: 36px;
 }
 .topbar h1 {
-  font-size: 1.52rem;
-  line-height: 1.1;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.15;
   margin: 0;
 }
-.coords {
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin: 6px 0 0;
-}
-.icon-button {
-  width: 46px;
-  height: 46px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: rgba(14, 34, 38, 0.86);
-  color: var(--text);
-  font-size: 1.6rem;
+/* Nazwa miejsca otwiera ekran wyboru miejsca. Wygląda jak zwykły nagłówek. */
+.place-name {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
-.icon-button:active {
-  transform: scale(0.96);
-}
-.section {
-  margin-top: 29px;
-}
-.section-title {
+.topbar-meta {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 0.9375rem;
+  line-height: 20px;
+  color: var(--sub-65);
 }
-.section-title h2 {
-  font-size: 1.04rem;
-  margin: 0;
+.section {
+  margin-top: 32px;
 }
-.section-title span {
-  font-size: 0.73rem;
-  color: var(--muted);
+.section-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 16px;
+  padding-inline: var(--text-inset);
 }
-.bottom-nav {
+/* Pływające przyciski mapy i miejsc (72×48, 24 px od krawędzi). Treść przewija się pod nimi, stąd rozmycie tła. */
+.fab-bar {
   position: fixed;
   z-index: 10;
   left: 50%;
-  bottom: 0;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   width: min(100%, 560px);
-  height: 82px;
-  padding: 10px 38px calc(10px + env(safe-area-inset-bottom));
+  padding-inline: 24px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  background: rgba(7, 18, 23, 0.91);
-  border-top: 1px solid var(--line);
-  backdrop-filter: blur(18px);
+  pointer-events: none;
 }
-.nav-button {
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font-size: 0.67rem;
+.fab {
+  pointer-events: auto;
   display: grid;
-  gap: 4px;
   place-items: center;
-  min-width: 55px;
+  width: 72px;
+  height: 48px;
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  background: var(--fab);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--press);
 }
-.nav-button span {
-  font-size: 1.3rem;
-}
-.nav-button.active {
-  color: var(--green);
+.fab:active {
+  transform: scale(var(--press-scale));
 }
 .toast {
   position: fixed;
@@ -154,11 +128,5 @@ input {
     border-radius: 36px;
     background: rgba(4, 14, 18, 0.55);
     min-height: 900px;
-  }
-  .bottom-nav {
-    bottom: 24px;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    width: 510px;
   }
 }

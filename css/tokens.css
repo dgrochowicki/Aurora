@@ -1,11 +1,19 @@
-/* Tokeny: kolory i czcionka. Nowy styl UI zaczyna się tutaj. */
+/* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  --bg: #071217;
-  --text: #f2faf7;
+  --bg: #091216;
+  --bg-top: #002f2b;
+  --text: #ffffff;
+  --sub: #afc7c2;
+  --sub-65: rgba(175, 199, 194, 0.65);
   --muted: #91aaa6;
   --green: #68f7bb;
+  --glow: #05805f;
   --line: rgba(255, 255, 255, 0.09);
+  --card: rgba(174, 255, 233, 0.08);
+  --card-border: rgba(174, 255, 233, 0.04);
+  --card-soft: rgba(174, 255, 233, 0.04);
+  --fab: rgba(16, 60, 54, 0.88);
   --surface: rgba(13, 32, 37, 0.78);
   --sheet: #0c1b20;
   --chip: #173036;
@@ -16,6 +24,15 @@
   --sky-twilight: #4f6378;
   --sky-night: #0a1620;
   --moon-up: #899caf;
+
+  /* Karty i kafelki sięgają do --gutter od krawędzi, a tekst leżący wprost na tle jest wcięty o --text-inset więcej. */
+  --gutter: 20px;
+  --text-inset: 4px;
+  --gap: 12px;
+  --radius: 20px;
+  --press-scale: 0.94;
+  --press: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
+
   font-family:
     Inter,
     ui-sans-serif,
