@@ -9,6 +9,7 @@
   --muted: #91aaa6;
   --green: #68f7bb;
   --glow: #05805f;
+  --glow-rgb: 5 128 95;
   --line: rgba(255, 255, 255, 0.09);
   --card: rgba(174, 255, 233, 0.08);
   --card-border: rgba(174, 255, 233, 0.04);

@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
-import { buildForecast, cloudChange, dayLabel, nightTimeline } from "../js/model/forecast.js";
+import { buildForecast, cloudChange, dayLabel, nightTimeline, glowLevel, hourGlow, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
@@ -80,6 +80,22 @@ test("szansa jest zerowa przy pełnym zachmurzeniu i wyższa przy czystym niebie
 test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {
   const rows = [80, 80, 20].map((cloud, i) => ({ cloud, t: `2026-10-04T2${i}:00` }));
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
+});
+
+test("poświata godzin rośnie z szansą, a przy słabej nocy pasek zostaje ciemny", () => {
+  assert.equal(glowLevel(9), 0);
+  assert.ok(glowLevel(20) > 0 && glowLevel(20) < glowLevel(50));
+  assert.equal(glowLevel(99), 1);
+  const rows = [3, 20, 44, 41, 8].map((score) => ({ score }));
+  assert.deepEqual(hourGlow(rows).map((g) => g > 0), [false, true, true, true, false]);
+  assert.deepEqual(hourGlow(rows, "best").map((g) => g > 0), [false, false, true, true, false]);
+  assert.deepEqual(hourGlow([{ score: 4 }, { score: 6 }], "best"), [0, 0]);
+});
+
+test("najlepsza szansa z godziną użytkownika dla miejsca w innej strefie", () => {
+  const best = { t: "2026-10-13T22:00", score: 34 };
+  assert.equal(outlookText(best, 40, null), "Najlepsza szansa około 22:00: 34%.");
+  assert.equal(outlookText(best, 40, null, "04:00"), "Najlepsza szansa około 22:00 (u Ciebie 04:00): 34%.");
 });
 
 test("data w nagłówku liczona w strefie miejsca", () => {

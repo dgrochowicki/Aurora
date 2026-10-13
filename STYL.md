@@ -48,7 +48,9 @@ Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, ods
 
 ## Godziny
 
-Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki. Wyróżnienie najlepszej godziny (lub kilku) autor zaprojektuje osobno.
+Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki.
+
+Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę od dołu (`--glow`), symulującą zorzę. Jej siła (`--aurora`, 0–1) zależy od szansy danej godziny: poniżej 10% brak, pełna od 70%. Przy słabej nocy pasek zostaje ciemny. Informacje ze starej karty: kierunek patrzenia jest w zdaniu pod wynikiem, „widoczna gołym okiem / przez aparat” w linii wybranej godziny, a czas użytkownika w zdaniu o najlepszej szansie.
 
 ## Ruch
 
@@ -66,8 +68,7 @@ Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7
 
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
-- Wygląd karty „Najlepszy moment”. Na razie ma styl kafelka.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
 - Panele szczegółów mają jeszcze stary styl (tło #0C1B20, pola #122A30, szary #91AAA6). Autor zaprojektuje je sam; do tego czasu nie ujednolicamy.
-- Wyróżnienie najlepszej godziny albo kilku godzin w pasku.
+- Wariant poświaty godzin: wszystkie pigułki według szansy (domyślnie) albo tylko najlepsze godziny (`?poswiata=najlepsza`). Po wyborze usuwamy drugi wariant z kodu. Na wybranej pigułce poświata jest słabiej widoczna przez jaśniejsze tło.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
