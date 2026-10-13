@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
-import { buildForecast, cloudChange, dayLabel, nightTimeline, glowLevel, hourGlow, outlookText } from "../js/model/forecast.js";
+import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
@@ -82,14 +82,14 @@ test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
 });
 
-test("poświata godzin rośnie z szansą, a przy słabej nocy pasek zostaje ciemny", () => {
-  assert.equal(glowLevel(9), 0);
-  assert.ok(glowLevel(20) > 0 && glowLevel(20) < glowLevel(50));
-  assert.equal(glowLevel(99), 1);
-  const rows = [3, 20, 44, 41, 8].map((score) => ({ score }));
-  assert.deepEqual(hourGlow(rows).map((g) => g > 0), [false, true, true, true, false]);
-  assert.deepEqual(hourGlow(rows, "best").map((g) => g > 0), [false, false, true, true, false]);
-  assert.deepEqual(hourGlow([{ score: 4 }, { score: 6 }], "best"), [0, 0]);
+test("poświata godzin narasta i gaśnie razem z szansą, a przy słabej nocy pasek zostaje ciemny", () => {
+  const glow = hourGlow([11, 15, 21, 16, 2].map((score) => ({ score })));
+  assert.ok(glow[0] > 0.2 && glow[0] < glow[1] && glow[1] < glow[2] && glow[3] < glow[2] && glow[4] < 0.1);
+  // Najlepsza godzina mocnej nocy świeci pełną siłą, a słabszej wyraźnie, ale słabiej.
+  assert.equal(Math.max(...hourGlow([{ score: 40 }, { score: 80 }])), 1);
+  assert.ok(glow[2] >= 0.5 && glow[2] < 0.7);
+  assert.deepEqual(hourGlow([{ score: 4 }, { score: 9 }]), [0, 0]);
+  assert.deepEqual(hourGlow([]), []);
 });
 
 test("najlepsza szansa z godziną użytkownika dla miejsca w innej strefie", () => {

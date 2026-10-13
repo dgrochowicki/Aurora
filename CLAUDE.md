@@ -94,6 +94,6 @@ Od najstarszych:
 5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Wynik bez „<1%”: pokazujemy zaokrągloną liczbę, także 0%. Szczegóły w `STYL.md`.
 6. **Menu z dwóch przycisków** (29.09.2026): mapa i ekran miejsc na pełnym ekranie zamiast dolnej nawigacji, widoku „Miejsca” i przycisku ⌖. Kolor paska Safari z tła `html`/`body` (iOS pomija `theme-color`).
 7. **Porządki w dokumentacji** (29.09.2026): `UWAGI.md` zawiera tylko otwarte zadania i ustalenia, usunięty prototyp `example/`.
-8. **Poświata godzin zamiast karty „Najlepszy moment”** (13.10.2026, gałąź `godziny-poswiata`): pigułki godzin świecą na zielono proporcjonalnie do szansy, karta usunięta, a jej informacje przeniesione do zdania pod wynikiem, linii wybranej godziny i zdania o najlepszej szansie. Autor wybiera jeszcze między dwoma wariantami (`?poswiata=najlepsza`).
+8. **Poświata godzin zamiast karty „Najlepszy moment”** (13.10.2026, gałąź `godziny-poswiata`): pigułki godzin świecą na zielono, najmocniej w najlepszej godzinie i słabiej w sąsiednich, żeby było widać, jak zorza narasta i gaśnie. Karta usunięta: zapowiedź z najlepszą godziną jest na dole karty szansy, kierunek patrzenia w zdaniu pod wynikiem, a tryb obserwacji w linii wybranej godziny.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

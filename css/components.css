@@ -70,6 +70,16 @@
   line-height: 20px;
   color: var(--sub);
 }
+/* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
+.outlook {
+  margin: 16px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--sub-65);
+}
+.outlook[hidden] {
+  display: none;
+}
 
 /* Godziny: pigułki przewijane w poziomie aż do krawędzi ekranu. */
 .hourly {
@@ -134,7 +144,7 @@
   line-height: 1.4;
   color: var(--sub);
 }
-/* Drobne teksty wprost na tle: zapowiedź, strefa czasowa i pewność prognozy. */
+/* Drobne teksty wprost na tle: strefa czasowa i pewność prognozy. */
 .note {
   margin: 12px 0 0;
   padding-inline: var(--text-inset);

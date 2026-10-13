@@ -6,7 +6,7 @@ Lista otwartych zadań, ustalenia dotyczące modelu i plan dalszych prac. Ustale
 
 W tej kolejności:
 
-1. **Styl UI.** Strona główna i menu mają styl z makiety autora. Zostały projekty autora dla paneli szczegółów, ekranu miejsc i mapy, wybór wariantu poświaty godzin oraz poprawka przycisków menu. Szczegóły w `STYL.md`, sekcja „Do ustalenia”.
+1. **Styl UI.** Strona główna i menu mają styl z makiety autora. Zostały projekty autora dla paneli szczegółów, ekranu miejsc i mapy oraz poprawka przycisków menu. Szczegóły w `STYL.md`, sekcja „Do ustalenia”.
 2. **Wykresy.** Kolorowe strefy tła (np. Bz poniżej zera, progi wiatru 500 i 700 km/s), znacznik „teraz” z ostatnią wartością, odczyt po dotknięciu, przełącznik zakresu 2 h / 6 h, czytelniejsze osie. Przy okazji: gdy Bz jest blisko zera, podpis „0” nakłada się na wartość skrajną.
 3. **Wyjaśnienia w panelach, na koniec.** Każdy panel w tym samym układzie: co to jest, co to znaczy teraz (zdanie zależne od wartości), jak czytać wykres, skala z progami.
 

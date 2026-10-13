@@ -39,9 +39,6 @@ const CONDITION_TILES = [
   { key: "light", label: "Światło w nocy", icon: true, wide: true },
 ];
 
-// Tymczasowo, do wyboru wariantu przez autora: ?poswiata=najlepsza wyróżnia tylko najlepsze godziny zamiast wszystkich według szansy.
-const GLOW_MODE = new URLSearchParams(location.search).get("poswiata") === "najlepsza" ? "best" : "score";
-
 // Ostatnio pokazana prognoza. Z niej budujemy panele szczegółów.
 let state = null;
 
@@ -136,7 +133,7 @@ export function renderForecast(loc, w, grid, space) {
       ? ""
       : `Godziny według czasu miejsca (${tz}). U Ciebie jest o ${Math.abs(diffH).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} h ${diffH > 0 ? "później" : "wcześniej"}.`;
 
-  renderHours(els.hourly, rows, hourGlow(rows, GLOW_MODE));
+  renderHours(els.hourly, rows, hourGlow(rows));
   selectHour(state.sel);
   // Przy miejscu w innej strefie najlepszą godzinę podajemy też w czasie użytkownika.
   const yours = diffH !== 0 && best.ms ? new Date(best.ms).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "";

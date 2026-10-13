@@ -40,7 +40,7 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 ## Karta szansy
 
-Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką.
+Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką. Na dole karty, jako część podsumowania, jest zapowiedź (13 px, `--sub-65`): zmiana chmur i najlepsza godzina z jej szansą, a przy innej strefie także czas użytkownika. Niżej widać to samo w poświacie godzin.
 
 ## Kafelek
 
@@ -50,7 +50,7 @@ Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, ods
 
 Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki.
 
-Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę od dołu (`--glow`), symulującą zorzę. Jej siła (`--aurora`, 0–1) zależy od szansy danej godziny: poniżej 10% brak, pełna od 70%. Przy słabej nocy pasek zostaje ciemny. Informacje ze starej karty: kierunek patrzenia jest w zdaniu pod wynikiem, „widoczna gołym okiem / przez aparat” w linii wybranej godziny, a czas użytkownika w zdaniu o najlepszej szansie.
+Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę od dołu (`--glow`), symulującą zorzę. Jej siła (`--aurora`, 0–1) ma dawać wrażenie narastania i gaśnięcia: najlepsza godzina świeci najmocniej (od 0,5 przy szansie 10% do 1 przy 70%), a pozostałe proporcjonalnie słabiej. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny. Informacje ze starej karty: kierunek patrzenia jest w zdaniu pod wynikiem, „widoczna gołym okiem / przez aparat” w linii wybranej godziny.
 
 ## Ruch
 
@@ -70,5 +70,4 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
 - Panele szczegółów mają jeszcze stary styl (tło #0C1B20, pola #122A30, szary #91AAA6). Autor zaprojektuje je sam; do tego czasu nie ujednolicamy.
-- Wariant poświaty godzin: wszystkie pigułki według szansy (domyślnie) albo tylko najlepsze godziny (`?poswiata=najlepsza`). Po wyborze usuwamy drugi wariant z kodu. Na wybranej pigułce poświata jest słabiej widoczna przez jaśniejsze tło.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.

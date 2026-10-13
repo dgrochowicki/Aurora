@@ -79,14 +79,13 @@ export function cloudChange(rows) {
   return r ? { short: `Chmury od ok. ${at(r)}`, sentence: `Około ${at(r)} napłyną chmury.` } : null;
 }
 
-// Siła poświaty pigułki godziny w skali 0–1. Zależy od samej szansy, więc przy słabej nocy pasek zostaje ciemny.
-export const glowLevel = (score) => (score < 10 ? 0 : clamp(score / 70, 0, 1));
-
-// Poświata dla każdej godziny. Tryb „best” wyróżnia tylko najlepsze godziny (co najmniej 90% najwyższej szansy), stałą siłą.
-export function hourGlow(rows, mode = "score") {
-  if (mode !== "best") return rows.map((r) => glowLevel(r.score));
+// Siła poświaty pigułek godzin w skali 0–1. Najlepsza godzina świeci tym mocniej, im wyższa jest jej szansa (od 0,5 przy 10% do 1 przy 70%),
+// a pozostałe proporcjonalnie słabiej, żeby w pasku było widać, jak zorza narasta i gaśnie. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny.
+export function hourGlow(rows) {
   const top = Math.max(0, ...rows.map((r) => r.score));
-  return rows.map((r) => (top >= 10 && r.score >= top * 0.9 ? 0.8 : 0));
+  if (top < 10) return rows.map(() => 0);
+  const peak = 0.5 + 0.5 * clamp((top - 10) / 60, 0, 1);
+  return rows.map((r) => (peak * r.score) / top);
 }
 
 // „yours” to godzina najlepszej szansy w czasie użytkownika, gdy miejsce leży w innej strefie.
