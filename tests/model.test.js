@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
-import { buildForecast, cloudChange, dayLabel, nightTimeline } from "../js/model/forecast.js";
+import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
@@ -80,6 +80,22 @@ test("szansa jest zerowa przy pełnym zachmurzeniu i wyższa przy czystym niebie
 test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {
   const rows = [80, 80, 20].map((cloud, i) => ({ cloud, t: `2026-10-04T2${i}:00` }));
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
+});
+
+test("poświata godzin narasta i gaśnie razem z szansą, a przy słabej nocy pasek zostaje ciemny", () => {
+  const glow = hourGlow([11, 15, 21, 16, 2].map((score) => ({ score })));
+  assert.ok(glow[0] > 0.2 && glow[0] < glow[1] && glow[1] < glow[2] && glow[3] < glow[2] && glow[4] < 0.1);
+  // Najlepsza godzina mocnej nocy świeci pełną siłą, a słabszej wyraźnie, ale słabiej.
+  assert.equal(Math.max(...hourGlow([{ score: 40 }, { score: 80 }])), 1);
+  assert.ok(glow[2] >= 0.5 && glow[2] < 0.7);
+  assert.deepEqual(hourGlow([{ score: 4 }, { score: 9 }]), [0, 0]);
+  assert.deepEqual(hourGlow([]), []);
+});
+
+test("najlepsza szansa z godziną użytkownika dla miejsca w innej strefie", () => {
+  const best = { t: "2026-10-13T22:00", score: 34 };
+  assert.equal(outlookText(best, 40, null), "Najlepsza szansa około 22:00: 34%.");
+  assert.equal(outlookText(best, 40, null, "04:00"), "Najlepsza szansa około 22:00 (u Ciebie 04:00): 34%.");
 });
 
 test("data w nagłówku liczona w strefie miejsca", () => {

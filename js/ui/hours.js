@@ -1,11 +1,12 @@
 // Pasek godzin: przyciski z godziną, ikoną pogody i szansą. Wybrana godzina ma aria-pressed="true".
+// „glow” to siła zielonej poświaty każdej pigułki (0–1), przekazywana do CSS jako --aurora.
 import { weatherIcon } from "./icons.js";
 
-export function renderHours(container, rows) {
+export function renderHours(container, rows, glow = []) {
   container.innerHTML = rows
     .map(
       (r, i) =>
-        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
+        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"${glow[i] ? ` style="--aurora:${glow[i].toFixed(2)}"` : ""}><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
     )
     .join("");
 }

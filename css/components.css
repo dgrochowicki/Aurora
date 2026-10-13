@@ -1,5 +1,5 @@
 /* Komponenty: karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa i lista miejsc. */
-/* Karty strony głównej: tło, obwódka i efekt wciśnięcia wspólne dla karty szansy, najlepszego momentu, godzin i kafelków. */
+/* Karty strony głównej: tło, obwódka i efekt wciśnięcia wspólne dla karty szansy, godzin i kafelków. */
 .card {
   position: relative;
   border: 1px solid var(--card-border);
@@ -70,49 +70,15 @@
   line-height: 20px;
   color: var(--sub);
 }
-
-.tonight-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-top: var(--gap);
-}
-.tonight-card[hidden] {
-  display: none;
-}
-.tonight-main strong {
-  display: block;
-  margin-top: 12px;
-  font-size: 1.3125rem;
-  line-height: 27px;
-  font-weight: 500;
-}
-.tonight-main > span {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.9375rem;
-  line-height: 20px;
-  color: var(--sub);
-}
-.direction {
-  display: grid;
-  grid-template-columns: 32px auto;
-  align-items: center;
-  flex: none;
-}
-.direction > span {
-  grid-row: 1/3;
-  font-size: 1.6rem;
-  color: var(--sub);
-}
-.direction small {
+/* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
+.outlook {
+  margin: 16px 0 0;
   font-size: 0.8125rem;
+  line-height: 1.45;
   color: var(--sub-65);
 }
-.direction b {
-  font-size: 0.9375rem;
-  font-weight: 500;
+.outlook[hidden] {
+  display: none;
 }
 
 /* Godziny: pigułki przewijane w poziomie aż do krawędzi ekranu. */
@@ -141,11 +107,19 @@
   padding: 20px 16px;
   border: 1px solid transparent;
   border-radius: 30px;
-  background: var(--card-soft);
+  /* Poświata zorzy od dołu pigułki. --aurora (0–1) ustawia hours.js: im większa szansa, tym jaśniej i wyżej. */
+  background: radial-gradient(
+      ellipse 130% calc(35% + var(--aurora, 0) * 60%) at 50% 100%,
+      rgb(var(--glow-rgb) / calc(var(--aurora, 0) * 0.95)),
+      rgb(var(--glow-rgb) / calc(var(--aurora, 0) * 0.4)) 55%,
+      transparent
+    )
+    no-repeat border-box;
+  background-color: var(--card-soft);
   color: var(--text);
 }
 .hour[aria-pressed="true"] {
-  background: var(--card);
+  background-color: var(--card);
   border-color: var(--card-border);
 }
 .hour time {
@@ -170,7 +144,7 @@
   line-height: 1.4;
   color: var(--sub);
 }
-/* Drobne teksty wprost na tle: zapowiedź, strefa czasowa i pewność prognozy. */
+/* Drobne teksty wprost na tle: strefa czasowa i pewność prognozy. */
 .note {
   margin: 12px 0 0;
   padding-inline: var(--text-inset);
@@ -328,33 +302,11 @@ html.sheet-open body {
     transition: none !important;
   }
 }
-.tonight-card[hidden] {
-  display: none;
-}
 .leaflet-container {
   font-family: inherit;
 }
 .leaflet-control-attribution {
   font-size: 9px !important;
-}
-.direction {
-  display: grid;
-  grid-template-columns: 35px auto;
-  grid-template-rows: auto auto;
-  align-items: center;
-  min-width: 112px;
-}
-.direction > span {
-  grid-row: 1/3;
-  font-size: 1.8rem;
-  color: var(--green);
-}
-.direction small {
-  font-size: 0.63rem;
-  color: var(--muted);
-}
-.direction b {
-  font-size: 0.76rem;
 }
 .info-sheet .source-note {
   font-size: 0.68rem;

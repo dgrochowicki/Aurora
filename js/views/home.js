@@ -1,8 +1,8 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
-import { $, fmtNum, localHM, localMs, browserOffset } from "../util.js";
+import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
-import { buildForecast, activityOnly, cloudChange, outlookText, dayLabel, nightTimeline } from "../model/forecast.js";
-import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel, moonTileLabel } from "../labels.js";
+import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
+import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
@@ -14,11 +14,6 @@ const els = {
   verdict: $("#verdict"),
   summary: $("#summary"),
   updated: $("#updatedText"),
-  tonightCard: $("#tonightCard"),
-  bestWindow: $("#bestWindow"),
-  viewMode: $("#viewMode"),
-  directionText: $("#directionText"),
-  directionArrow: $("#directionArrow"),
   hourly: $("#hourly"),
   hourDetail: $("#hourDetail"),
   outlook: $("#outlook"),
@@ -77,7 +72,6 @@ export function clearHome() {
   els.hourly.innerHTML = "";
   els.hourDetail.textContent = "";
   els.outlook.hidden = true;
-  els.tonightCard.hidden = true;
   clearPlaceTime();
 }
 
@@ -139,12 +133,14 @@ export function renderForecast(loc, w, grid, space) {
       ? ""
       : `Godziny według czasu miejsca (${tz}). U Ciebie jest o ${Math.abs(diffH).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} h ${diffH > 0 ? "później" : "wcześniej"}.`;
 
-  renderHours(els.hourly, rows);
+  renderHours(els.hourly, rows, hourGlow(rows));
   selectHour(state.sel);
-  els.outlook.textContent = outlookText(best, maxAct, change);
+  // Przy miejscu w innej strefie najlepszą godzinę podajemy też w czasie użytkownika.
+  const yours = diffH !== 0 && best.ms ? new Date(best.ms).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "";
+  els.outlook.textContent = outlookText(best, maxAct, change, yours);
   els.outlook.hidden = !rows.length;
-  renderGuidance(loc, best, space, grid, offset, diffH);
-  renderVerdict(first, best, maxAct);
+  renderConfidence(space, grid);
+  renderVerdict(first, best, maxAct, loc.lat >= 0 ? "na północ" : "na południe");
 }
 
 // Bez prognozy pogody nie policzymy szansy, ale nadal pokazujemy aktywność, Kp i Bz z NOAA.
@@ -160,9 +156,8 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
   clearPlaceTime();
-  els.verdict.textContent = "Nie znamy teraz zachmurzenia";
+  els.verdict.textContent = "Nie znamy teraz zachmurzenia.";
   els.summary.textContent = `Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
-  els.tonightCard.hidden = true;
 }
 
 // Data w czasie miejsca i godzina pobrania danych w czasie użytkownika.
@@ -171,40 +166,27 @@ function showUpdated(now, offset) {
   els.updated.textContent = `Aktualizacja ${new Date(now).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
-// Linia pod godzinami opisuje wybraną godzinę: chmury, porę dnia i Księżyc.
+// Linia pod godzinami opisuje wybraną godzinę: chmury, porę dnia, Księżyc i czym da się zobaczyć zorzę.
 function selectHour(i) {
   if (!state?.rows[i]) return;
   state.sel = i;
   markHour(els.hourly, i);
   const r = state.rows[i];
-  els.hourDetail.textContent = [r.label, `${r.cloud}% chmur`, phaseAt(r.ms, state.loc).toLowerCase(), moonLabel(r.sky)].join(" · ");
+  els.hourDetail.textContent = [r.label, `${r.cloud}% chmur`, phaseAt(r.ms, state.loc).toLowerCase(), moonLabel(r.sky), viewLabel(r.score)]
+    .filter(Boolean)
+    .join(" · ");
 }
 
-function renderGuidance(loc, best, space, grid, offset, diffH) {
-  const start = best.t ? localMs(best.t) : NaN;
-  els.bestWindow.textContent =
-    !best.night || !Number.isFinite(start) ? "Po zachodzie słońca" : `${localHM(start)}–${localHM(start + 3600000)}`;
-  const yourT = (ms) => new Date(ms).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
-  const yours =
-    diffH !== 0 && best.night && Number.isFinite(start)
-      ? ` • u Ciebie ${yourT(start - offset)}–${yourT(start - offset + 3600000)}`
-      : "";
-  els.viewMode.textContent =
-    (best.score >= 48 ? "Możliwa widoczność gołym okiem" : best.score >= 14 ? "Najpierw spróbuj aparatem" : "Widoczność będzie ograniczona") +
-    yours;
-  const north = loc.lat >= 0;
-  els.directionText.textContent = north ? "na północ" : "na południe";
-  els.directionArrow.textContent = north ? "↑" : "↓";
+function renderConfidence(space, grid) {
   const gridFresh = grid.coords.length && Date.now() - Date.parse(grid.time) < 60 * 60000;
   const confidence =
     gridFresh && space.kp != null && space.kpForecast?.length ? "wysoka" : grid.coords.length || space.kp != null ? "średnia" : "niska";
   els.confidence.textContent = `Pewność prognozy: ${confidence} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
 }
 
-function renderVerdict(first, best, activity) {
-  let verdict,
-    reason,
-    showWindow = false;
+// Werdykt i zdanie pod wynikiem. „where” to kierunek patrzenia: na północ albo na południe.
+function renderVerdict(first, best, activity, where) {
+  let verdict, reason;
   if (activity < 8 && best.score < 10) {
     verdict = "Dziś zorzy nie zobaczysz";
     reason = "Aktywność zorzowa jest zbyt niska dla Twojej lokalizacji.";
@@ -213,30 +195,24 @@ function renderVerdict(first, best, activity) {
     reason = "Nawet po zmroku przewidywana aktywność, chmury lub Księżyc nie dają dobrej szansy.";
   } else if (!first.night && best.score >= 10) {
     verdict = "Zorza może być widoczna po zmroku";
-    reason = "Teraz jest za jasno. Poniżej pokazujemy najlepszy przewidywany przedział.";
-    showWindow = true;
+    reason = "Teraz jest za jasno. Najlepsze godziny są podświetlone poniżej.";
   } else if (first.cover >= 75 && first.act >= 8) {
     verdict = "Zorzę zasłaniają teraz chmury";
     reason = `Zachmurzenie wynosi ${Math.round(first.cloud)}%. Sprawdź późniejsze godziny.`;
-    showWindow = best.score >= 10;
   } else if (first.score >= 70) {
     verdict = "Wyjdź teraz — zorza jest aktywna";
-    reason = "Warunki sprzyjają obserwacji gołym okiem.";
-    showWindow = true;
+    reason = `Warunki sprzyjają obserwacji gołym okiem. Patrz ${where}.`;
   } else if (first.score >= 40) {
     verdict = "Zorza może być widoczna gołym okiem";
-    reason = "Patrz w stronę wskazaną poniżej, z dala od świateł miasta.";
-    showWindow = true;
+    reason = `Patrz ${where}, z dala od świateł miasta.`;
   } else if (first.score >= 14) {
     verdict = "Zorza może być widoczna przez aparat";
-    reason = "Gołym okiem może być bardzo słaba. Spróbuj trybu nocnego.";
-    showWindow = true;
+    reason = `Gołym okiem może być bardzo słaba. Skieruj aparat ${where} i spróbuj trybu nocnego.`;
   } else {
     verdict = "Zorza jest aktywna, ale trudno ją teraz zobaczyć";
     reason = first.cover >= 50 ? "Przeszkodą jest duże zachmurzenie." : "Aktywność jest jeszcze zbyt słaba dla obserwacji gołym okiem.";
-    showWindow = best.score >= 10;
   }
-  els.verdict.textContent = verdict;
+  // Werdykt i uzasadnienie płyną jednym akapitem, bez łamania wiersza między nimi.
+  els.verdict.textContent = `${verdict}.`;
   els.summary.textContent = reason;
-  els.tonightCard.hidden = !showWindow;
 }

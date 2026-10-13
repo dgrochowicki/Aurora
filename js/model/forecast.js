@@ -79,13 +79,23 @@ export function cloudChange(rows) {
   return r ? { short: `Chmury od ok. ${at(r)}`, sentence: `Około ${at(r)} napłyną chmury.` } : null;
 }
 
-export function outlookText(best, maxAct, change) {
+// Siła poświaty pigułek godzin w skali 0–1. Najlepsza godzina świeci tym mocniej, im wyższa jest jej szansa (od 0,5 przy 10% do 1 przy 70%),
+// a pozostałe proporcjonalnie słabiej, żeby w pasku było widać, jak zorza narasta i gaśnie. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny.
+export function hourGlow(rows) {
+  const top = Math.max(0, ...rows.map((r) => r.score));
+  if (top < 10) return rows.map(() => 0);
+  const peak = 0.5 + 0.5 * clamp((top - 10) / 60, 0, 1);
+  return rows.map((r) => (peak * r.score) / top);
+}
+
+// „yours” to godzina najlepszej szansy w czasie użytkownika, gdy miejsce leży w innej strefie.
+export function outlookText(best, maxAct, change, yours = "") {
   const parts = change ? [change.sentence] : [];
   parts.push(
     maxAct < 8
       ? "Aktywność zorzy pozostanie zbyt niska, żeby ją zobaczyć."
       : best.score >= 10
-        ? `Najlepsza szansa około ${localHM(localMs(best.t))}: ${best.score}%.`
+        ? `Najlepsza szansa około ${localHM(localMs(best.t))}${yours ? ` (u Ciebie ${yours})` : ""}: ${best.score}%.`
         : "Szansa na zorzę pozostaje mała.",
   );
   return parts.join(" ");
