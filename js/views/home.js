@@ -156,7 +156,7 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
   clearPlaceTime();
-  els.verdict.textContent = "Nie znamy teraz zachmurzenia";
+  els.verdict.textContent = "Nie znamy teraz zachmurzenia.";
   els.summary.textContent = `Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
 }
 
@@ -212,6 +212,7 @@ function renderVerdict(first, best, activity, where) {
     verdict = "Zorza jest aktywna, ale trudno ją teraz zobaczyć";
     reason = first.cover >= 50 ? "Przeszkodą jest duże zachmurzenie." : "Aktywność jest jeszcze zbyt słaba dla obserwacji gołym okiem.";
   }
-  els.verdict.textContent = verdict;
+  // Werdykt i uzasadnienie płyną jednym akapitem, bez łamania wiersza między nimi.
+  els.verdict.textContent = `${verdict}.`;
   els.summary.textContent = reason;
 }

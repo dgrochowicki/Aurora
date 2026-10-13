@@ -40,7 +40,7 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 ## Karta szansy
 
-Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką. Na dole karty, jako część podsumowania, jest zapowiedź (13 px, `--sub-65`): zmiana chmur i najlepsza godzina z jej szansą, a przy innej strefie także czas użytkownika. Niżej widać to samo w poświacie godzin.
+Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką. Werdykt i uzasadnienie to jeden akapit bez łamania wiersza. Na dole karty, jako część podsumowania, jest zapowiedź (13 px, `--sub-65`): zmiana chmur i najlepsza godzina z jej szansą, a przy innej strefie także czas użytkownika. Niżej widać to samo w poświacie godzin.
 
 ## Kafelek
 
