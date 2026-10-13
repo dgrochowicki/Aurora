@@ -20,13 +20,13 @@ css/base.css          reset, układ, nagłówek, sekcje, pływające przyciski, 
 css/components.css    karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
 js/main.js            start, loadLocation(), geolokalizacja, pływające przyciski mapy i miejsc, odświeżanie co 5 min
 js/util.js            $, esc, fmtNum (polski zapis), fetchJSON, localMs/localHM (czas miejsca)
-js/labels.js          słowne opisy wartości i progi (Kp, Bz, wiatr, GOES, chmury, Księżyc)
+js/labels.js          słowne opisy wartości, progi i poziomy 0–3 „sprzyja zorzy” (Kp, Bz, wiatr, GOES, chmury, Księżyc)
 js/data/noaa.js       OVATION, Kp, prognoza Kp, Bz, wiatr słoneczny, magnetometr GOES; cache 5 min
 js/data/places.js     Open-Meteo (pogoda, geokodowanie), BigDataCloud, localStorage
 js/model/sky.js       Słońce i Księżyc (wzory SunCalc), ciemność, pora dnia, szerokość geomagnetyczna
 js/model/aurora.js    widoczna aktywność (OVATION w promieniu 1000 km, Kp), część czystego nieba
 js/model/forecast.js  buildForecast() dla 12 godzin, poświata godzin, zmiana chmur, opis nocy, data w nagłówku, oś nocy 16:00–10:00
-js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
+js/ui/                komponenty: tile, spark (miernik i mini wykres w kafelku), sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
 js/views/home.js      strona główna, konfiguracja kafelków (ACTIVITY_TILES, CONDITION_TILES)
 js/views/details.js   treść paneli szczegółów (DETAILS: score, mag, bz, kp, wind, cloud, light)
 js/views/map.js       mapa Leaflet z modelem OVATION na pełnym ekranie, zamykana ✕

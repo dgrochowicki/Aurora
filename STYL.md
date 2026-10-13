@@ -46,6 +46,8 @@ Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze ja
 
 Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, odstęp 20 px, metryka (ikona 24×24, liczba, opis, co 4 px), odstęp 20 px i opis zmiany. Ikony pochodzą z zestawu Phosphor (styl fill), a kod jest w `js/ui/icons.js`.
 
+Kafelki aktywności mówią, co pomiar znaczy dla zorzy, w czterech poziomach z progów w `labels.js`: „Nie sprzyja” (`--sub-65`), „Neutralnie” (`--sub`), „Sprzyja zorzy” (`--green`), „Mocno sprzyja” (`--violet`, #C4A1FF). Kolor poziomu ma kropka przy opisie i wskaźnik pod nim (wysokość 32 px, 16 px pod opisem): Kp to miernik z 9 segmentów, a Magnetometr, Bz i Wiatr słoneczny to mini wykres z 2 godzin bez osi. Bz ma linię zera i podświetlony obszar pod nią, wiatr przerywaną linię progu 500 km/s. Opis fizyczny („Na południe”, „Burza G2”) zostaje w panelu szczegółów.
+
 ## Godziny
 
 Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki.
@@ -66,6 +68,8 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 
 ## Do ustalenia
 
+- Wariant wskaźników w kafelkach aktywności (gałąź `kafelki-wskazniki`): mieszany (domyślnie) albo ten sam miernik z 4 segmentów wszędzie (`?kafelki=paski`). Po wyborze usuwamy drugi wariant z kodu. Do potwierdzenia też słowa i kolory czterech poziomów.
+- Paleta: neutralna, granatowa baza i zielony tylko jako sygnał zorzy, fiolet dla mocnej aktywności. Warianty do porównania na zrzutach.
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
