@@ -166,11 +166,14 @@ export const DETAILS = {
             empty: "Brak prognozy zachmurzenia.",
           },
         ) +
-        infoStats([
-          ["Chmury niskie", pct(r.low)],
-          ["Chmury średnie", pct(r.mid)],
-          ["Chmury wysokie", pct(r.high)],
-        ]) +
+        infoStats(
+          [
+            ["Chmury niskie", pct(r.low)],
+            ["Chmury średnie", pct(r.mid)],
+            ["Chmury wysokie", pct(r.high)],
+          ],
+          3,
+        ) +
         infoText(
           ...(change ? [change.sentence] : []),
           `Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,

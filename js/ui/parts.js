@@ -13,9 +13,9 @@ export const infoHero = (value, unit = "", { status = "", tight = false, text = 
 // Wykres od krawędzi do krawędzi panelu.
 export const infoChart = (svg) => `<div class="info-chart">${svg}</div>`;
 
-// Dane w dwóch kolumnach: etykieta, pod nią wartość i kreska.
-export const infoStats = (list) =>
-  `<div class="info-stats">${list.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join("")}</div>`;
+// Dane w kolumnach (domyślnie dwóch): etykieta, pod nią wartość i kreska.
+export const infoStats = (list, cols = 2) =>
+  `<div class="info-stats"${cols === 2 ? "" : ` style="--cols:${cols}"`}>${list.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join("")}</div>`;
 
 // Karta z tytułem jak na stronie głównej. Pusta treść nie tworzy karty.
 export const infoCard = (title, html) =>
