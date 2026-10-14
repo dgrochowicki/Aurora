@@ -69,7 +69,7 @@ Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej p
 - Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
 - Treść: odstęp między blokami 20 px. Kolejno:
   1. Metryka (`infoHero`): liczba z jednostką 48 px medium, biała, jednostka w tym samym rozmiarze. Zaraz pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px).
-  2. Wykres od krawędzi do krawędzi (`infoChart`). Wygląd wykresu robimy osobno.
+  2. Wykres z 2 godzin (`infoChart`, `ui/chart.js`). Linia i podziałka od krawędzi do krawędzi panelu, bez paddingu. Podziałka: co najmniej 3 linie co 32 px, przerywane 4/4 px (`--track`), na „ładnych” wartościach (krok 1, 2, 2,5 albo 5 razy potęga 10), więc przy Bz zero jest zawsze linią. Liczby osi Y po prawej, 24 px od krawędzi i 4 px nad swoją linią. Oś X (początek, środek, koniec) 24 px od krawędzi, 12 px pod wykresem. Liczby 13 px `--sub-65`. Linia zielona 2 px, pod nią zielony gradient; przy Bz gradient tylko poniżej zera, bo to sprzyja zorzy.
   3. Dane (`infoStats`): padding 12 px góra i dół, dwie kolumny z odstępem 20 px. W każdej etykieta 13 px `--sub`, pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
   4. Wyjaśnienie 13/18 `--sub`, akapity co 16 px.
   5. Źródła 13 px `--sub-65`.
@@ -89,5 +89,5 @@ Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej p
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Wykres Bz ma jeszcze pomarańczową część poniżej zera, choć to ona sprzyja zorzy.
+- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
