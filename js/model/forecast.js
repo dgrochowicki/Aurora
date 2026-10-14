@@ -165,6 +165,8 @@ export function nightTimeline(loc, now, offset) {
   return {
     start,
     end,
+    // Wysokość Słońca i Księżyca nad horyzontem w stopniach co 5 minut, do wykresu łuków.
+    arcs: samples.map((s) => ({ t: s.t, sun: s.sky.sunAlt, moon: s.sky.moonAlt })),
     sun: segs("sun"),
     moon: segs("moon"),
     sunEv: cross((s) => s.sunAlt, -0.833),

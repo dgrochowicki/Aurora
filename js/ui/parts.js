@@ -1,6 +1,6 @@
 // Klocki paneli szczegółów. Każdy panel składa się z nich w tej samej kolejności:
 // metryka na górze (infoHero), wykres od krawędzi do krawędzi (infoChart), dane w poziomie (infoStats) i wyjaśnienie (infoText).
-// Treści, które nie mają jeszcze projektu (paski, oś nocy), leżą tymczasowo w kartach (infoCard).
+// Treści, które nie mają jeszcze projektu (paski „Skąd ten wynik”), leżą tymczasowo w kartach (infoCard).
 import { clamp } from "../util.js";
 
 // Liczba z jednostką w jednym rozmiarze, pod nią stan. tight: jednostka bez spacji (np. „67%”).

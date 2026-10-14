@@ -544,7 +544,7 @@ html.sheet-open body {
   line-height: 18px;
   color: var(--sub-65);
 }
-/* Tymczasowo, do projektu: paski i oś nocy w kartach. */
+/* Tymczasowo, do projektu: paski „Skąd ten wynik” w karcie. */
 .info-card .card-title {
   margin-bottom: 12px;
 }
@@ -652,89 +652,78 @@ html.sheet-open body {
   font-size: 0.8125rem;
   color: var(--sub-65);
 }
-.time-axis {
-  position: relative;
-  height: 16px;
-  margin-bottom: 4px;
-  color: var(--sub-65);
-  font-size: 0.6875rem;
+/* Łuki Słońca i Księżyca (ui/sky-chart.js): od krawędzi do krawędzi jak inne wykresy, legenda i godziny 24 px od krawędzi. */
+.sky-chart {
+  padding-top: 0;
 }
-.time-axis span {
-  position: absolute;
-  transform: translateX(-50%);
-}
-.light-label {
+.sky-legend {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 12px 0 8px;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding-inline: 24px;
 }
-.light-label small {
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--sub-65);
+.sky-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--sky);
+  vertical-align: 1px;
 }
-.time-track {
-  position: relative;
-  display: flex;
-  height: 28px;
-  border-radius: 8px;
-  overflow: hidden;
-  font-size: 0.6875rem;
+.sky-chart .is-sun {
+  --sky: var(--yellow);
 }
-.time-track .seg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  overflow: hidden;
+.sky-chart .is-moon {
+  --sky: var(--moon);
 }
-.seg.day {
-  background: var(--sky-day);
-  color: #1c1606;
-}
-.seg.twilight {
-  background: var(--sky-twilight);
-}
-.seg.night {
-  background: var(--sky-night);
-  color: #dbe8f0;
-}
-.seg.up {
-  background: var(--moon-up);
-  color: #101d2c;
-}
-.seg.down {
-  background: var(--track);
-  color: var(--sub-65);
-}
-.now-line {
+.sky-dark {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--green);
+  background: rgb(var(--green-rgb) / 0.08);
 }
-.event-list {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin-top: 8px;
-  font-size: 0.8125rem;
-  color: var(--sub-65);
+.sky-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
 }
-.event-list b {
-  font-weight: 500;
-  color: var(--text);
+.sky-arc {
+  fill: none;
+  stroke: var(--sky);
+  stroke-width: 2.3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
-.dark-window {
-  font-size: 1.3125rem;
-  line-height: 27px;
-  font-weight: 500;
+/* Pod horyzontem łuk jest przygaszony. */
+.sky-arc.is-below {
+  opacity: 0.35;
+}
+.sky-sun-fill {
+  fill: url(#skySunFill);
+}
+.sky-dot {
+  position: absolute;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--sky);
+}
+.sky-x {
+  position: relative;
+  height: 18px;
+  margin-top: 12px;
+}
+.sky-x span {
+  position: absolute;
+  transform: translateX(-50%);
 }
 .factor {
   padding: 12px 0;

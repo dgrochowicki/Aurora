@@ -23,10 +23,7 @@
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
   --warn: #ffc867;
-  --sky-day: #c5ab72;
-  --sky-twilight: #4f6378;
-  --sky-night: #0a1620;
-  --moon-up: #899caf;
+  --moon: #c9d6e3;
 
   /* Karty i kafelki sięgają do --gutter od krawędzi, a tekst leżący wprost na tle jest wcięty o --text-inset więcej. */
   --gutter: 20px;
