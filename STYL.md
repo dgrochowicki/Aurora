@@ -58,7 +58,7 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 ## Ruch
 
 - Wciśnięcie karty, kafelka lub godziny płynnie ją zmniejsza do 94% (`--press-scale`, przejście `--press`, 0,2 s). Na iOS działa dzięki nasłuchiwaniu `touchstart` w `main.js`.
-- Panele wysuwają się od dołu (0,4 s), a tło się przyciemnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
+- Panele wysuwają się od dołu (0,4 s) i chowają tak samo w dół (0,35 s, ta sama krzywa), a tło się przyciemnia i rozjaśnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
 - Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
 
 ## Panel szczegółów
