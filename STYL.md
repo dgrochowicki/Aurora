@@ -91,5 +91,5 @@ Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej p
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno.
+- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Do dopracowania: wykres zachmurzenia jest kanciasty (wygładzić linię, np. krzywą monotoniczną, żeby nie wychodziła poza 0–100%), a panele są za wysokie.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
