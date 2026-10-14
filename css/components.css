@@ -391,11 +391,11 @@ html.sheet-open body {
   position: absolute;
   top: 9px;
   left: 50%;
-  width: 38px;
+  width: 44px;
   height: 4px;
-  margin-left: -19px;
+  margin-left: -22px;
   border-radius: 4px;
-  background: var(--track);
+  background: rgba(255, 255, 255, 0.3);
 }
 .sheet-header {
   display: flex;

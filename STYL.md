@@ -66,7 +66,7 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
 
 - Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, boki 20 px (`--gutter`).
-- Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14. Tytuł 24 px od krawędzi panelu (20 + 4 wcięcia, jak tekst na stronie głównej). Uchwyt zostaje: leży nad nagłówkiem i nie zmienia odstępów. Po przewinięciu pod nagłówkiem pojawia się linia.
+- Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14. Tytuł 24 px od krawędzi panelu (20 + 4 wcięcia, jak tekst na stronie głównej). Uchwyt zostaje: 44×4, biały 30%, 9 px od góry, leży nad nagłówkiem i nie zmienia odstępów. Po przewinięciu pod nagłówkiem pojawia się linia.
 - Wynik (`infoHero`): liczba 40 px medium, biała. Jednostka 15 px `--sub`, a „%” w rozmiarze liczby. Pod spodem opis stanu 15 px `--sub` z kropką w kolorze poziomu 0–3, tak jak w kafelku. W panelu „Światło” zamiast liczby jest zdanie (28 px).
 - Dane w kartach (`infoCard`) wyglądających jak kafelki. Tytuł karty 13 px medium `--sub`, odstęp między kartami 12 px. W kartach są wiersze, siatka pól (`--card-soft`), wykres z 2 godzin, paski i oś nocy.
 - Na końcu wyjaśnienie 15/20 `--sub` i źródło 13 px `--sub-65`, oba wprost na tle z wcięciem 4 px.
