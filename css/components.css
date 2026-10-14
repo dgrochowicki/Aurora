@@ -427,11 +427,20 @@ html.sheet-open body {
 .sheet-header button:active {
   transform: scale(var(--press-scale));
 }
-/* Krzyżyk Phosphor zajmuje 61% swojej ramki, czyli 12 px z 20. Powiększenie daje 14 px jak w makiecie. */
+/* Krzyżyk Phosphor bold zajmuje 66% swojej ramki, czyli 13 px z 20. Powiększenie daje 14 px jak w makiecie. */
 .sheet-header button .icon {
   width: 20px;
   height: 20px;
-  transform: scale(1.15);
+  transform: scale(1.07);
+}
+/* Delikatne podświetlenie: tło z 4% do 8%. */
+.sheet-header button:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+@media (hover: hover) {
+  .sheet-header button:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 .search-field {
   flex: none;

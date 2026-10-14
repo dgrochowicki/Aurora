@@ -49,7 +49,7 @@ let state = null;
 const info = createSheet({ sheet: $("#infoSheet"), backdrop: $("#detailBackdrop"), closeButton: $("#closeInfo") });
 
 export function initHome() {
-  $("#closeInfo").innerHTML = icon("x");
+  $("#closeInfo").innerHTML = icon("xBold");
   renderTiles(els.activityTiles, ACTIVITY_TILES);
   renderTiles(els.conditionTiles, CONDITION_TILES);
   document.querySelectorAll("[data-detail]").forEach((b) => (b.onclick = () => openDetail(b.dataset.detail, b)));
