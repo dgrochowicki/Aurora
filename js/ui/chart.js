@@ -29,7 +29,7 @@ export function niceTicks(lo, hi, min = 3) {
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 
-// series: [{t, v}] od najstarszego. zero: podświetlony obszar pod zerem, bo przy Bz to on sprzyja zorzy.
+// series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
 // offset: strefa, w której podpisujemy godziny.
 export function lineChart(series, { zero = false, label, offset = 0 }) {
   if (series.length < 2) return '<p class="chart-empty">Brak danych z ostatnich 2 godzin.</p>';
@@ -50,11 +50,13 @@ export function lineChart(series, { zero = false, label, offset = 0 }) {
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100,
     y = (v) => ((top - v) / (top - bottom)) * H;
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
-  // Obszar pod linią do dołu wykresu, a przy zero: tylko część poniżej zera.
-  const base = zero ? y(0) : H;
-  const area = `${line}L100 ${base.toFixed(1)}L0 ${base.toFixed(1)}Z`;
-  const clip = zero ? `<clipPath id="chartBelowZero"><rect x="0" y="${base.toFixed(1)}" width="100" height="${H}"/></clipPath>` : "";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--green);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--green);stop-opacity:0"/></linearGradient>${clip}</defs><path class="chart-area" d="${area}"${zero ? ' clip-path="url(#chartBelowZero)"' : ""}/><path class="chart-line" d="${line}"/></svg>`;
+  // Gradient pod linią do dołu wykresu. Przy zero zamiast niego linia poniżej zera w drugim kolorze.
+  const area = zero ? "" : `<path class="chart-area" d="${line}L100 ${H}L0 ${H}Z"/>`;
+  const below = zero
+    ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
+    : "";
+  const negative = zero ? `<path class="chart-line negative" clip-path="url(#chartBelowZero)" d="${line}"/>` : "";
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--green);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--green);stop-opacity:0"/></linearGradient>${below}</defs>${area}<path class="chart-line" d="${line}"/>${negative}</svg>`;
   const grid = ticks
     .map((v) => {
       const pos = `top:${y(v).toFixed(1)}px`;

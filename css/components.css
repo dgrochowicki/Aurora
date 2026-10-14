@@ -593,18 +593,24 @@ html.sheet-open body {
   height: 1px;
   background: repeating-linear-gradient(90deg, var(--track) 0 4px, transparent 4px 8px);
 }
+/* Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. */
 .chart-y {
   position: absolute;
+  z-index: 1;
   right: 24px;
   transform: translateY(calc(-100% - 4px));
 }
 .chart-line {
   fill: none;
   stroke: var(--green);
-  stroke-width: 2;
+  /* Tyle, ile miała linia starego wykresu (2 jednostki przy skali ok. 1,15). */
+  stroke-width: 2.3px;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+.chart-line.negative {
+  stroke: var(--warn);
 }
 .chart-area {
   fill: url(#chartFill);
