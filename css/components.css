@@ -285,7 +285,7 @@
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.25s ease;
 }
 .sheet-backdrop.open {
   opacity: 1;
@@ -305,8 +305,8 @@
   border-radius: 32px 32px 0 0;
   border: 1px solid var(--card-border);
   transform: translate(-50%, 100%);
-  /* Chowa się tak, jak się wysuwa: ta sama krzywa, odrobinę krócej. Czas zgodny z CLOSE_MS w sheet.js. */
-  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Chowa się tak, jak się wysuwa: ta sama krzywa, ale szybciej. Czas zgodny z CLOSE_MS w sheet.js. */
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sheet.open {
   transform: translate(-50%, 0);
@@ -620,6 +620,46 @@ html.sheet-open body {
   justify-content: space-between;
   margin-top: 12px;
   padding-inline: 24px;
+}
+/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, kolor poziomu jak w kafelku. Godziny pod środkiem słupków. */
+.chart-bars {
+  position: absolute;
+  inset: 0 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+/* Każdy blok ma równą część szerokości, a słupek 24 px na jej środku. */
+.chart-bars b {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+  font-weight: 400;
+}
+.chart-bars i {
+  position: relative;
+  width: 24px;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: var(--state);
+}
+.chart-bars span {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: -12px;
+  right: -12px;
+  text-align: center;
+  font-style: normal;
+  color: var(--sub);
+}
+.chart-x.is-bars {
+  gap: 8px;
+}
+.chart-x.is-bars span {
+  flex: 1;
+  text-align: center;
 }
 .chart-empty {
   margin: 0;

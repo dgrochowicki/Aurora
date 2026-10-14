@@ -4,7 +4,7 @@
 import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
-import { lineChart } from "../ui/chart.js";
+import { lineChart, barChart } from "../ui/chart.js";
 import { timeAxis, timeTrack, eventList } from "../ui/timeline.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, infoGrid, factorBar } from "../ui/parts.js";
 
@@ -106,8 +106,13 @@ export const DETAILS = {
         infoHero(s.kp == null ? null : fmtNum(s.kp), "/ 9", {
           status: favor(s.kp, kpLevel),
         }) +
+        infoChart(
+          barChart(
+            blocks.map((r) => ({ t: r.t, v: r.kp, level: kpLevel(r.kp) })),
+            { label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${localHM(r.t + off)} ${fmtNum(r.kp)}`).join(", ")}`, offset: off },
+          ),
+        ) +
         infoStats([["Ocena", s.kp == null ? "—" : kpLabel(s.kp)]]) +
-        infoCard("Prognoza w blokach 3-godzinnych", infoGrid(blocks.map((r) => [localHM(r.t + off), fmtNum(r.kp)]))) +
         infoText("Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu."),
     };
   },

@@ -1,4 +1,4 @@
-// Wykres liniowy z 2 godzin w panelu szczegółów. Linia sięga krawędzi panelu, podpisy osi mają wcięcie 24 px.
+// Wykresy w panelu szczegółów: liniowy z 2 godzin i słupkowy dla prognozy Kp. Linia sięga krawędzi panelu, podpisy osi mają wcięcie 24 px.
 // Podziałka: co najmniej 3 przerywane linie co 48 px, liczby osi Y po prawej, 4 px nad linią.
 import { esc, fmtNum, localHM } from "../util.js";
 
@@ -29,6 +29,25 @@ export function niceTicks(lo, hi, min = 3) {
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 
+// Skala pionowa z podziałki: wysokość w px i położenie wartości od góry.
+function scale(ticks) {
+  const top = ticks[0],
+    bottom = ticks[ticks.length - 1],
+    H = (ticks.length - 1) * ROW;
+  return { H, y: (v) => ((top - v) / (top - bottom)) * H };
+}
+
+// Przerywane linie podziałki z liczbami osi Y po prawej.
+function gridHTML(ticks, y) {
+  const d = decimals(ticks);
+  return ticks
+    .map((v) => {
+      const pos = `top:${y(v).toFixed(1)}px`;
+      return `<i class="chart-grid" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}</span>`;
+    })
+    .join("");
+}
+
 // series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
 // offset: strefa, w której podpisujemy godziny.
 export function lineChart(series, { zero = false, label, offset = 0 }) {
@@ -41,14 +60,10 @@ export function lineChart(series, { zero = false, label, offset = 0 }) {
     hi = Math.max(hi, 0);
   }
   const ticks = niceTicks(lo, hi),
-    top = ticks[0],
-    bottom = ticks[ticks.length - 1],
-    H = (ticks.length - 1) * ROW,
-    d = decimals(ticks);
+    { H, y } = scale(ticks);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
-  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100,
-    y = (v) => ((top - v) / (top - bottom)) * H;
+  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100;
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
   // Gradient pod linią do dołu wykresu. Przy zero zamiast niego linia poniżej zera w drugim kolorze.
   const area = zero ? "" : `<path class="chart-area" d="${line}L100 ${H}L0 ${H}Z"/>`;
@@ -57,12 +72,19 @@ export function lineChart(series, { zero = false, label, offset = 0 }) {
     : "";
   const negative = zero ? `<path class="chart-line negative" clip-path="url(#chartBelowZero)" d="${line}"/>` : "";
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--green);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--green);stop-opacity:0"/></linearGradient>${below}</defs>${area}<path class="chart-line" d="${line}"/>${negative}</svg>`;
-  const grid = ticks
-    .map((v) => {
-      const pos = `top:${y(v).toFixed(1)}px`;
-      return `<i class="chart-grid" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}</span>`;
-    })
-    .join("");
   const hm = (t) => localHM(t + offset);
-  return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${grid}${svg}</div><div class="chart-x" aria-hidden="true"><span>${hm(t0)}</span><span>${hm((t0 + t1) / 2)}</span><span>${hm(t1)}</span></div></div>`;
+  return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}${svg}</div><div class="chart-x" aria-hidden="true"><span>${hm(t0)}</span><span>${hm((t0 + t1) / 2)}</span><span>${hm(t1)}</span></div></div>`;
+}
+
+// Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, level}] od najwcześniejszego.
+// level (0–3) ustawia kolor słupka tak jak w kafelku, nad słupkiem jest jego wartość, pod nim godzina początku bloku.
+export function barChart(items, { label, offset = 0 }) {
+  if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
+  const ticks = niceTicks(0, Math.max(...items.map((p) => p.v))),
+    { H, y } = scale(ticks);
+  const bars = items
+    .map((p) => `<b><i data-level="${p.level}" style="height:${(H - y(p.v)).toFixed(1)}px"><span>${fmtNum(p.v)}</span></i></b>`)
+    .join("");
+  const times = items.map((p) => `<span>${localHM(p.t + offset)}</span>`).join("");
+  return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div><div class="chart-x is-bars" aria-hidden="true">${times}</div></div>`;
 }

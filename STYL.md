@@ -58,7 +58,7 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 ## Ruch
 
 - Wciśnięcie karty, kafelka lub godziny płynnie ją zmniejsza do 94% (`--press-scale`, przejście `--press`, 0,2 s). Na iOS działa dzięki nasłuchiwaniu `touchstart` w `main.js`.
-- Panele wysuwają się od dołu (0,4 s) i chowają tak samo w dół (0,35 s, ta sama krzywa), a tło się przyciemnia i rozjaśnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
+- Panele wysuwają się od dołu (0,4 s) i chowają tak samo w dół, szybciej (0,25 s, ta sama krzywa), a tło się przyciemnia i rozjaśnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
 - Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
 
 ## Panel szczegółów
@@ -70,6 +70,7 @@ Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej p
 - Treść: odstęp między blokami 20 px. Kolejno:
   1. Metryka (`infoHero`): liczba z jednostką 28/34 px medium, biała, jednostka w tym samym rozmiarze. Zaraz pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px semibold).
   2. Wykres z 2 godzin (`infoChart`, `ui/chart.js`). Linia i podziałka od krawędzi do krawędzi panelu, bez paddingu. Podziałka: co najmniej 3 linie co 48 px, przerywane 4/4 px (`--track`), na „ładnych” wartościach (krok 1, 2, 2,5 albo 5 razy potęga 10), więc przy Bz zero jest zawsze linią. Liczby osi Y po prawej, 24 px od krawędzi i 4 px nad swoją linią. Oś X (początek, środek, koniec) 24 px od krawędzi, 12 px pod wykresem. Liczby 13 px `--sub-65`. Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. Linia 2,3 px (jak w starym wykresie; w Figmie 3 px), zielona z gradientem pod spodem. Bz jest dwukolorowy: poniżej zera linia `--warn`, bez gradientu. Kolory każdego wykresu autor ustali osobno.
+     Prognoza Kp to wykres słupkowy (`barChart`): 6 bloków 3-godzinnych, podziałka od zera jak wyżej, słupki 24 px na środku równych części pasa 24 px od krawędzi, zaokrąglone u góry 4 px, w kolorze poziomu jak kafelek. Nad słupkiem wartość 13 px `--sub`, pod nim godzina początku bloku.
   3. Dane (`infoStats`): padding 12 px góra i dół, dwie kolumny z odstępem 20 px. W każdej etykieta 13 px `--sub`, pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
   4. Wyjaśnienie 13/18 `--sub`, akapity co 16 px.
   5. Źródła 13 px `--sub-65`.
