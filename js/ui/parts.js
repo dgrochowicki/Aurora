@@ -1,19 +1,28 @@
-// Powtarzalne fragmenty paneli szczegółów.
+// Klocki paneli szczegółów. Każdy panel składa się z nich w tej samej kolejności:
+// metryka na górze (infoHero), wykres od krawędzi do krawędzi (infoChart), dane w poziomie (infoStats) i wyjaśnienie (infoText).
+// Treści, które nie mają jeszcze projektu (paski, oś nocy), leżą tymczasowo w kartach (infoCard).
 import { clamp } from "../util.js";
 
-// Duża wartość na górze panelu. unit trafia do mniejszego, szarego dopisku.
-export const infoValue = (value, unit = "") =>
-  `<div class="info-value">${value == null ? "Brak danych" : `${value}${unit ? ` <small>${unit}</small>` : ""}`}</div>`;
+// Liczba z jednostką w jednym rozmiarze, pod nią stan. tight: jednostka bez spacji (np. „67%”).
+// text: zamiast liczby krótkie zdanie (np. „Ciemniej po 23:10”).
+export const infoHero = (value, unit = "", { status = "", tight = false, text = false } = {}) => {
+  const val = value == null ? "Brak danych" : `${value}${!unit ? "" : tight ? unit : ` ${unit}`}`;
+  return `<div class="info-hero${text ? " is-text" : ""}"><div class="info-value">${val}</div>${status ? `<p class="info-status">${status}</p>` : ""}</div>`;
+};
 
-// Wiersze „etykieta — wartość”.
-export const infoRows = (list) =>
-  `<div class="info-rows">${list.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join("")}</div>`;
+// Wykres od krawędzi do krawędzi panelu.
+export const infoChart = (svg) => `<div class="info-chart">${svg}</div>`;
 
-// Siatka małych pól, np. kolejne godziny albo bloki prognozy Kp.
-export const infoGrid = (list) =>
-  list.length ? `<div class="info-grid">${list.map(([k, v]) => `<div>${k}<strong>${v}</strong></div>`).join("")}</div>` : "";
+// Dane w dwóch kolumnach: etykieta, pod nią wartość i kreska.
+export const infoStats = (list) =>
+  `<div class="info-stats">${list.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join("")}</div>`;
 
-export const infoSub = (text) => `<h3 class="info-sub">${text}</h3>`;
+// Karta z tytułem jak na stronie głównej. Pusta treść nie tworzy karty.
+export const infoCard = (title, html) =>
+  html ? `<section class="info-card card">${title ? `<h3 class="card-title">${title}</h3>` : ""}${html}</section>` : "";
+
+// Wyjaśnienie, każdy argument to osobny akapit.
+export const infoText = (...paras) => `<div class="info-text">${paras.map((t) => `<p>${t}</p>`).join("")}</div>`;
 
 // Pasek udziału 0–1 z nazwą, wartością i podpowiedzią.
 export const factorBar = (name, v, text, hint) =>

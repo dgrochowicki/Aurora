@@ -192,6 +192,80 @@
   line-height: 20px;
   color: var(--sub);
 }
+/* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
+.data-tile[data-level="0"] {
+  --state: var(--sub-65);
+}
+.data-tile[data-level="1"] {
+  --state: var(--sub);
+}
+.data-tile[data-level="2"] {
+  --state: var(--green);
+}
+.data-tile[data-level="3"] {
+  --state: var(--violet);
+}
+.data-tile[data-level] .tile-status::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--state);
+  vertical-align: 1px;
+}
+/* Wskaźnik pod opisem: miernik z segmentów albo mini wykres z 2 godzin. */
+.tile-viz {
+  display: block;
+  height: 32px;
+  margin-top: 16px;
+}
+.tile-viz:empty {
+  display: none;
+}
+.meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 100%;
+}
+.meter i {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--track);
+}
+.meter i.on {
+  background: var(--state);
+}
+.spark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.spark path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.spark-line {
+  stroke: var(--state);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.spark .spark-area {
+  fill: var(--green);
+  opacity: 0.22;
+}
+.spark-rule {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
+}
+.spark-rule.dashed {
+  stroke-dasharray: 3 3;
+}
 .next-change {
   margin-top: auto;
   padding-top: 20px;
@@ -211,7 +285,7 @@
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   opacity: 0;
-  transition: opacity 0.28s ease;
+  transition: opacity 0.25s ease;
 }
 .sheet-backdrop.open {
   opacity: 1;
@@ -228,10 +302,11 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--sheet);
-  border-radius: 28px 28px 0 0;
-  border: 1px solid var(--line);
+  border-radius: 32px 32px 0 0;
+  border: 1px solid var(--card-border);
   transform: translate(-50%, 100%);
-  transition: transform 0.28s cubic-bezier(0.4, 0, 1, 1);
+  /* Chowa się tak, jak się wysuwa: ta sama krzywa, ale szybciej. Czas zgodny z CLOSE_MS w sheet.js. */
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sheet.open {
   transform: translate(-50%, 0);
@@ -243,7 +318,9 @@
 .info-sheet {
   max-height: 86vh;
   max-height: calc(100dvh - 40px - env(safe-area-inset-top));
-  padding: 9px 20px 0;
+  /* Nagłówek i treść 24 px od krawędzi, jak w makiecie panelu. Padding mają osobno,
+     bo przewijana treść obcinałaby wykres, który sięga krawędzi panelu. */
+  padding: 0;
 }
 /* Mapa i ekran miejsc zajmują cały ekran. */
 .map-sheet,
@@ -271,15 +348,18 @@
 .sheet-header {
   flex: none;
 }
-/* Odstęp pod nagłówkiem, a po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
+/* Nagłówek z makiety: 24 px nad i pod. Po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
 .info-sheet .sheet-header {
   margin-bottom: 0;
-  padding-bottom: 12px;
+  padding: 24px;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
+.info-sheet .sheet-scroll {
+  padding-inline: 24px;
+}
 .info-sheet.scrolled .sheet-header {
-  border-bottom-color: var(--line);
+  border-bottom-color: var(--card-border);
 }
 .sheet-scroll {
   flex: 1 1 auto;
@@ -308,19 +388,16 @@ html.sheet-open body {
 .leaflet-control-attribution {
   font-size: 9px !important;
 }
-.info-sheet .source-note {
-  font-size: 0.68rem;
-  color: var(--muted);
-}
 .hourly::-webkit-scrollbar {
   display: none;
 }
+/* Uchwyt ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. */
 .sheet-handle {
-  width: 38px;
+  width: 44px;
   height: 4px;
+  margin: 8px auto 0;
   border-radius: 4px;
-  background: #49605e;
-  margin: 0 auto 20px;
+  background: rgba(255, 255, 255, 0.3);
 }
 .sheet-header {
   display: flex;
@@ -328,17 +405,44 @@ html.sheet-open body {
   align-items: center;
 }
 .sheet-header h2 {
-  font-size: 1.25rem;
   margin: 0;
+  font-size: 1.3125rem;
+  font-weight: 600;
+  line-height: 27px;
+  letter-spacing: -0.01em;
 }
+/* ✕ z makiety: 44×44, padding 12, w środku ramka ikony 20×20. */
 .sheet-header button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
   border: 0;
-  background: var(--chip);
-  color: var(--text);
-  width: 36px;
-  height: 36px;
   border-radius: 50%;
-  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--press);
+}
+.sheet-header button:active {
+  transform: scale(var(--press-scale));
+}
+/* Krzyżyk Phosphor bold zajmuje 66% swojej ramki, czyli 13 px z 20. Powiększenie daje 14 px jak w makiecie. */
+.sheet-header button .icon {
+  width: 20px;
+  height: 20px;
+  transform: scale(1.07);
+}
+/* Delikatne podświetlenie: tło z 4% do 8%. */
+.sheet-header button:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+@media (hover: hover) {
+  .sheet-header button:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 .search-field {
   flex: none;
@@ -373,107 +477,187 @@ html.sheet-open body {
   margin: 12px 0;
   padding-inline: var(--text-inset);
 }
+/* Treść panelu szczegółów według makiety (STYL.md, „Panel szczegółów”): metryka, wykres od krawędzi do krawędzi,
+   dane w dwóch kolumnach, wyjaśnienie i źródła. Odstęp między blokami 20 px. */
 .info-body {
-  margin-top: 14px;
-}
-.info-body p {
-  color: #bed0cd;
-  font-size: 0.86rem;
-  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 .info-value {
-  font-size: 2.4rem;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  color: var(--green);
-  margin: 6px 0 10px;
-}
-.info-value small {
-  font-size: 0.9rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: var(--muted);
-}
-.info-sub {
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 1.75rem;
   font-weight: 500;
-  margin: 16px 0 8px;
+  line-height: 34px;
+  letter-spacing: -0.02em;
 }
-.info-rows > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.84rem;
-}
-.info-rows span {
-  color: var(--muted);
-}
-.info-rows b {
+.info-hero.is-text .info-value {
   font-weight: 600;
 }
-.info-grid {
+.info-status {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 20px;
+  color: var(--sub);
+}
+/* Wykres sięga krawędzi panelu mimo paddingu 24 px. */
+.info-chart {
+  margin-inline: -24px;
+}
+.info-chart .chart-empty {
+  padding-inline: 24px;
+}
+.info-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 16px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  padding: 12px 0;
 }
-.info-grid > div {
-  background: var(--field);
-  border-radius: 13px;
-  padding: 11px 6px;
-  text-align: center;
-  font-size: 0.72rem;
-  color: var(--muted);
+.info-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--track);
+  font-size: 0.8125rem;
+  line-height: 18px;
 }
-.info-grid strong {
-  display: block;
-  font-size: 1.15rem;
-  color: var(--text);
-  margin-top: 4px;
+.info-stats span {
+  color: var(--sub);
 }
+.info-stats b {
+  font-weight: 600;
+}
+.info-text {
+  font-size: 0.8125rem;
+  line-height: 18px;
+  color: var(--sub);
+}
+.info-text p {
+  margin: 0;
+}
+.info-text p + p {
+  margin-top: 16px;
+}
+.info-sheet .source-note {
+  margin: 20px 0 0;
+  font-size: 0.8125rem;
+  line-height: 18px;
+  color: var(--sub-65);
+}
+/* Tymczasowo, do projektu: paski i oś nocy w kartach. */
+.info-card .card-title {
+  margin-bottom: 12px;
+}
+/* Wykres w panelu: linia od krawędzi do krawędzi, podpisy osi 24 px od krawędzi, 13 px.
+   Linie podziałki co 48 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
 .chart {
-  display: block;
+  /* Kolor linii i gradientu; .is-yellow dla zachmurzenia. */
+  --chart: var(--green);
+  padding-top: 22px;
+  font-size: 0.8125rem;
+  line-height: 18px;
+  color: var(--sub-65);
+}
+.chart.is-yellow {
+  --chart: var(--yellow);
+}
+.chart-plot {
+  position: relative;
+}
+.chart-plot svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  margin: 6px 0 8px;
+  height: 100%;
   overflow: visible;
 }
-.chart text {
-  fill: var(--muted);
-  font-size: 10px;
-  font-family: inherit;
+.chart-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--track) 0 4px, transparent 4px 8px);
 }
-.chart .gridline {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 0.8;
+/* Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. */
+.chart-y {
+  position: absolute;
+  z-index: 1;
+  right: 24px;
+  transform: translateY(calc(-100% - 4px));
 }
-.chart .signal {
+.chart-line {
   fill: none;
-  stroke: var(--green);
-  stroke-width: 2;
+  stroke: var(--chart);
+  /* Tyle, ile miała linia starego wykresu (2 jednostki przy skali ok. 1,15). */
+  stroke-width: 2.3px;
   stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
-.chart .signal.negative {
+.chart-line.negative {
   stroke: var(--warn);
 }
-.chart-empty {
-  font-size: 0.8rem;
+.chart-area {
+  fill: url(#chartFill);
 }
-.light-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 4px 0 6px;
+.chart-x {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-inline: 24px;
+}
+/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, zielone o jasności zależnej od wartości. Godziny pod środkiem słupków. */
+.chart-bars {
+  position: absolute;
+  inset: 0 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+/* Każdy blok ma równą część szerokości, a słupek 24 px na jej środku. */
+.chart-bars b {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+  font-weight: 400;
+}
+.chart-bars i {
+  position: relative;
+  width: 24px;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  /* Jasność z --a (0–1) ustawia wykres: im wyższe Kp, tym jaśniejszy zielony. */
+  background: rgb(var(--green-rgb) / var(--a, 1));
+}
+.chart-bars span {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: -12px;
+  right: -12px;
+  text-align: center;
+  font-style: normal;
+  color: var(--sub);
+}
+.chart-x.is-bars {
+  gap: 8px;
+}
+.chart-x.is-bars span {
+  flex: 1;
+  text-align: center;
+}
+.chart-empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--sub-65);
 }
 .time-axis {
   position: relative;
-  height: 18px;
-  margin: 22px 0 8px;
-  color: var(--muted);
-  font-size: 0.66rem;
+  height: 16px;
+  margin-bottom: 4px;
+  color: var(--sub-65);
+  font-size: 0.6875rem;
 }
 .time-axis span {
   position: absolute;
@@ -483,12 +667,14 @@ html.sheet-open body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.78rem;
-  margin: 16px 0 8px;
+  margin: 12px 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
 }
 .light-label small {
-  color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--sub-65);
 }
 .time-track {
   position: relative;
@@ -496,7 +682,7 @@ html.sheet-open body {
   height: 28px;
   border-radius: 8px;
   overflow: hidden;
-  font-size: 0.66rem;
+  font-size: 0.6875rem;
 }
 .time-track .seg {
   display: flex;
@@ -521,8 +707,8 @@ html.sheet-open body {
   color: #101d2c;
 }
 .seg.down {
-  background: var(--chip);
-  color: var(--muted);
+  background: var(--track);
+  color: var(--sub-65);
 }
 .now-line {
   position: absolute;
@@ -537,52 +723,57 @@ html.sheet-open body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px 12px;
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-top: 7px;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  color: var(--sub-65);
 }
 .event-list b {
+  font-weight: 500;
   color: var(--text);
-  font-weight: 600;
 }
 .dark-window {
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-.dark-window strong {
-  font-size: 0.82rem;
-}
-.dark-window p {
-  font-size: 0.76rem !important;
-  margin: 4px 0 0;
+  font-size: 1.3125rem;
+  line-height: 27px;
+  font-weight: 500;
 }
 .factor {
   padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--card-border);
+}
+.factor:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+.factor:last-child {
+  padding-bottom: 0;
 }
 .factor-head {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 0.84rem;
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 20px;
+}
+.factor-head b {
+  font-weight: 500;
 }
 .factor-bar {
-  height: 7px;
-  border-radius: 7px;
-  background: var(--chip);
-  margin: 8px 0 6px;
+  height: 6px;
+  margin: 8px 0;
+  border-radius: 3px;
+  background: var(--track);
   overflow: hidden;
 }
 .factor-bar i {
   display: block;
   height: 100%;
-  border-radius: 7px;
+  border-radius: 3px;
   background: var(--green);
 }
 .factor small {
-  color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sub-65);
 }
 
 /* Mapa na pełnym ekranie: ✕ w prawym górnym rogu, legenda w karcie na dole. */

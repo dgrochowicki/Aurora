@@ -2,11 +2,12 @@
 import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
 import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
-import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { activityLabel, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
+import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
-import { weatherIcon, phaseIcon } from "../ui/icons.js";
+import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
 import { DETAILS } from "./details.js";
 
 const els = {
@@ -29,15 +30,18 @@ const els = {
 
 // Kafelki w kolejności z prototypu. Klucz to też nazwa panelu szczegółów w DETAILS.
 const ACTIVITY_TILES = [
-  { key: "mag", label: "Magnetometr", unit: "nT" },
-  { key: "bz", label: "Pole wiatru · Bz", unit: "nT" },
-  { key: "kp", label: "Indeks Kp", unit: "/ 9" },
-  { key: "wind", label: "Wiatr słoneczny", unit: "km/s" },
+  { key: "mag", label: "Magnetometr", unit: "nT", viz: true },
+  { key: "bz", label: "Pole wiatru · Bz", unit: "nT", viz: true },
+  { key: "kp", label: "Indeks Kp", unit: "/ 9", viz: true },
+  { key: "wind", label: "Wiatr słoneczny", unit: "km/s", viz: true },
 ];
 const CONDITION_TILES = [
   { key: "cloud", label: "Zachmurzenie", unit: "%", tight: true, icon: true, wide: true },
   { key: "light", label: "Światło w nocy", icon: true, wide: true },
 ];
+
+// Tymczasowo, do wyboru wariantu przez autora: ?kafelki=paski pokazuje we wszystkich kafelkach ten sam miernik zamiast mini wykresów.
+const BARS_ONLY = new URLSearchParams(location.search).get("kafelki") === "paski";
 
 // Ostatnio pokazana prognoza. Z niej budujemy panele szczegółów.
 let state = null;
@@ -45,6 +49,7 @@ let state = null;
 const info = createSheet({ sheet: $("#infoSheet"), backdrop: $("#detailBackdrop"), closeButton: $("#closeInfo") });
 
 export function initHome() {
+  $("#closeInfo").innerHTML = icon("xBold");
   renderTiles(els.activityTiles, ACTIVITY_TILES);
   renderTiles(els.conditionTiles, CONDITION_TILES);
   document.querySelectorAll("[data-detail]").forEach((b) => (b.onclick = () => openDetail(b.dataset.detail, b)));
@@ -86,21 +91,26 @@ export const showLoading = () => {
   els.score.textContent = "—";
 };
 
-// Kafelki aktywności. Status Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
+// Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
+// Opis mówi, co pomiar znaczy dla zorzy, a wskaźnik pod nim pokazuje to samo kolorem: miernik dla Kp, mini wykres z 2 godzin dla reszty.
 function renderSpaceTiles(space) {
-  const t = els.activityTiles,
-    none = "Brak danych";
-  setTile(t, "mag", {
-    value: space.goes == null ? null : fmtNum(space.goes),
-    status: space.goesRange == null ? none : goesLabel(space.goesRange),
-  });
   const bzRef = space.bzAvg ?? space.bz;
-  setTile(t, "bz", { value: space.bz == null ? null : fmtNum(space.bz), status: bzRef == null ? none : bzLabel(bzRef) });
-  setTile(t, "kp", { value: space.kp == null ? null : fmtNum(space.kp), status: space.kp == null ? none : kpLabel(space.kp) });
-  setTile(t, "wind", {
-    value: space.wind == null ? null : String(Math.round(space.wind)),
-    status: space.wind == null ? none : windLabel(space.wind),
-  });
+  const tiles = [
+    { key: "mag", value: space.goes == null ? null : fmtNum(space.goes), level: space.goesRange == null ? null : goesLevel(space.goesRange) },
+    { key: "bz", value: space.bz == null ? null : fmtNum(space.bz), level: bzRef == null ? null : bzLevel(bzRef) },
+    { key: "kp", value: space.kp == null ? null : fmtNum(space.kp), level: space.kp == null ? null : kpLevel(space.kp) },
+    { key: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), level: space.wind == null ? null : windLevel(space.wind) },
+  ];
+  const spark = {
+    mag: () => sparkline(space.goesSeries || [], { minSpan: 40 }),
+    bz: () => sparkline(space.bzSeries || [], { zero: true, minSpan: 12 }),
+    kp: () => meter(9, Math.round(space.kp)),
+    wind: () => sparkline(space.windSeries || [], { threshold: WIND_FAST, minSpan: 150 }),
+  };
+  for (const { key, value, level } of tiles) {
+    const viz = level == null ? "" : (!BARS_ONLY && spark[key]()) || meter(4, level + 1);
+    setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : favorLabel(level) });
+  }
 }
 
 export function renderForecast(loc, w, grid, space) {

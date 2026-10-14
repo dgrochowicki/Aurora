@@ -2,8 +2,8 @@
 // backdrop i closeButton są opcjonalne: ekran miejsc zajmuje cały ekran i zamyka się wyborem miejsca albo klawiszem Escape.
 import { $ } from "../util.js";
 
-// Czas animacji zamykania, taki sam jak w CSS (.sheet). Po nim panel dostaje hidden.
-const CLOSE_MS = 280;
+// Czas animacji zamykania z CSS (.sheet) z zapasem. Po nim panel dostaje hidden; wcześniej ucinało koniec ruchu.
+const CLOSE_MS = 300;
 const open = [];
 
 // Gdy panel jest otwarty, reszta strony nie przyjmuje fokusu ani kliknięć.

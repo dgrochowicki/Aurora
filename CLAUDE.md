@@ -20,13 +20,13 @@ css/base.css          reset, układ, nagłówek, sekcje, pływające przyciski, 
 css/components.css    karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
 js/main.js            start, loadLocation(), geolokalizacja, pływające przyciski mapy i miejsc, odświeżanie co 5 min
 js/util.js            $, esc, fmtNum (polski zapis), fetchJSON, localMs/localHM (czas miejsca)
-js/labels.js          słowne opisy wartości i progi (Kp, Bz, wiatr, GOES, chmury, Księżyc)
+js/labels.js          słowne opisy wartości, progi i poziomy 0–3 „sprzyja zorzy” (Kp, Bz, wiatr, GOES, chmury, Księżyc)
 js/data/noaa.js       OVATION, Kp, prognoza Kp, Bz, wiatr słoneczny, magnetometr GOES; cache 5 min
 js/data/places.js     Open-Meteo (pogoda, geokodowanie), BigDataCloud, localStorage
 js/model/sky.js       Słońce i Księżyc (wzory SunCalc), ciemność, pora dnia, szerokość geomagnetyczna
 js/model/aurora.js    widoczna aktywność (OVATION w promieniu 1000 km, Kp), część czystego nieba
 js/model/forecast.js  buildForecast() dla 12 godzin, poświata godzin, zmiana chmur, opis nocy, data w nagłówku, oś nocy 16:00–10:00
-js/ui/                komponenty: tile, sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
+js/ui/                komponenty: tile, spark (miernik i mini wykres w kafelku), sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
 js/views/home.js      strona główna, konfiguracja kafelków (ACTIVITY_TILES, CONDITION_TILES)
 js/views/details.js   treść paneli szczegółów (DETAILS: score, mag, bz, kp, wind, cloud, light)
 js/views/map.js       mapa Leaflet z modelem OVATION na pełnym ekranie, zamykana ✕
@@ -95,5 +95,7 @@ Od najstarszych:
 6. **Menu z dwóch przycisków** (29.09.2026): mapa i ekran miejsc na pełnym ekranie zamiast dolnej nawigacji, widoku „Miejsca” i przycisku ⌖. Kolor paska Safari z tła `html`/`body` (iOS pomija `theme-color`).
 7. **Porządki w dokumentacji** (29.09.2026): `UWAGI.md` zawiera tylko otwarte zadania i ustalenia, usunięty prototyp `example/`.
 8. **Poświata godzin zamiast karty „Najlepszy moment”** (13.10.2026): pigułki godzin świecą na zielono, najmocniej w najlepszej godzinie i słabiej w sąsiednich, żeby było widać, jak zorza narasta i gaśnie. Karta usunięta: zapowiedź z najlepszą godziną jest na dole karty szansy, kierunek patrzenia w zdaniu pod wynikiem, a tryb obserwacji w linii wybranej godziny. Werdykt i jego uzasadnienie w karcie szansy płyną jednym akapitem.
+9. **Kafelki aktywności ze wskaźnikami** (13.10.2026): kafelki Magnetometr, Bz, Kp i Wiatr mówią, co pomiar znaczy dla zorzy (4 poziomy z `labels.js`), z kropką w kolorze poziomu i wskaźnikiem pod opisem: miernik dla Kp, mini wykres z 2 godzin dla reszty. Wariant `?kafelki=paski` czeka na wybór autora (`STYL.md`, „Do ustalenia”).
+10. **Panele szczegółów według makiety autora** (14.10.2026): tło #1C2127, nagłówek z ✕ 44×44, uchwyt w pasku 12 px. Treść w jednym układzie: metryka 28 px ze stanem jak w kafelku, wykres od krawędzi do krawędzi (`ui/chart.js`: podziałka co 48 px, oś Y po prawej, prognoza Kp jako słupki 0–9, zachmurzenie jako żółta linia), dane w dwóch kolumnach z „Oceną”, wyjaśnienie i źródła. Klocki w `ui/parts.js`. Panel chowa się w dół zamiast znikać. Szczegóły w `STYL.md`, „Panel szczegółów”.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

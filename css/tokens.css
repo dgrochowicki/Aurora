@@ -6,19 +6,21 @@
   --text: #ffffff;
   --sub: #afc7c2;
   --sub-65: rgba(175, 199, 194, 0.65);
-  --muted: #91aaa6;
   --green: #68f7bb;
+  --green-rgb: 104 247 187;
+  --yellow: #ffc867;
   --glow: #05805f;
   --glow-rgb: 5 128 95;
+  --violet: #c4a1ff;
   --line: rgba(255, 255, 255, 0.09);
   --card: rgba(174, 255, 233, 0.08);
   --card-border: rgba(174, 255, 233, 0.04);
   --card-soft: rgba(174, 255, 233, 0.04);
+  /* Tło pustej części pasków, mierników i linii siatki. */
+  --track: rgba(255, 255, 255, 0.1);
   --fab: rgba(16, 60, 54, 0.88);
+  --sheet: #1c2127;
   --surface: rgba(13, 32, 37, 0.78);
-  --sheet: #0c1b20;
-  --chip: #173036;
-  --field: #122a30;
   --on-accent: #062117;
   --warn: #ffc867;
   --sky-day: #c5ab72;
