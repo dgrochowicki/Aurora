@@ -6,7 +6,7 @@ import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart } from "../ui/chart.js";
 import { timeAxis, timeTrack, eventList } from "../ui/timeline.js";
-import { infoHero, infoChart, infoStats, infoCard, infoText, infoGrid, factorBar } from "../ui/parts.js";
+import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
 const placeOffset = (st) => st.offset ?? browserOffset();
@@ -98,7 +98,8 @@ export const DETAILS = {
     const s = st.space,
       now = Date.now(),
       off = placeOffset(st);
-    const blocks = (s.kpForecast || []).filter((r) => r.t + 3 * 3600000 > now).slice(0, 6);
+    // Doba prognozy: 8 bloków 3-godzinnych od bieżącego.
+    const blocks = (s.kpForecast || []).filter((r) => r.t + 3 * 3600000 > now).slice(0, 8);
     return {
       title: "Indeks Kp",
       source: "NOAA SWPC · indeks Kp i prognoza 3-dniowa",
@@ -108,8 +109,13 @@ export const DETAILS = {
         }) +
         infoChart(
           barChart(
-            blocks.map((r) => ({ t: r.t, v: r.kp, level: kpLevel(r.kp) })),
-            { label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${localHM(r.t + off)} ${fmtNum(r.kp)}`).join(", ")}`, offset: off },
+            // Cała skala 0–9, a słupek tym jaśniejszy, im wyższe Kp, czyli większa szansa na zorzę.
+            blocks.map((r) => ({ t: r.t, v: r.kp, a: 0.2 + 0.8 * Math.min(1, r.kp / 9) })),
+            {
+              label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${localHM(r.t + off)} ${fmtNum(r.kp)}`).join(", ")}`,
+              offset: off,
+              ticks: [9, 6, 3, 0],
+            },
           ),
         ) +
         infoStats([["Ocena", s.kp == null ? "—" : kpLabel(s.kp)]]) +
@@ -150,12 +156,21 @@ export const DETAILS = {
       source: "Open-Meteo · prognoza godzinowa",
       html:
         infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) }) +
+        chart(
+          rows.map((h) => ({ t: h.ms, v: h.cloud })),
+          {
+            label: `Zachmurzenie w najbliższych godzinach: ${rows.map((h) => `${h.label} ${h.cloud}%`).join(", ")}`,
+            offset: st.offset,
+            ticks: [100, 50, 0],
+            tone: "yellow",
+            empty: "Brak prognozy zachmurzenia.",
+          },
+        ) +
         infoStats([
           ["Chmury niskie", pct(r.low)],
           ["Chmury średnie", pct(r.mid)],
           ["Chmury wysokie", pct(r.high)],
         ]) +
-        infoCard("Kolejne godziny", infoGrid(rows.slice(1, 7).map((h) => [h.label, `${h.cloud}%`]))) +
         infoText(
           ...(change ? [change.sentence] : []),
           `Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,

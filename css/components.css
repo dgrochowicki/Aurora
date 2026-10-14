@@ -193,16 +193,16 @@
   color: var(--sub);
 }
 /* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
-[data-level="0"] {
+.data-tile[data-level="0"] {
   --state: var(--sub-65);
 }
-[data-level="1"] {
+.data-tile[data-level="1"] {
   --state: var(--sub);
 }
-[data-level="2"] {
+.data-tile[data-level="2"] {
   --state: var(--green);
 }
-[data-level="3"] {
+.data-tile[data-level="3"] {
   --state: var(--violet);
 }
 .data-tile[data-level] .tile-status::before {
@@ -544,37 +544,22 @@ html.sheet-open body {
   line-height: 18px;
   color: var(--sub-65);
 }
-/* Tymczasowo, do projektu: siatki, paski i oś nocy w kartach. */
+/* Tymczasowo, do projektu: paski i oś nocy w kartach. */
 .info-card .card-title {
   margin-bottom: 12px;
-}
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.info-grid > div {
-  padding: 12px 6px;
-  border-radius: 14px;
-  background: var(--card-soft);
-  text-align: center;
-  font-size: 0.8125rem;
-  color: var(--sub-65);
-}
-.info-grid strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 1.0625rem;
-  font-weight: 500;
-  color: var(--text);
 }
 /* Wykres w panelu: linia od krawędzi do krawędzi, podpisy osi 24 px od krawędzi, 13 px.
    Linie podziałki co 48 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
 .chart {
+  /* Kolor linii i gradientu; .is-yellow dla zachmurzenia. */
+  --chart: var(--green);
   padding-top: 22px;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--sub-65);
+}
+.chart.is-yellow {
+  --chart: var(--yellow);
 }
 .chart-plot {
   position: relative;
@@ -602,7 +587,7 @@ html.sheet-open body {
 }
 .chart-line {
   fill: none;
-  stroke: var(--green);
+  stroke: var(--chart);
   /* Tyle, ile miała linia starego wykresu (2 jednostki przy skali ok. 1,15). */
   stroke-width: 2.3px;
   stroke-linejoin: round;
@@ -621,7 +606,7 @@ html.sheet-open body {
   margin-top: 12px;
   padding-inline: 24px;
 }
-/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, kolor poziomu jak w kafelku. Godziny pod środkiem słupków. */
+/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, zielone o jasności zależnej od wartości. Godziny pod środkiem słupków. */
 .chart-bars {
   position: absolute;
   inset: 0 24px;
@@ -643,7 +628,8 @@ html.sheet-open body {
   width: 24px;
   min-height: 2px;
   border-radius: 4px 4px 0 0;
-  background: var(--state);
+  /* Jasność z --a (0–1) ustawia wykres: im wyższe Kp, tym jaśniejszy zielony. */
+  background: rgb(var(--green-rgb) / var(--a, 1));
 }
 .chart-bars span {
   position: absolute;

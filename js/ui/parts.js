@@ -1,6 +1,6 @@
 // Klocki paneli szczegółów. Każdy panel składa się z nich w tej samej kolejności:
 // metryka na górze (infoHero), wykres od krawędzi do krawędzi (infoChart), dane w poziomie (infoStats) i wyjaśnienie (infoText).
-// Treści, które nie mają jeszcze projektu (siatki, paski, oś nocy), leżą tymczasowo w kartach (infoCard).
+// Treści, które nie mają jeszcze projektu (paski, oś nocy), leżą tymczasowo w kartach (infoCard).
 import { clamp } from "../util.js";
 
 // Liczba z jednostką w jednym rozmiarze, pod nią stan. tight: jednostka bez spacji (np. „67%”).
@@ -23,10 +23,6 @@ export const infoCard = (title, html) =>
 
 // Wyjaśnienie, każdy argument to osobny akapit.
 export const infoText = (...paras) => `<div class="info-text">${paras.map((t) => `<p>${t}</p>`).join("")}</div>`;
-
-// Siatka małych pól, np. kolejne godziny albo bloki prognozy Kp.
-export const infoGrid = (list) =>
-  list.length ? `<div class="info-grid">${list.map(([k, v]) => `<div>${k}<strong>${v}</strong></div>`).join("")}</div>` : "";
 
 // Pasek udziału 0–1 z nazwą, wartością i podpowiedzią.
 export const factorBar = (name, v, text, hint) =>
