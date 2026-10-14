@@ -1,11 +1,12 @@
 // Treść paneli szczegółów po stuknięciu w kafelek. Każda funkcja dostaje stan strony głównej i zwraca {title, source, html}.
-// Układ wspólny dla wszystkich paneli: wynik ze stanem, karty z danymi, na końcu wyjaśnienie (klocki z ui/parts.js).
+// Układ wspólny dla wszystkich paneli: metryka ze stanem, wykres, dane, na końcu wyjaśnienie (klocki z ui/parts.js).
+// Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
 import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
-import { activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart } from "../ui/chart.js";
 import { timeAxis, timeTrack, eventList } from "../ui/timeline.js";
-import { infoHero, infoCard, infoText, infoRows, infoGrid, factorBar } from "../ui/parts.js";
+import { infoHero, infoChart, infoStats, infoCard, infoText, infoGrid, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
 const placeOffset = (st) => st.offset ?? browserOffset();
@@ -14,7 +15,8 @@ const ageText = (grid) => {
   return age == null ? "brak danych" : age < 1 ? "przed chwilą" : `${age} min temu`;
 };
 
-const chartCard = (series, opts) => infoCard("Ostatnie 2 godziny", lineChart(series || [], opts));
+const chart = (series, opts) => infoChart(lineChart(series || [], opts));
+const favor = (v, level) => (v == null ? "" : favorLabel(level(v)));
 
 export const DETAILS = {
   score(st) {
@@ -38,14 +40,11 @@ export const DETAILS = {
           status: first ? "" : "Bez prognozy pogody nie znamy ciemności i zachmurzenia, więc nie liczymy szansy.",
         }) +
         infoCard("Trzy części szansy", factors) +
-        infoCard(
-          "Dane",
-          infoRows([
-            ["Szerokość geomagnetyczna", `${fmtNum(magLat(loc.lat, loc.lon))}°`],
-            ["Kp teraz", space.kp == null ? "—" : fmtNum(space.kp)],
-            ["Model OVATION", ageText(grid)],
-          ]),
-        ) +
+        infoStats([
+          ["Szerokość geomagnetyczna", `${fmtNum(magLat(loc.lat, loc.lon))}°`],
+          ["Kp teraz", space.kp == null ? "—" : fmtNum(space.kp)],
+          ["Model OVATION", ageText(grid)],
+        ]) +
         infoText(
           "Szansa to iloczyn trzech części: aktywności zorzy w zasięgu wzroku, ciemności nieba i części nieba wolnej od chmur. Gdy którakolwiek jest bliska zera, cała szansa też spada do zera.",
         ),
@@ -59,15 +58,20 @@ export const DETAILS = {
       source: "NOAA SWPC · magnetometr satelity GOES",
       html:
         infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
-          status: s.goesRange == null ? "" : goesLabel(s.goesRange),
-          level: s.goesRange == null ? null : goesLevel(s.goesRange),
+          status: favor(s.goesRange, goesLevel),
         }) +
-        chartCard(s.goesSeries, {
+        chart(s.goesSeries, {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
           offset: placeOffset(st),
         }) +
-        infoCard("Dane", infoRows([["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`]])) +
-        infoText("Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp. Gwałtowny spadek, a potem szybki wzrost często towarzyszą subburzy, czyli nagłemu rozjaśnieniu zorzy. To pomiar z orbity, a nie ze stacji w Twojej okolicy."),
+        infoStats([
+          ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
+          ["Ocena", s.goesRange == null ? "—" : goesLabel(s.goesRange)],
+        ]) +
+        infoText(
+          "Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp.",
+          "Gwałtowny spadek, a potem szybki wzrost często towarzyszą subburzy, czyli nagłemu rozjaśnieniu zorzy. To pomiar z orbity, a nie ze stacji w Twojej okolicy.",
+        ),
     };
   },
 
@@ -79,11 +83,13 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
-          status: ref == null ? "" : bzLabel(ref),
-          level: ref == null ? null : bzLevel(ref),
+          status: favor(ref, bzLevel),
         }) +
-        chartCard(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoCard("Dane", infoRows([["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`]])) +
+        chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        infoStats([
+          ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
+          ["Ocena", ref == null ? "—" : bzLabel(ref)],
+        ]) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
   },
@@ -98,9 +104,9 @@ export const DETAILS = {
       source: "NOAA SWPC · indeks Kp i prognoza 3-dniowa",
       html:
         infoHero(s.kp == null ? null : fmtNum(s.kp), "/ 9", {
-          status: s.kp == null ? "" : kpLabel(s.kp),
-          level: s.kp == null ? null : kpLevel(s.kp),
+          status: favor(s.kp, kpLevel),
         }) +
+        infoStats([["Ocena", s.kp == null ? "—" : kpLabel(s.kp)]]) +
         infoCard("Prognoza w blokach 3-godzinnych", infoGrid(blocks.map((r) => [localHM(r.t + off), fmtNum(r.kp)]))) +
         infoText("Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu."),
     };
@@ -113,11 +119,13 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
-          status: s.wind == null ? "" : windLabel(s.wind),
-          level: s.wind == null ? null : windLevel(s.wind),
+          status: favor(s.wind, windLevel),
         }) +
-        chartCard(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoCard("Dane", infoRows([["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`]])) +
+        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        infoStats([
+          ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
+          ["Ocena", s.wind == null ? "—" : windLabel(s.wind)],
+        ]) +
         infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };
   },
@@ -137,17 +145,15 @@ export const DETAILS = {
       source: "Open-Meteo · prognoza godzinowa",
       html:
         infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) }) +
-        infoCard(
-          "Warstwy chmur",
-          infoRows([
-            ["Chmury niskie", pct(r.low)],
-            ["Chmury średnie", pct(r.mid)],
-            ["Chmury wysokie", pct(r.high)],
-          ]),
-        ) +
+        infoStats([
+          ["Chmury niskie", pct(r.low)],
+          ["Chmury średnie", pct(r.mid)],
+          ["Chmury wysokie", pct(r.high)],
+        ]) +
         infoCard("Kolejne godziny", infoGrid(rows.slice(1, 7).map((h) => [h.label, `${h.cloud}%`]))) +
         infoText(
-          `${change ? change.sentence + " " : ""}Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,
+          ...(change ? [change.sentence] : []),
+          `Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,
         ),
     };
   },

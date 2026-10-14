@@ -95,6 +95,6 @@ Od najstarszych:
 6. **Menu z dwóch przycisków** (29.09.2026): mapa i ekran miejsc na pełnym ekranie zamiast dolnej nawigacji, widoku „Miejsca” i przycisku ⌖. Kolor paska Safari z tła `html`/`body` (iOS pomija `theme-color`).
 7. **Porządki w dokumentacji** (29.09.2026): `UWAGI.md` zawiera tylko otwarte zadania i ustalenia, usunięty prototyp `example/`.
 8. **Poświata godzin zamiast karty „Najlepszy moment”** (13.10.2026): pigułki godzin świecą na zielono, najmocniej w najlepszej godzinie i słabiej w sąsiednich, żeby było widać, jak zorza narasta i gaśnie. Karta usunięta: zapowiedź z najlepszą godziną jest na dole karty szansy, kierunek patrzenia w zdaniu pod wynikiem, a tryb obserwacji w linii wybranej godziny. Werdykt i jego uzasadnienie w karcie szansy płyną jednym akapitem.
-9. **Wspólny styl paneli szczegółów** (14.10.2026): tło, typografia i karty ze strony głównej, wynik z kropką poziomu jak w kafelku, dane w kartach, wyjaśnienie na końcu. Klocki w `ui/parts.js` (`infoHero`, `infoCard`, `infoText`). Usunięte stare tokeny `--sheet`, `--field`, `--chip`, `--muted`.
+9. **Wspólny styl paneli szczegółów** (14.10.2026): tło, typografia i karty ze strony głównej, metryka ze stanem jak w kafelku, wykres od krawędzi do krawędzi, dane w dwóch kolumnach, wyjaśnienie na końcu. Klocki w `ui/parts.js` (`infoHero`, `infoChart`, `infoStats`, `infoText`, tymczasowo `infoCard`), wymiary z makiety autora w `STYL.md`. Usunięte stare tokeny `--sheet`, `--field`, `--chip`, `--muted`.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.

@@ -192,7 +192,7 @@
   line-height: 20px;
   color: var(--sub);
 }
-/* Kolor stanu pomiaru, w kafelku i na górze panelu: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
+/* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
 [data-level="0"] {
   --state: var(--sub-65);
 }
@@ -205,8 +205,7 @@
 [data-level="3"] {
   --state: var(--violet);
 }
-.data-tile[data-level] .tile-status::before,
-.info-hero[data-level] .info-status::before {
+.data-tile[data-level] .tile-status::before {
   content: "";
   display: inline-block;
   width: 8px;
@@ -318,7 +317,9 @@
 .info-sheet {
   max-height: 86vh;
   max-height: calc(100dvh - 40px - env(safe-area-inset-top));
-  padding: 0 var(--gutter);
+  /* Nagłówek i treść 24 px od krawędzi, jak w makiecie panelu. Padding mają osobno,
+     bo przewijana treść obcinałaby wykres, który sięga krawędzi panelu. */
+  padding: 0;
 }
 /* Mapa i ekran miejsc zajmują cały ekran. */
 .map-sheet,
@@ -349,9 +350,12 @@
 /* Nagłówek z makiety: 24 px nad i pod. Po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
 .info-sheet .sheet-header {
   margin-bottom: 0;
-  padding: 24px 0 24px var(--text-inset);
+  padding: 24px;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
+}
+.info-sheet .sheet-scroll {
+  padding-inline: 24px;
 }
 .info-sheet.scrolled .sheet-header {
   border-bottom-color: var(--card-border);
@@ -472,78 +476,75 @@ html.sheet-open body {
   margin: 12px 0;
   padding-inline: var(--text-inset);
 }
-/* Treść panelu szczegółów. Wspólny układ: wynik ze stanem, karty z danymi (.info-card, jak kafelki), wyjaśnienie wprost na tle.
-   Typografia i kolory te same co na stronie głównej (STYL.md). */
+/* Treść panelu szczegółów według makiety (STYL.md, „Panel szczegółów”): metryka, wykres od krawędzi do krawędzi,
+   dane w dwóch kolumnach, wyjaśnienie i źródła. Odstęp między blokami 20 px. */
 .info-body {
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
-}
-.info-hero {
-  padding: 8px var(--text-inset) 12px;
+  gap: 20px;
 }
 .info-value {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 500;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.02em;
-}
-.info-value small {
-  font-size: 0.9375rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: var(--sub);
 }
 .info-hero.is-text .info-value {
   font-size: 1.75rem;
   font-weight: 600;
-  line-height: 1.15;
 }
 .info-status {
-  margin: 8px 0 0;
+  margin: 0;
   font-size: 0.9375rem;
   line-height: 20px;
   color: var(--sub);
 }
-.info-card .card-title {
-  margin-bottom: 12px;
+/* Wykres sięga krawędzi panelu mimo paddingu 24 px. Tymczasowo, do przebudowy wykresu, rysunek ma wcięcie 12 px. */
+.info-chart {
+  margin-inline: -24px;
+  padding-inline: 12px;
+}
+.info-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  padding: 12px 0;
+}
+.info-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--track);
+  font-size: 0.8125rem;
+  line-height: 18px;
+}
+.info-stats span {
+  color: var(--sub);
+}
+.info-stats b {
+  font-weight: 600;
 }
 .info-text {
-  margin: 8px 0 0;
-  padding-inline: var(--text-inset);
-  font-size: 0.9375rem;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 18px;
   color: var(--sub);
+}
+.info-text p {
+  margin: 0;
+}
+.info-text p + p {
+  margin-top: 16px;
 }
 .info-sheet .source-note {
-  margin: 16px 0 0;
-  padding-inline: var(--text-inset);
+  margin: 20px 0 0;
   font-size: 0.8125rem;
-  line-height: 1.45;
+  line-height: 18px;
   color: var(--sub-65);
 }
-.info-rows > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--card-border);
-  font-size: 0.9375rem;
-  line-height: 20px;
-}
-.info-rows > div:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-.info-rows > div:last-child {
-  padding-bottom: 0;
-}
-.info-rows span {
-  color: var(--sub);
-}
-.info-rows b {
-  font-weight: 500;
-  text-align: right;
+/* Tymczasowo, do projektu: siatki, paski i oś nocy w kartach. */
+.info-card .card-title {
+  margin-bottom: 12px;
 }
 .info-grid {
   display: grid;

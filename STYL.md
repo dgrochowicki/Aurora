@@ -65,12 +65,16 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 
 Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
 
-- Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, boki 20 px (`--gutter`).
-- Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Tytuł 24 px od krawędzi panelu (20 + 4 wcięcia, jak tekst na stronie głównej). Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
-- Wynik (`infoHero`): liczba 40 px medium, biała. Jednostka 15 px `--sub`, a „%” w rozmiarze liczby. Pod spodem opis stanu 15 px `--sub` z kropką w kolorze poziomu 0–3, tak jak w kafelku. W panelu „Światło” zamiast liczby jest zdanie (28 px).
-- Dane w kartach (`infoCard`) wyglądających jak kafelki. Tytuł karty 13 px medium `--sub`, odstęp między kartami 12 px. W kartach są wiersze, siatka pól (`--card-soft`), wykres z 2 godzin, paski i oś nocy.
-- Na końcu wyjaśnienie 15/20 `--sub` i źródło 13 px `--sub-65`, oba wprost na tle z wcięciem 4 px.
-- Puste części pasków, mierników i linie siatki mają `--track` (biały 10%).
+- Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, nagłówek i treść 24 px od krawędzi.
+- Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
+- Treść: odstęp między blokami 20 px. Kolejno:
+  1. Metryka (`infoHero`): liczba z jednostką 48 px medium, biała, jednostka w tym samym rozmiarze. Zaraz pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px).
+  2. Wykres od krawędzi do krawędzi (`infoChart`). Wygląd wykresu robimy osobno.
+  3. Dane (`infoStats`): padding 12 px góra i dół, dwie kolumny z odstępem 20 px. W każdej etykieta 13 px `--sub`, pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
+  4. Wyjaśnienie 13/18 `--sub`, akapity co 16 px.
+  5. Źródła 13 px `--sub-65`.
+- Treści bez projektu (siatka prognozy Kp i godzin, paski „Skąd ten wynik”, oś nocy) leżą tymczasowo w kartach (`infoCard`).
+- Puste części pasków, mierników, kreski i linie siatki mają `--track` (biały 10%).
 
 ## Menu, mapa i miejsca
 
