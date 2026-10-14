@@ -5,7 +5,7 @@ import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart } from "../ui/chart.js";
-import { timeAxis, timeTrack, eventList } from "../ui/timeline.js";
+import { skyChart } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
@@ -206,20 +206,36 @@ export const DETAILS = {
     const sky = skyAt(Date.now(), st.loc.lat, st.loc.lon),
       illum = Math.round(sky.moonIllum * 100);
     const moonNow = `Księżyc jest teraz ${sky.moonAlt > 0 ? "nad" : "pod"} horyzontem, tarcza oświetlona w ${illum}%.`;
-    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)}–${hm(g.to)}`).join(", ") : "Brak pełnej ciemności";
+    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)}–${hm(g.to)}`).join(", ") : "Brak";
+    // Pierwszy wschód i zachód na osi nocy; kreska, gdy go nie ma.
+    const ev = (list, rise) => {
+      const e = list.find((e) => e.rise === rise);
+      return e ? hm(e.t) : "—";
+    };
     return {
       title: "Światło tej nocy",
       source: "Położenie Słońca i Księżyca liczone w przeglądarce",
       html:
         infoHero(title, "", { text: true, status: `${why} ${moonNow}`.trim() }) +
-        infoCard(
-          "Słońce i Księżyc tej nocy",
-          `${timeAxis(n, off)}
-<div class="light-label"><span>☀ Słońce</span><small>Teraz: ${phaseAt(Date.now(), st.loc).toLowerCase()}</small></div>${timeTrack(n, n.sun, { day: "", twilight: "", night: "Noc" }, "Oś Słońca: dzień, zmierzch i noc astronomiczna")}${eventList(n.sunEv, off)}
-<div class="light-label"><span>☾ Księżyc</span><small>${illum}% tarczy</small></div>${timeTrack(n, n.moon, { up: "Nad horyzontem", down: "Pod horyzontem" }, "Oś Księżyca: nad i pod horyzontem")}${eventList(n.moonEv, off)}`,
+        infoChart(
+          skyChart(n, {
+            offset: off,
+            illum: sky.moonIllum,
+            label: `Wysokość Słońca i Księżyca tej nocy. Najciemniej: ${windows}.`,
+          }),
         ) +
-        infoCard("Najciemniejsze niebo", `<div class="dark-window">${windows}</div>`) +
-        infoText("Noc astronomiczna, a Księżyc pod horyzontem albo bardzo słaby. Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy."),
+        infoStats([
+          ["Zachód Słońca", ev(n.sunEv, false)],
+          ["Wschód Słońca", ev(n.sunEv, true)],
+          ["Wschód Księżyca", ev(n.moonEv, true)],
+          ["Zachód Księżyca", ev(n.moonEv, false)],
+          ["Najciemniej", windows],
+          ["Tarcza Księżyca", `${illum}%`],
+        ]) +
+        infoText(
+          "Łuki pokazują wysokość Słońca i Księżyca nad horyzontem. Najciemniej jest wtedy, gdy Słońce zejdzie poniżej −18° (noc astronomiczna), a Księżyc jest pod horyzontem albo bardzo słaby. Te godziny zaznacza zielony pas.",
+          "Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy.",
+        ),
     };
   },
 };
