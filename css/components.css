@@ -192,20 +192,21 @@
   line-height: 20px;
   color: var(--sub);
 }
-/* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
-.data-tile[data-level="0"] {
+/* Kolor stanu pomiaru, w kafelku i na górze panelu: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
+[data-level="0"] {
   --state: var(--sub-65);
 }
-.data-tile[data-level="1"] {
+[data-level="1"] {
   --state: var(--sub);
 }
-.data-tile[data-level="2"] {
+[data-level="2"] {
   --state: var(--green);
 }
-.data-tile[data-level="3"] {
+[data-level="3"] {
   --state: var(--violet);
 }
-.data-tile[data-level] .tile-status::before {
+.data-tile[data-level] .tile-status::before,
+.info-hero[data-level] .info-status::before {
   content: "";
   display: inline-block;
   width: 8px;
@@ -234,7 +235,7 @@
   flex: 1;
   height: 6px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--track);
 }
 .meter i.on {
   background: var(--state);
@@ -301,9 +302,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--sheet);
+  /* Tło jak na stronie głównej: gradient u góry przechodzi w --bg. */
+  background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 360px) var(--bg);
   border-radius: 28px 28px 0 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--card-border);
   transform: translate(-50%, 100%);
   transition: transform 0.28s cubic-bezier(0.4, 0, 1, 1);
 }
@@ -317,7 +319,7 @@
 .info-sheet {
   max-height: 86vh;
   max-height: calc(100dvh - 40px - env(safe-area-inset-top));
-  padding: 9px 20px 0;
+  padding: 9px var(--gutter) 0;
 }
 /* Mapa i ekran miejsc zajmują cały ekran. */
 .map-sheet,
@@ -348,12 +350,12 @@
 /* Odstęp pod nagłówkiem, a po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
 .info-sheet .sheet-header {
   margin-bottom: 0;
-  padding-bottom: 12px;
+  padding: 0 0 12px var(--text-inset);
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
 .info-sheet.scrolled .sheet-header {
-  border-bottom-color: var(--line);
+  border-bottom-color: var(--card-border);
 }
 .sheet-scroll {
   flex: 1 1 auto;
@@ -382,10 +384,6 @@ html.sheet-open body {
 .leaflet-control-attribution {
   font-size: 9px !important;
 }
-.info-sheet .source-note {
-  font-size: 0.68rem;
-  color: var(--muted);
-}
 .hourly::-webkit-scrollbar {
   display: none;
 }
@@ -393,8 +391,8 @@ html.sheet-open body {
   width: 38px;
   height: 4px;
   border-radius: 4px;
-  background: #49605e;
-  margin: 0 auto 20px;
+  background: var(--track);
+  margin: 0 auto 16px;
 }
 .sheet-header {
   display: flex;
@@ -402,17 +400,31 @@ html.sheet-open body {
   align-items: center;
 }
 .sheet-header h2 {
-  font-size: 1.25rem;
   margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
+/* ✕ jak przy mapie, tylko na tle karty. */
 .sheet-header button {
-  border: 0;
-  background: var(--chip);
-  color: var(--text);
-  width: 36px;
-  height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--card-border);
   border-radius: 50%;
-  font-size: 1.4rem;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--press);
+}
+.sheet-header button:active {
+  transform: scale(var(--press-scale));
+}
+.sheet-header button .icon {
+  width: 18px;
+  height: 18px;
 }
 .search-field {
   flex: none;
@@ -447,82 +459,113 @@ html.sheet-open body {
   margin: 12px 0;
   padding-inline: var(--text-inset);
 }
+/* Treść panelu szczegółów. Wspólny układ: wynik ze stanem, karty z danymi (.info-card, jak kafelki), wyjaśnienie wprost na tle.
+   Typografia i kolory te same co na stronie głównej (STYL.md). */
 .info-body {
-  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
 }
-.info-body p {
-  color: #bed0cd;
-  font-size: 0.86rem;
-  line-height: 1.55;
+.info-hero {
+  padding: 8px var(--text-inset) 12px;
 }
 .info-value {
-  font-size: 2.4rem;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  color: var(--green);
-  margin: 6px 0 10px;
+  font-size: 2.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 .info-value small {
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 400;
   letter-spacing: 0;
-  color: var(--muted);
+  color: var(--sub);
 }
-.info-sub {
-  font-size: 0.8rem;
-  color: var(--muted);
-  font-weight: 500;
-  margin: 16px 0 8px;
+.info-hero.is-text .info-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.info-status {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  line-height: 20px;
+  color: var(--sub);
+}
+.info-card .card-title {
+  margin-bottom: 12px;
+}
+.info-text {
+  margin: 8px 0 0;
+  padding-inline: var(--text-inset);
+  font-size: 0.9375rem;
+  line-height: 20px;
+  color: var(--sub);
+}
+.info-sheet .source-note {
+  margin: 16px 0 0;
+  padding-inline: var(--text-inset);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--sub-65);
 }
 .info-rows > div {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.84rem;
+  padding: 12px 0;
+  border-top: 1px solid var(--card-border);
+  font-size: 0.9375rem;
+  line-height: 20px;
+}
+.info-rows > div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.info-rows > div:last-child {
+  padding-bottom: 0;
 }
 .info-rows span {
-  color: var(--muted);
+  color: var(--sub);
 }
 .info-rows b {
-  font-weight: 600;
+  font-weight: 500;
+  text-align: right;
 }
 .info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: 16px 0;
 }
 .info-grid > div {
-  background: var(--field);
-  border-radius: 13px;
-  padding: 11px 6px;
+  padding: 12px 6px;
+  border-radius: 14px;
+  background: var(--card-soft);
   text-align: center;
-  font-size: 0.72rem;
-  color: var(--muted);
+  font-size: 0.8125rem;
+  color: var(--sub-65);
 }
 .info-grid strong {
   display: block;
-  font-size: 1.15rem;
-  color: var(--text);
   margin-top: 4px;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--text);
 }
 .chart {
   display: block;
   width: 100%;
   height: auto;
-  margin: 6px 0 8px;
   overflow: visible;
 }
 .chart text {
-  fill: var(--muted);
+  fill: var(--sub-65);
   font-size: 10px;
   font-family: inherit;
 }
 .chart .gridline {
   fill: none;
-  stroke: var(--line);
+  stroke: var(--track);
   stroke-width: 0.8;
 }
 .chart .signal {
@@ -535,19 +578,16 @@ html.sheet-open body {
   stroke: var(--warn);
 }
 .chart-empty {
-  font-size: 0.8rem;
-}
-.light-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 4px 0 6px;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--sub-65);
 }
 .time-axis {
   position: relative;
-  height: 18px;
-  margin: 22px 0 8px;
-  color: var(--muted);
-  font-size: 0.66rem;
+  height: 16px;
+  margin-bottom: 4px;
+  color: var(--sub-65);
+  font-size: 0.6875rem;
 }
 .time-axis span {
   position: absolute;
@@ -557,12 +597,14 @@ html.sheet-open body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.78rem;
-  margin: 16px 0 8px;
+  margin: 12px 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
 }
 .light-label small {
-  color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--sub-65);
 }
 .time-track {
   position: relative;
@@ -570,7 +612,7 @@ html.sheet-open body {
   height: 28px;
   border-radius: 8px;
   overflow: hidden;
-  font-size: 0.66rem;
+  font-size: 0.6875rem;
 }
 .time-track .seg {
   display: flex;
@@ -595,8 +637,8 @@ html.sheet-open body {
   color: #101d2c;
 }
 .seg.down {
-  background: var(--chip);
-  color: var(--muted);
+  background: var(--track);
+  color: var(--sub-65);
 }
 .now-line {
   position: absolute;
@@ -611,52 +653,57 @@ html.sheet-open body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px 12px;
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-top: 7px;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  color: var(--sub-65);
 }
 .event-list b {
+  font-weight: 500;
   color: var(--text);
-  font-weight: 600;
 }
 .dark-window {
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-.dark-window strong {
-  font-size: 0.82rem;
-}
-.dark-window p {
-  font-size: 0.76rem !important;
-  margin: 4px 0 0;
+  font-size: 1.3125rem;
+  line-height: 27px;
+  font-weight: 500;
 }
 .factor {
   padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--card-border);
+}
+.factor:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+.factor:last-child {
+  padding-bottom: 0;
 }
 .factor-head {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 0.84rem;
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 20px;
+}
+.factor-head b {
+  font-weight: 500;
 }
 .factor-bar {
-  height: 7px;
-  border-radius: 7px;
-  background: var(--chip);
-  margin: 8px 0 6px;
+  height: 6px;
+  margin: 8px 0;
+  border-radius: 3px;
+  background: var(--track);
   overflow: hidden;
 }
 .factor-bar i {
   display: block;
   height: 100%;
-  border-radius: 7px;
+  border-radius: 3px;
   background: var(--green);
 }
 .factor small {
-  color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sub-65);
 }
 
 /* Mapa na pełnym ekranie: ✕ w prawym górnym rogu, legenda w karcie na dole. */

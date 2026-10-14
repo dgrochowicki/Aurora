@@ -1,10 +1,11 @@
 // Treść paneli szczegółów po stuknięciu w kafelek. Każda funkcja dostaje stan strony głównej i zwraca {title, source, html}.
+// Układ wspólny dla wszystkich paneli: wynik ze stanem, karty z danymi, na końcu wyjaśnienie (klocki z ui/parts.js).
 import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
-import { activityLabel, cloudLabel, bzLabel, kpLabel, goesLabel, windLabel, moonLabel } from "../labels.js";
+import { activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart } from "../ui/chart.js";
 import { timeAxis, timeTrack, eventList } from "../ui/timeline.js";
-import { infoValue, infoRows, infoGrid, infoSub, factorBar } from "../ui/parts.js";
+import { infoHero, infoCard, infoText, infoRows, infoGrid, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
 const placeOffset = (st) => st.offset ?? browserOffset();
@@ -12,6 +13,8 @@ const ageText = (grid) => {
   const age = grid.time ? Math.round((Date.now() - Date.parse(grid.time)) / 60000) : null;
   return age == null ? "brak danych" : age < 1 ? "przed chwilą" : `${age} min temu`;
 };
+
+const chartCard = (series, opts) => infoCard("Ostatnie 2 godziny", lineChart(series || [], opts));
 
 export const DETAILS = {
   score(st) {
@@ -25,19 +28,27 @@ export const DETAILS = {
         ) +
         factorBar("Ciemność", first.dark, `${Math.round(first.dark * 100)}%`, `${phaseAt(Date.now(), loc)} · ${moonLabel(first.sky)}`) +
         factorBar("Czyste niebo", first.clear, `${Math.round(first.clear * 100)}%`, "Niskie chmury ważą najwięcej, wysokie najmniej.")
-      : "<p>Bez prognozy pogody nie znamy ciemności i zachmurzenia, więc nie liczymy szansy.</p>";
+      : "";
     return {
       title: "Skąd ten wynik",
       source: "NOAA SWPC · model OVATION i Kp · Open-Meteo · obliczenia w przeglądarce",
       html:
-        (first ? infoValue(`${first.score}<small>%</small>`) : '<div class="info-value">—</div>') +
-        "<p>Szansa to iloczyn trzech części: aktywności zorzy w zasięgu wzroku, ciemności nieba i części nieba wolnej od chmur. Gdy którakolwiek jest bliska zera, cała szansa też spada do zera.</p>" +
-        factors +
-        infoRows([
-          ["Szerokość geomagnetyczna", `${fmtNum(magLat(loc.lat, loc.lon))}°`],
-          ["Kp teraz", space.kp == null ? "—" : fmtNum(space.kp)],
-          ["Model OVATION", ageText(grid)],
-        ]),
+        infoHero(first ? first.score : null, "%", {
+          tight: true,
+          status: first ? "" : "Bez prognozy pogody nie znamy ciemności i zachmurzenia, więc nie liczymy szansy.",
+        }) +
+        infoCard("Trzy części szansy", factors) +
+        infoCard(
+          "Dane",
+          infoRows([
+            ["Szerokość geomagnetyczna", `${fmtNum(magLat(loc.lat, loc.lon))}°`],
+            ["Kp teraz", space.kp == null ? "—" : fmtNum(space.kp)],
+            ["Model OVATION", ageText(grid)],
+          ]),
+        ) +
+        infoText(
+          "Szansa to iloczyn trzech części: aktywności zorzy w zasięgu wzroku, ciemności nieba i części nieba wolnej od chmur. Gdy którakolwiek jest bliska zera, cała szansa też spada do zera.",
+        ),
     };
   },
 
@@ -47,16 +58,16 @@ export const DETAILS = {
       title: "Magnetometr",
       source: "NOAA SWPC · magnetometr satelity GOES",
       html:
-        infoValue(s.goes == null ? null : fmtNum(s.goes), "nT") +
-        lineChart(s.goesSeries || [], {
+        infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
+          status: s.goesRange == null ? "" : goesLabel(s.goesRange),
+          level: s.goesRange == null ? null : goesLevel(s.goesRange),
+        }) +
+        chartCard(s.goesSeries, {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
           offset: placeOffset(st),
         }) +
-        infoRows([
-          ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
-          ["Ocena", s.goesRange == null ? "—" : goesLabel(s.goesRange)],
-        ]) +
-        "<p>Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp. Gwałtowny spadek, a potem szybki wzrost często towarzyszą subburzy, czyli nagłemu rozjaśnieniu zorzy. To pomiar z orbity, a nie ze stacji w Twojej okolicy.</p>",
+        infoCard("Dane", infoRows([["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`]])) +
+        infoText("Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp. Gwałtowny spadek, a potem szybki wzrost często towarzyszą subburzy, czyli nagłemu rozjaśnieniu zorzy. To pomiar z orbity, a nie ze stacji w Twojej okolicy."),
     };
   },
 
@@ -67,13 +78,13 @@ export const DETAILS = {
       title: "Pole wiatru słonecznego · Bz",
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
-        infoValue(s.bz == null ? null : fmtNum(s.bz), "nT") +
-        lineChart(s.bzSeries || [], { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoRows([
-          ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
-          ["Ocena", ref == null ? "—" : bzLabel(ref)],
-        ]) +
-        "<p>Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy.</p>",
+        infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
+          status: ref == null ? "" : bzLabel(ref),
+          level: ref == null ? null : bzLevel(ref),
+        }) +
+        chartCard(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        infoCard("Dane", infoRows([["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`]])) +
+        infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
   },
 
@@ -86,10 +97,12 @@ export const DETAILS = {
       title: "Indeks Kp",
       source: "NOAA SWPC · indeks Kp i prognoza 3-dniowa",
       html:
-        infoValue(s.kp == null ? null : fmtNum(s.kp), s.kp == null ? "" : `/ 9 · ${kpLabel(s.kp).toLowerCase()}`) +
-        (blocks.length ? infoSub("Prognoza w blokach 3-godzinnych") : "") +
-        infoGrid(blocks.map((r) => [localHM(r.t + off), fmtNum(r.kp)])) +
-        "<p>Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu.</p>",
+        infoHero(s.kp == null ? null : fmtNum(s.kp), "/ 9", {
+          status: s.kp == null ? "" : kpLabel(s.kp),
+          level: s.kp == null ? null : kpLevel(s.kp),
+        }) +
+        infoCard("Prognoza w blokach 3-godzinnych", infoGrid(blocks.map((r) => [localHM(r.t + off), fmtNum(r.kp)]))) +
+        infoText("Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu."),
     };
   },
 
@@ -99,13 +112,13 @@ export const DETAILS = {
       title: "Wiatr słoneczny",
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
-        infoValue(s.wind == null ? null : Math.round(s.wind), "km/s") +
-        lineChart(s.windSeries || [], { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoRows([
-          ["Ocena", s.wind == null ? "—" : windLabel(s.wind)],
-          ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
-        ]) +
-        "<p>Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz.</p>",
+        infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
+          status: s.wind == null ? "" : windLabel(s.wind),
+          level: s.wind == null ? null : windLevel(s.wind),
+        }) +
+        chartCard(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        infoCard("Dane", infoRows([["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`]])) +
+        infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };
   },
 
@@ -115,7 +128,7 @@ export const DETAILS = {
       return {
         title: "Zachmurzenie",
         source: "Open-Meteo",
-        html: "<p>Nie udało się pobrać prognozy pogody. Spróbuj ponownie za chwilę.</p>",
+        html: infoHero(null) + infoText("Nie udało się pobrać prognozy pogody. Spróbuj ponownie za chwilę."),
       };
     const r = rows[0],
       pct = (v) => (v == null ? "—" : `${v}%`);
@@ -123,14 +136,19 @@ export const DETAILS = {
       title: "Zachmurzenie",
       source: "Open-Meteo · prognoza godzinowa",
       html:
-        infoValue(`${Math.round(r.cloud)}<small>% · ${cloudLabel(r.cloud).toLowerCase()}</small>`) +
-        infoRows([
-          ["Chmury niskie", pct(r.low)],
-          ["Chmury średnie", pct(r.mid)],
-          ["Chmury wysokie", pct(r.high)],
-        ]) +
-        infoGrid(rows.slice(1, 7).map((h) => [h.label, `${h.cloud}%`])) +
-        `<p>${change ? change.sentence + " " : ""}Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.</p>`,
+        infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) }) +
+        infoCard(
+          "Warstwy chmur",
+          infoRows([
+            ["Chmury niskie", pct(r.low)],
+            ["Chmury średnie", pct(r.mid)],
+            ["Chmury wysokie", pct(r.high)],
+          ]),
+        ) +
+        infoCard("Kolejne godziny", infoGrid(rows.slice(1, 7).map((h) => [h.label, `${h.cloud}%`]))) +
+        infoText(
+          `${change ? change.sentence + " " : ""}Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,
+        ),
     };
   },
 
@@ -140,7 +158,7 @@ export const DETAILS = {
       return {
         title: "Światło tej nocy",
         source: "Obliczenia w przeglądarce",
-        html: "<p>Bez prognozy pogody nie znamy strefy czasowej miejsca, więc nie pokazujemy godzin.</p>",
+        html: infoHero(null) + infoText("Bez prognozy pogody nie znamy strefy czasowej miejsca, więc nie pokazujemy godzin."),
       };
     const off = st.offset,
       hm = (ms) => localHM(ms + off),
@@ -159,15 +177,20 @@ export const DETAILS = {
     const sky = skyAt(Date.now(), st.loc.lat, st.loc.lon),
       illum = Math.round(sky.moonIllum * 100);
     const moonNow = `Księżyc jest teraz ${sky.moonAlt > 0 ? "nad" : "pod"} horyzontem, tarcza oświetlona w ${illum}%.`;
-    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)}–${hm(g.to)}`).join(", ") + " · najciemniejsze niebo" : "Brak pełnej ciemności";
+    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)}–${hm(g.to)}`).join(", ") : "Brak pełnej ciemności";
     return {
       title: "Światło tej nocy",
       source: "Położenie Słońca i Księżyca liczone w przeglądarce",
-      html: `<div class="light-title">${title}</div><p>${why} ${moonNow}</p>
-${timeAxis(n, off)}
+      html:
+        infoHero(title, "", { text: true, status: `${why} ${moonNow}`.trim() }) +
+        infoCard(
+          "Słońce i Księżyc tej nocy",
+          `${timeAxis(n, off)}
 <div class="light-label"><span>☀ Słońce</span><small>Teraz: ${phaseAt(Date.now(), st.loc).toLowerCase()}</small></div>${timeTrack(n, n.sun, { day: "", twilight: "", night: "Noc" }, "Oś Słońca: dzień, zmierzch i noc astronomiczna")}${eventList(n.sunEv, off)}
-<div class="light-label"><span>☾ Księżyc</span><small>${illum}% tarczy</small></div>${timeTrack(n, n.moon, { up: "Nad horyzontem", down: "Pod horyzontem" }, "Oś Księżyca: nad i pod horyzontem")}${eventList(n.moonEv, off)}
-<div class="dark-window"><strong>${windows}</strong><p>Noc astronomiczna, a Księżyc pod horyzontem albo bardzo słaby. Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy.</p></div>`,
+<div class="light-label"><span>☾ Księżyc</span><small>${illum}% tarczy</small></div>${timeTrack(n, n.moon, { up: "Nad horyzontem", down: "Pod horyzontem" }, "Oś Księżyca: nad i pod horyzontem")}${eventList(n.moonEv, off)}`,
+        ) +
+        infoCard("Najciemniejsze niebo", `<div class="dark-window">${windows}</div>`) +
+        infoText("Noc astronomiczna, a Księżyc pod horyzontem albo bardzo słaby. Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy."),
     };
   },
 };

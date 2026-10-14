@@ -60,6 +60,17 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 - Panele wysuwają się od dołu (0,4 s), a tło się przyciemnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
 - Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
 
+## Panel szczegółów
+
+Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
+
+- Tło jak strona: gradient od `--bg-top` do `--bg`, obwódka `--card-border`, zaokrąglenie u góry 28 px, boki 20 px (`--gutter`).
+- Nagłówek: tytuł 20 px semibold, ✕ 40 px w kółku z tłem karty (ikona Phosphor). Po przewinięciu pod nagłówkiem pojawia się linia.
+- Wynik (`infoHero`): liczba 40 px medium, biała. Jednostka 15 px `--sub`, a „%” w rozmiarze liczby. Pod spodem opis stanu 15 px `--sub` z kropką w kolorze poziomu 0–3, tak jak w kafelku. W panelu „Światło” zamiast liczby jest zdanie (28 px).
+- Dane w kartach (`infoCard`) wyglądających jak kafelki. Tytuł karty 13 px medium `--sub`, odstęp między kartami 12 px. W kartach są wiersze, siatka pól (`--card-soft`), wykres z 2 godzin, paski i oś nocy.
+- Na końcu wyjaśnienie 15/20 `--sub` i źródło 13 px `--sub-65`, oba wprost na tle z wcięciem 4 px.
+- Puste części pasków, mierników i linie siatki mają `--track` (biały 10%).
+
 ## Menu, mapa i miejsca
 
 - Dwa pływające przyciski 72×48, zaokrąglenie 24, 24 px od krawędzi i od dołu, tło `--fab` (#103C36, 88%) z rozmyciem. Globus otwiera mapę, strzałka ekran miejsc.
@@ -73,5 +84,5 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów mają jeszcze stary styl (tło #0C1B20, pola #122A30, szary #91AAA6). Autor zaprojektuje je sam; do tego czasu nie ujednolicamy.
+- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Wykres Bz ma jeszcze pomarańczową część poniżej zera, choć to ona sprzyja zorzy.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.

@@ -1,9 +1,19 @@
-// Powtarzalne fragmenty paneli szczegółów.
+// Klocki paneli szczegółów. Każdy panel składa się z nich w tej samej kolejności:
+// wynik na górze (infoHero), karty z danymi (infoCard) i tekst wyjaśnienia wprost na tle (infoText).
 import { clamp } from "../util.js";
 
-// Duża wartość na górze panelu. unit trafia do mniejszego, szarego dopisku.
-export const infoValue = (value, unit = "") =>
-  `<div class="info-value">${value == null ? "Brak danych" : `${value}${unit ? ` <small>${unit}</small>` : ""}`}</div>`;
+// Duża wartość na górze panelu, pod nią opis stanu. level (0–3) koloruje kropkę przy opisie tak jak w kafelku.
+// tight: jednostka bez spacji i w rozmiarze liczby (np. „67%”, jak wynik na stronie głównej), text: zamiast liczby krótkie zdanie (np. „Ciemniej po 23:10”).
+export const infoHero = (value, unit = "", { status = "", level = null, tight = false, text = false } = {}) => {
+  const val = value == null ? "Brak danych" : `${value}${!unit ? "" : tight ? unit : ` <small>${unit}</small>`}`;
+  return `<div class="info-hero${text ? " is-text" : ""}"${level == null ? "" : ` data-level="${level}"`}><div class="info-value">${val}</div>${status ? `<p class="info-status">${status}</p>` : ""}</div>`;
+};
+
+// Karta z tytułem jak na stronie głównej. Pusta treść nie tworzy karty.
+export const infoCard = (title, html) =>
+  html ? `<section class="info-card card">${title ? `<h3 class="card-title">${title}</h3>` : ""}${html}</section>` : "";
+
+export const infoText = (text) => `<p class="info-text">${text}</p>`;
 
 // Wiersze „etykieta — wartość”.
 export const infoRows = (list) =>
@@ -12,8 +22,6 @@ export const infoRows = (list) =>
 // Siatka małych pól, np. kolejne godziny albo bloki prognozy Kp.
 export const infoGrid = (list) =>
   list.length ? `<div class="info-grid">${list.map(([k, v]) => `<div>${k}<strong>${v}</strong></div>`).join("")}</div>` : "";
-
-export const infoSub = (text) => `<h3 class="info-sub">${text}</h3>`;
 
 // Pasek udziału 0–1 z nazwą, wartością i podpowiedzią.
 export const factorBar = (name, v, text, hint) =>

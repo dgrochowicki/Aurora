@@ -7,7 +7,7 @@ import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
-import { weatherIcon, phaseIcon } from "../ui/icons.js";
+import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
 import { DETAILS } from "./details.js";
 
 const els = {
@@ -49,6 +49,7 @@ let state = null;
 const info = createSheet({ sheet: $("#infoSheet"), backdrop: $("#detailBackdrop"), closeButton: $("#closeInfo") });
 
 export function initHome() {
+  $("#closeInfo").innerHTML = icon("x");
   renderTiles(els.activityTiles, ACTIVITY_TILES);
   renderTiles(els.conditionTiles, CONDITION_TILES);
   document.querySelectorAll("[data-detail]").forEach((b) => (b.onclick = () => openDetail(b.dataset.detail, b)));
