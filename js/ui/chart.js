@@ -1,8 +1,8 @@
 // Wykres liniowy z 2 godzin w panelu szczegółów. Linia sięga krawędzi panelu, podpisy osi mają wcięcie 24 px.
-// Podziałka: co najmniej 3 przerywane linie co 32 px, liczby osi Y po prawej, 4 px nad linią.
+// Podziałka: co najmniej 3 przerywane linie co 48 px, liczby osi Y po prawej, 4 px nad linią.
 import { esc, fmtNum, localHM } from "../util.js";
 
-const ROW = 32;
+const ROW = 48;
 
 // „Ładny” krok podziałki: 1, 2, 2,5 albo 5 razy potęga dziesięciu, nie mniejszy niż raw.
 const niceStep = (raw) => {

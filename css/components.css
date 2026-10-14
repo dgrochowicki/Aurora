@@ -484,13 +484,12 @@ html.sheet-open body {
   gap: 20px;
 }
 .info-value {
-  font-size: 3rem;
+  font-size: 1.75rem;
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 34px;
   letter-spacing: -0.02em;
 }
 .info-hero.is-text .info-value {
-  font-size: 1.75rem;
   font-weight: 600;
 }
 .info-status {
@@ -569,7 +568,7 @@ html.sheet-open body {
   color: var(--text);
 }
 /* Wykres w panelu: linia od krawędzi do krawędzi, podpisy osi 24 px od krawędzi, 13 px.
-   Linie podziałki co 32 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
+   Linie podziałki co 48 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
 .chart {
   padding-top: 22px;
   font-size: 0.8125rem;
