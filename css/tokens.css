@@ -17,6 +17,7 @@
   /* Tło pustej części pasków, mierników i linii siatki. */
   --track: rgba(255, 255, 255, 0.1);
   --fab: rgba(16, 60, 54, 0.88);
+  --sheet: #1c2127;
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
   --warn: #ffc867;

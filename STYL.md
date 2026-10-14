@@ -21,6 +21,7 @@ Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` 
 | `--card` | #AEFFE9 8% | tło kart i kafelków |
 | `--card-border` | #AEFFE9 4% | obwódka kart |
 | `--glow` | #05805F | poświata w karcie szansy |
+| `--sheet` | #1C2127 | tło panelu szczegółów |
 
 Autor chciał notek przy 50% krycia. Przy tak małym tekście kontrast wynosi wtedy 3,4:1, a minimum to 4,5:1, więc na razie jest 65%. Pełną paletę sprawdzimy razem, gdy będzie gotowa.
 
@@ -64,7 +65,7 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 
 Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
 
-- Tło jak strona: gradient od `--bg-top` do `--bg`, obwódka `--card-border`, zaokrąglenie u góry 28 px, boki 20 px (`--gutter`).
+- Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, boki 20 px (`--gutter`).
 - Nagłówek: tytuł 20 px semibold, ✕ 40 px w kółku z tłem karty (ikona Phosphor). Po przewinięciu pod nagłówkiem pojawia się linia.
 - Wynik (`infoHero`): liczba 40 px medium, biała. Jednostka 15 px `--sub`, a „%” w rozmiarze liczby. Pod spodem opis stanu 15 px `--sub` z kropką w kolorze poziomu 0–3, tak jak w kafelku. W panelu „Światło” zamiast liczby jest zdanie (28 px).
 - Dane w kartach (`infoCard`) wyglądających jak kafelki. Tytuł karty 13 px medium `--sub`, odstęp między kartami 12 px. W kartach są wiersze, siatka pól (`--card-soft`), wykres z 2 godzin, paski i oś nocy.
