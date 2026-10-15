@@ -41,7 +41,7 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 ## Zorza w tle
 
-Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny). Przy „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Stoją w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się nad nimi. Trzecia, mniejsza zielona plama zmienia kształt zorzy. Ruch jest delikatny: przesunięcie ±3%, powiększenie do 110%, obrót ±3° (13–23 s), a jasność oddycha od 70% do 100% (8–11 s). Przy zmianie poziomu plamy przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
+Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny, „Brak” jak „Bardzo mała”). Przy „Braku” i „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Stoją w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się nad nimi. Trzecia, mniejsza zielona plama zmienia kształt zorzy. Ruch jest delikatny: przesunięcie ±3%, powiększenie do 110%, obrót ±3° (13–23 s), a jasność oddycha od 70% do 100% (8–11 s). Przy zmianie poziomu plamy przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
 
 Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytułu „Aktywność zorzy” po prawej jest poziom aktywności (Niska / Umiarkowana / Wysoka), 15 px regular `--sub`.
 
@@ -49,7 +49,7 @@ Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytu�
 
 W kodzie `.chance`. Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`), padding 32 px nad i pod. Nad nim 16 px od nagłówka z datą, pod nim 16 px do sekcji „Najbliższe godziny”. Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px (tylko między opisem szansy a akapitem 16 px):
 1. tytuł „Szansa na zorzę” (13 px, `--sub`);
-2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Bardzo mała <5%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
+2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Brak 0–2%, Bardzo mała <10%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
 3. akapit 15 px `--sub`: zdanie o zorzy (z kierunkiem patrzenia, gdy jest szansa) i zdanie o warunkach obserwacji (`conditionsText`: za jasno albo dobre / umiarkowane / słabe według chmur i jasnego Księżyca, z procentem zachmurzenia);
 4. zapowiedź 13 px `--sub-65`: zmiana chmur i najlepsza godzina, przy innej strefie także czas użytkownika.
 
