@@ -90,10 +90,10 @@
     aurora-drift 18s ease-in-out infinite alternate,
     aurora-breath 8s ease-in-out infinite alternate;
 }
-/* Mniejsza zielona plama na lewo i niżej od dużej, w innym tempie: kształt zorzy się zmienia, a nie tylko przesuwa. */
+/* Mniejsza zielona plama na lewo i wyżej od dużej, w innym tempie: kształt zorzy się zmienia, a nie tylko przesuwa. */
 .aurora-green-2 {
   left: calc(var(--g-x) - var(--g-w) * 0.28);
-  top: calc(var(--g-y) + var(--g-h) * 0.18);
+  top: calc(var(--g-y) - var(--g-h) * 0.1);
   width: calc(var(--g-w) * 0.55);
   height: calc(var(--g-h) * 0.55);
   opacity: calc(var(--g-o) * 0.8 * var(--breath));
@@ -127,12 +127,12 @@
   --v-x: 60%; --v-y: 380px; --v-w: 460px; --v-h: 320px; --v-o: 0.9;
 }
 .aurora-sky[data-level="3"] {
-  --g-x: 64%; --g-y: 150px; --g-w: 760px; --g-h: 580px; --g-o: 0.85;
-  --v-x: 48%; --v-y: 480px; --v-w: 640px; --v-h: 320px; --v-o: 1;
+  --g-x: 60%; --g-y: 130px; --g-w: 860px; --g-h: 680px; --g-o: 0.9;
+  --v-x: 45%; --v-y: 480px; --v-w: 700px; --v-h: 300px; --v-o: 1;
 }
 .aurora-sky[data-level="4"] {
-  --g-x: 50%; --g-y: 120px; --g-w: 960px; --g-h: 660px; --g-o: 1;
-  --v-x: 45%; --v-y: 570px; --v-w: 820px; --v-h: 340px; --v-o: 1;
+  --g-x: 50%; --g-y: 150px; --g-w: 1040px; --g-h: 780px; --g-o: 1;
+  --v-x: 45%; --v-y: 550px; --v-w: 900px; --v-h: 320px; --v-o: 1;
 }
 @keyframes aurora-drift {
   from {
