@@ -26,23 +26,23 @@
 }
 .data-tile,
 .hour,
-.hero-card {
+.chance {
   cursor: pointer;
   transition: var(--press);
 }
 .data-tile:active,
-.hero-card:has(.hero-link:active),
+.chance:has(.chance-link:active),
 .hour:active {
   transform: scale(var(--press-scale));
 }
 
-/* Szansa na zorzę: tekst wprost na tle, bez ramki. Całość otwiera „Skąd ten wynik”. */
-.hero-card {
+/* Blok szansy: tekst wprost na tle, bez ramki, 32 px nad i pod. Całość otwiera „Skąd ten wynik”. */
+.chance {
   position: relative;
-  padding-inline: var(--text-inset);
+  padding: 32px var(--text-inset);
   color: var(--text);
 }
-.hero-link {
+.chance-link {
   width: 100%;
   border: 0;
   padding: 0;
@@ -50,7 +50,7 @@
   cursor: pointer;
 }
 /* Rozciągnięty przycisk: kliknięcie w dowolne miejsce karty działa jak kliknięcie w tytuł. */
-.hero-link::after {
+.chance-link::after {
   content: "";
   position: absolute;
   inset: 0;

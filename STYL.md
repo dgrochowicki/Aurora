@@ -39,9 +39,9 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 | Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
-## Szansa na zorzę
+## Blok szansy
 
-Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`). Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px:
+W kodzie `.chance`. Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`), padding 32 px nad i pod. Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px:
 1. tytuł „Szansa na zorzę” (13 px, `--sub`);
 2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Bardzo mała <5%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
 3. akapit 15 px `--sub`: zdanie o zorzy (z kierunkiem patrzenia, gdy jest szansa) i zdanie o warunkach obserwacji (`conditionsText`: za jasno albo dobre / umiarkowane / słabe według chmur i jasnego Księżyca, z procentem zachmurzenia);
