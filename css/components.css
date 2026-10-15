@@ -65,6 +65,9 @@
   height: 100lvh;
   overflow: hidden;
   pointer-events: none;
+  /* Safari maluje pasek u góry jednolitym kolorem strony, więc zorza wchodzi łagodnie od ciemnej góry zamiast urywać się pod paskiem. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 160px);
+  mask-image: linear-gradient(to bottom, transparent, #000 160px);
   transition:
     --g-o 2s ease,
     --v-o 2s ease;
