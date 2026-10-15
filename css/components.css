@@ -36,14 +36,38 @@
   transform: scale(var(--press-scale));
 }
 
-/* Zorza w tle strony: zielona i fioletowa plama, które rosną z poziomem szansy (data-level 0–4, jak opis słowny)
-   i powoli falują. Przy małej szansie świecą przy prawej krawędzi obok bloku szansy, przy bardzo dużej zalewają górę ekranu. */
+/* Zorza w tle strony: zielona i fioletowa plama i mniejsza zielona obok, które rosną z poziomem szansy
+   (data-level 0–4, jak opis słowny). Przy małej szansie świecą przy prawej krawędzi obok bloku szansy, przy bardzo dużej
+   zalewają górę ekranu. Stoją w miejscu przy przewijaniu jak niebo, a treść przesuwa się nad nimi. */
+@property --g-o {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --v-o {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+/* Oddychanie: jasność każdej plamy powoli rośnie i spada we własnym tempie. */
+@property --breath {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
 .aurora-sky {
-  position: absolute;
+  position: fixed;
   z-index: -1;
-  inset: 0 0 auto;
-  height: 900px;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: min(100%, 560px);
+  height: 100lvh;
+  overflow: hidden;
   pointer-events: none;
+  transition:
+    --g-o 2s ease,
+    --v-o 2s ease;
 }
 .aurora-sky i {
   position: absolute;
@@ -53,17 +77,30 @@
     left 2s ease,
     top 2s ease,
     width 2s ease,
-    height 2s ease,
-    opacity 2s ease;
-  animation: aurora-drift 18s ease-in-out infinite alternate;
+    height 2s ease;
 }
 .aurora-green {
   left: var(--g-x);
   top: var(--g-y);
   width: var(--g-w);
   height: var(--g-h);
-  opacity: var(--g-o);
+  opacity: calc(var(--g-o) * var(--breath));
   background: radial-gradient(closest-side, var(--aurora-green), rgb(90 195 105 / 0.5) 45%, transparent);
+  animation:
+    aurora-drift 18s ease-in-out infinite alternate,
+    aurora-breath 8s ease-in-out infinite alternate;
+}
+/* Mniejsza zielona plama na lewo i niżej od dużej, w innym tempie: kształt zorzy się zmienia, a nie tylko przesuwa. */
+.aurora-green-2 {
+  left: calc(var(--g-x) - var(--g-w) * 0.28);
+  top: calc(var(--g-y) + var(--g-h) * 0.18);
+  width: calc(var(--g-w) * 0.55);
+  height: calc(var(--g-h) * 0.55);
+  opacity: calc(var(--g-o) * 0.8 * var(--breath));
+  background: radial-gradient(closest-side, var(--aurora-green), rgb(90 195 105 / 0.4) 50%, transparent);
+  animation:
+    aurora-drift-2 13s ease-in-out infinite alternate,
+    aurora-breath 11s ease-in-out -4s infinite alternate;
 }
 .aurora-violet {
   z-index: -1;
@@ -71,14 +108,11 @@
   top: var(--v-y);
   width: var(--v-w);
   height: var(--v-h);
-  opacity: var(--v-o);
+  opacity: calc(var(--v-o) * var(--breath));
   background: radial-gradient(closest-side, var(--aurora-violet), rgb(65 43 93 / 0.6) 50%, transparent);
-  animation-duration: 23s;
-  animation-direction: alternate-reverse;
-}
-/* Bez danych zorza jest schowana. */
-.aurora-sky:not([data-level]) i {
-  opacity: 0;
+  animation:
+    aurora-drift 23s ease-in-out infinite alternate-reverse,
+    aurora-breath 9s ease-in-out -3s infinite alternate;
 }
 .aurora-sky[data-level="0"] {
   --g-x: 104%; --g-y: 230px; --g-w: 200px; --g-h: 320px; --g-o: 0.4;
@@ -102,10 +136,26 @@
 }
 @keyframes aurora-drift {
   from {
-    transform: translate(-6%, 2%) scale(1) rotate(-4deg);
+    transform: translate(-3%, 1.5%) scale(1) rotate(-3deg);
   }
   to {
-    transform: translate(6%, -3%) scale(1.12) rotate(4deg);
+    transform: translate(3%, -2%) scale(1.1) rotate(3deg);
+  }
+}
+@keyframes aurora-drift-2 {
+  from {
+    transform: translate(4%, -3%) scale(1.15) rotate(5deg);
+  }
+  to {
+    transform: translate(-4%, 3%) scale(0.95) rotate(-5deg);
+  }
+}
+@keyframes aurora-breath {
+  from {
+    --breath: 0.7;
+  }
+  to {
+    --breath: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {

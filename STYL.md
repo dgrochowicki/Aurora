@@ -41,7 +41,7 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 ## Zorza w tle
 
-Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny). Przy „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Plamy powoli falują (18 i 23 s), a przy zmianie poziomu przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
+Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny). Przy „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Stoją w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się nad nimi. Trzecia, mniejsza zielona plama zmienia kształt zorzy. Ruch jest delikatny: przesunięcie ±3%, powiększenie do 110%, obrót ±3° (13–23 s), a jasność oddycha od 70% do 100% (8–11 s). Przy zmianie poziomu plamy przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
 
 Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytułu „Aktywność zorzy” po prawej jest poziom aktywności (Niska / Umiarkowana / Wysoka), 15 px regular `--sub`.
 
