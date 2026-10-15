@@ -1,6 +1,8 @@
 // Pogoda, wyszukiwanie miejsc i zapisane miejsca.
 import { fetchJSON } from "../util.js";
 
+// Miejsce testowe do oglądania wyglądu przy mocnej zorzy: prawdziwe dane z Abisko, podmieniona tylko szansa (pole „test”).
+export const TEST_PLACE = { name: "Test", country: "Abisko · szansa 67%", lat: 68.35, lon: 18.83, test: 67 };
 export const FALLBACK = { name: "Szczecin", country: "Polska", lat: 53.4285, lon: 14.5528, isDefault: true };
 const KEY = "aurora-places";
 

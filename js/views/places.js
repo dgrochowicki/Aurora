@@ -1,7 +1,7 @@
 // Ekran wyboru miejsca na pełnym ekranie: wyszukiwarka, oglądane teraz miejsce, moja lokalizacja i zapisane miejsca.
 // Nie ma przycisku zamknięcia. Ekran zamyka wybór miejsca, także tego oglądanego teraz, albo Escape.
 import { $, esc, fmtCoords } from "../util.js";
-import { searchPlaces, loadSaved, storeSaved } from "../data/places.js";
+import { searchPlaces, loadSaved, storeSaved, TEST_PLACE } from "../data/places.js";
 import { createSheet } from "../ui/sheet.js";
 import { icon } from "../ui/icons.js";
 import { toast } from "../ui/toast.js";
@@ -77,6 +77,7 @@ export function renderPlaces() {
       }),
     );
   if (!current?.isGeo) rows.push(row({ key: "geo", name: `${icon("navArrow")}Moja lokalizacja`, sub: "Użyj lokalizacji telefonu" }));
+  if (!current?.test) rows.push(row({ key: "test", name: TEST_PLACE.name, sub: TEST_PLACE.country }));
   others.forEach((p) =>
     rows.push(
       row({
@@ -94,6 +95,7 @@ export function renderPlaces() {
         const k = b.dataset.key;
         sheet.close();
         if (k === "geo") locate();
+        else if (k === "test") choose(TEST_PLACE);
         else if (k.startsWith("saved:")) choose(saved[+k.slice(6)]);
       }),
   );

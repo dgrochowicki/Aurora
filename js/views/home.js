@@ -122,6 +122,7 @@ function renderSpaceTiles(space) {
 export function renderForecast(loc, w, grid, space) {
   const now = Date.now();
   const fc = buildForecast(loc, w, grid, space, now);
+  if (loc.test) applyTest(fc, loc.test);
   const { rows, first, best, maxAct, nowSky, offset, tz } = fc;
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
@@ -160,6 +161,14 @@ export function renderForecast(loc, w, grid, space) {
   els.outlook.hidden = !rows.length;
   renderConfidence(space, grid);
   renderVerdict(first, best, maxAct, loc.lat >= 0 ? "na północ" : "na południe");
+}
+
+// Miejsce testowe: szansa teraz to „pct”, a kolejne godziny najpierw rosną, potem gasną, żeby było widać poświatę.
+const TEST_SHAPE = [1, 1.05, 1.15, 1.25, 1.1, 0.9, 0.7, 0.5, 0.35, 0.25, 0.15, 0.1];
+function applyTest(fc, pct) {
+  fc.rows.forEach((r, i) => (r.score = Math.min(99, Math.round(pct * (TEST_SHAPE[i] ?? 0.1)))));
+  fc.first.score = pct;
+  fc.best = fc.rows.reduce((a, b) => (b.score > a.score ? b : a), fc.first);
 }
 
 // Bez prognozy pogody nie policzymy szansy, ale nadal pokazujemy aktywność, Kp i Bz z NOAA.
