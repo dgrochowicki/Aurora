@@ -1,8 +1,9 @@
 // Wykresy w panelu szczegółów: liniowe (pomiary z 2 godzin, zachmurzenie) i słupkowy (prognoza Kp). Linia sięga krawędzi panelu, podpisy osi mają wcięcie 24 px.
-// Podziałka: co najmniej 3 przerywane linie co 48 px, liczby osi Y po prawej, 4 px nad linią.
+// Podziałka: co najmniej 3 przerywane linie co 53 px (32 px od linii do liczby nad następną: liczba 16 + 4 przerwy + 1 linia),
+// liczby osi Y po prawej, 4 px nad linią. Przy 3 liniach wykres z osią godzin ma 153 px, jak w makiecie.
 import { esc, fmtNum, localHM } from "../util.js";
 
-const ROW = 48;
+const ROW = 53;
 
 // „Ładny” krok podziałki: 1, 2, 2,5 albo 5 razy potęga dziesięciu, nie mniejszy niż raw.
 const niceStep = (raw) => {

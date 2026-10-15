@@ -560,11 +560,12 @@ html.sheet-open body {
   margin-bottom: 12px;
 }
 /* Wykres w panelu: linia od krawędzi do krawędzi, podpisy osi 24 px od krawędzi, 13 px.
-   Linie podziałki co 48 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
+   Linie podziałki co 53 px, przerywane 4/4 px; liczby osi Y po prawej, 4 px nad linią. */
 .chart {
   /* Kolor linii i gradientu; .is-yellow dla zachmurzenia. */
   --chart: var(--green);
-  padding-top: 22px;
+  /* Liczba nad górną linią: 16 px wysokości i 4 px przerwy. */
+  padding-top: 20px;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--sub-65);
@@ -594,6 +595,7 @@ html.sheet-open body {
   position: absolute;
   z-index: 1;
   right: 24px;
+  line-height: 16px;
   transform: translateY(calc(-100% - 4px));
 }
 .chart-line {
@@ -611,10 +613,11 @@ html.sheet-open body {
 .chart-area {
   fill: url(#chartFill);
 }
+/* 8 px pod dolną linią podziałki, która ma 1 px i wystaje pod wykres. */
 .chart-x {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 9px;
   padding-inline: 24px;
 }
 /* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, zielone o jasności zależnej od wartości. Godziny pod środkiem słupków. */
