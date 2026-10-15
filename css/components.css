@@ -26,23 +26,158 @@
 }
 .data-tile,
 .hour,
-.hero-card {
+.chance {
   cursor: pointer;
   transition: var(--press);
 }
 .data-tile:active,
-.hero-card:has(.hero-link:active),
+.chance:has(.chance-link:active),
 .hour:active {
   transform: scale(var(--press-scale));
 }
 
-/* Karta szansy: zielona poświata w lewym dolnym rogu, cała karta otwiera „Skąd ten wynik”. */
-.hero-card {
-  padding: 20px;
-  /* Poświata w lewym dolnym rogu. Bez powtarzania: inaczej wraca pod górną i lewą krawędzią obwódki. */
-  background: radial-gradient(ellipse 260px 290px at 0 100%, var(--glow), rgba(5, 128, 95, 0.45) 42%, rgba(5, 128, 95, 0.12) 56%, transparent 70%) no-repeat border-box;
+/* Zorza w tle strony: zielona i fioletowa plama i mniejsza zielona obok, które rosną z poziomem szansy
+   (data-level 0–4, jak opis słowny). Przy małej szansie świecą przy prawej krawędzi obok bloku szansy, przy bardzo dużej
+   zalewają górę ekranu. Stoją w miejscu przy przewijaniu jak niebo, a treść przesuwa się nad nimi. */
+@property --g-o {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
 }
-.hero-link {
+@property --v-o {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+/* Oddychanie: jasność każdej plamy powoli rośnie i spada we własnym tempie. */
+@property --breath {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+.aurora-sky {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: min(100%, 560px);
+  height: 100lvh;
+  overflow: hidden;
+  pointer-events: none;
+  /* Safari maluje pasek u góry jednolitym kolorem strony, więc zorza wchodzi łagodnie od ciemnej góry zamiast urywać się pod paskiem. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 160px);
+  mask-image: linear-gradient(to bottom, transparent, #000 160px);
+  transition:
+    --g-o 2s ease,
+    --v-o 2s ease;
+}
+.aurora-sky i {
+  position: absolute;
+  translate: -50% -50%;
+  border-radius: 50%;
+  transition:
+    left 2s ease,
+    top 2s ease,
+    width 2s ease,
+    height 2s ease;
+}
+.aurora-green {
+  left: var(--g-x);
+  top: var(--g-y);
+  width: var(--g-w);
+  height: var(--g-h);
+  opacity: calc(var(--g-o) * var(--breath));
+  background: radial-gradient(closest-side, var(--aurora-green), rgb(90 195 105 / 0.5) 45%, transparent);
+  animation:
+    aurora-drift 18s ease-in-out infinite alternate,
+    aurora-breath 8s ease-in-out infinite alternate;
+}
+/* Mniejsza zielona plama na lewo i wyżej od dużej, w innym tempie: kształt zorzy się zmienia, a nie tylko przesuwa. */
+.aurora-green-2 {
+  left: calc(var(--g-x) - var(--g-w) * 0.28);
+  top: calc(var(--g-y) - var(--g-h) * 0.1);
+  width: calc(var(--g-w) * 0.55);
+  height: calc(var(--g-h) * 0.55);
+  opacity: calc(var(--g-o) * 0.8 * var(--breath));
+  background: radial-gradient(closest-side, var(--aurora-green), rgb(90 195 105 / 0.4) 50%, transparent);
+  animation:
+    aurora-drift-2 13s ease-in-out infinite alternate,
+    aurora-breath 11s ease-in-out -4s infinite alternate;
+}
+.aurora-violet {
+  z-index: -1;
+  left: var(--v-x);
+  top: var(--v-y);
+  width: var(--v-w);
+  height: var(--v-h);
+  opacity: calc(var(--v-o) * var(--breath));
+  background: radial-gradient(closest-side, var(--aurora-violet), rgb(65 43 93 / 0.6) 50%, transparent);
+  animation:
+    aurora-drift 23s ease-in-out infinite alternate-reverse,
+    aurora-breath 9s ease-in-out -3s infinite alternate;
+}
+.aurora-sky[data-level="0"] {
+  --g-x: 104%; --g-y: 230px; --g-w: 200px; --g-h: 320px; --g-o: 0.4;
+  --v-x: 86%; --v-y: 250px; --v-w: 200px; --v-h: 280px; --v-o: 0.7;
+}
+.aurora-sky[data-level="1"] {
+  --g-x: 98%; --g-y: 220px; --g-w: 320px; --g-h: 400px; --g-o: 0.55;
+  --v-x: 78%; --v-y: 290px; --v-w: 280px; --v-h: 320px; --v-o: 0.8;
+}
+.aurora-sky[data-level="2"] {
+  --g-x: 82%; --g-y: 190px; --g-w: 520px; --g-h: 500px; --g-o: 0.7;
+  --v-x: 60%; --v-y: 380px; --v-w: 460px; --v-h: 320px; --v-o: 0.9;
+}
+.aurora-sky[data-level="3"] {
+  --g-x: 60%; --g-y: 130px; --g-w: 860px; --g-h: 680px; --g-o: 0.9;
+  --v-x: 45%; --v-y: 480px; --v-w: 700px; --v-h: 300px; --v-o: 1;
+}
+.aurora-sky[data-level="4"] {
+  --g-x: 50%; --g-y: 150px; --g-w: 1040px; --g-h: 780px; --g-o: 1;
+  --v-x: 45%; --v-y: 550px; --v-w: 900px; --v-h: 320px; --v-o: 1;
+}
+@keyframes aurora-drift {
+  from {
+    transform: translate(-3%, 1.5%) scale(1) rotate(-3deg);
+  }
+  to {
+    transform: translate(3%, -2%) scale(1.1) rotate(3deg);
+  }
+}
+@keyframes aurora-drift-2 {
+  from {
+    transform: translate(4%, -3%) scale(1.15) rotate(5deg);
+  }
+  to {
+    transform: translate(-4%, 3%) scale(0.95) rotate(-5deg);
+  }
+}
+@keyframes aurora-breath {
+  from {
+    --breath: 0.7;
+  }
+  to {
+    --breath: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-sky i {
+    animation: none;
+  }
+}
+
+/* Blok szansy: tekst wprost na tle, bez ramki, 32 px nad i pod. Całość otwiera „Skąd ten wynik”. */
+.chance {
+  position: relative;
+  padding: 32px var(--text-inset);
+  color: var(--text);
+}
+/* Sekcja pod blokiem szansy: blok ma już własne 32 px, więc dokładamy tylko 16. */
+.chance + .section {
+  margin-top: 16px;
+}
+.chance-link {
   width: 100%;
   border: 0;
   padding: 0;
@@ -50,29 +185,35 @@
   cursor: pointer;
 }
 /* Rozciągnięty przycisk: kliknięcie w dowolne miejsce karty działa jak kliknięcie w tytuł. */
-.hero-link::after {
+.chance-link::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
 }
-.score {
-  display: block;
-  margin-top: 28px;
-  font-size: 4rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.02em;
+/* Słowny opis szansy po lewej, liczba procent po prawej, oba 28 px. */
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 1.75rem;
+  line-height: 34px;
 }
+.score-row strong {
+  font-weight: 500;
+}
+/* W bloku szansy teksty są co 8 px, tylko pod opisem szansy 16 px. */
 .summary {
-  margin: 24px 0 0;
+  margin: 16px 0 0;
   font-size: 0.9375rem;
   line-height: 20px;
   color: var(--sub);
 }
 /* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
 .outlook {
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   font-size: 0.8125rem;
   line-height: 1.45;
   color: var(--sub-65);
@@ -95,7 +236,7 @@
   display: none;
 }
 /* Wymiary z Figmy: 70×123, padding 20/16, gap 12. Wybrana godzina ma tło i obwódkę kafelka, pozostałe słabsze tło bez obwódki.
-   Bez backdrop-filter z Figmy: pod pigułkami jest jednolite tło, a w przewijanym pasku Chromium rysował je wtedy jako puste prostokąty. */
+   Rozmycie tła (szkło) jest wspólne z kafelkami, przy regule .data-tile. */
 .hour {
   flex: 0 0 70px;
   height: 123px;
@@ -126,6 +267,10 @@
   font-size: 0.8125rem;
   white-space: nowrap;
   color: var(--sub);
+}
+/* „Teraz” na biało, żeby odróżniało się od kolejnych godzin. */
+.hour time.now {
+  color: var(--text);
 }
 .hour strong {
   font-size: 0.9375rem;
@@ -164,6 +309,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--gap);
+}
+/* Kafelki i pigułki godzin to szkło: rozmywają zorzę w tle. */
+.data-tile,
+.hour {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 .data-tile {
   display: flex;
@@ -383,12 +534,6 @@ html.sheet-open body {
   .hour {
     transition: none !important;
   }
-}
-.leaflet-container {
-  font-family: inherit;
-}
-.leaflet-control-attribution {
-  font-size: 9px !important;
 }
 .hourly::-webkit-scrollbar {
   display: none;
@@ -783,7 +928,12 @@ html.sheet-open body {
 #auroraMap {
   position: absolute;
   inset: 0;
-  background: #10242a;
+  background: var(--bg);
+}
+/* Ciemna mapa: odwracamy jasne kafelki OpenStreetMap i przywracamy odcienie, żeby pasowały do grafitowego tła.
+   Filtr dotyczy tylko podkładu, kropki zorzy i znacznik miejsca zostają w swoich kolorach. */
+#auroraMap .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.4);
 }
 .leaflet-container {
   font-family: inherit;

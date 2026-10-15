@@ -20,8 +20,8 @@ Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` 
 | `--sub-65` | #AFC7C2 65% | notki, opis zmiany w kafelku, data w nagłówku |
 | `--card` | #AEFFE9 8% | tło kart i kafelków |
 | `--card-border` | #AEFFE9 4% | obwódka kart |
-| `--glow` | #05805F | poświata w karcie szansy |
-| `--sheet` | #1C2127 | tło panelu szczegółów |
+| `--glow` | #5AC369 | poświata pigułek godzin |
+| `--sheet` | #1E2226 | tło panelu szczegółów (biały 4% na `--bg`) |
 
 Autor chciał notek przy 50% krycia. Przy tak małym tekście kontrast wynosi wtedy 3,4:1, a minimum to 4,5:1, więc na razie jest 65%. Pełną paletę sprawdzimy razem, gdy będzie gotowa.
 
@@ -31,17 +31,27 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 | Element | Rozmiar | Grubość | Kolor |
 |---|---|---|---|
-| Nazwa miejsca | 28 | semibold | biały |
+| Nazwa miejsca | 21 | semibold | biały |
 | Tytuł sekcji | 15 | semibold | biały |
 | Tytuł karty i kafelka | 13 | medium | `--sub` |
-| Wynik w karcie szansy | 64 | medium | biały |
+| Szansa: opis słowny i procent | 28 / linia 34 | medium | biały |
 | Wartość w kafelku | 21 / linia 27 | medium | biały, jednostka tak samo |
 | Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
-## Karta szansy
+## Zorza w tle
 
-Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką. Werdykt i uzasadnienie to jeden akapit bez łamania wiersza. Na dole karty, jako część podsumowania, jest zapowiedź (13 px, `--sub-65`): zmiana chmur i najlepsza godzina z jej szansą, a przy innej strefie także czas użytkownika. Niżej widać to samo w poświacie godzin.
+Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny). Przy „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Stoją w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się nad nimi. Trzecia, mniejsza zielona plama zmienia kształt zorzy. Ruch jest delikatny: przesunięcie ±3%, powiększenie do 110%, obrót ±3° (13–23 s), a jasność oddycha od 70% do 100% (8–11 s). Przy zmianie poziomu plamy przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
+
+Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytułu „Aktywność zorzy” po prawej jest poziom aktywności (Niska / Umiarkowana / Wysoka), 15 px regular `--sub`.
+
+## Blok szansy
+
+W kodzie `.chance`. Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`), padding 32 px nad i pod. Nad nim 16 px od nagłówka z datą, pod nim 16 px do sekcji „Najbliższe godziny”. Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px (tylko między opisem szansy a akapitem 16 px):
+1. tytuł „Szansa na zorzę” (13 px, `--sub`);
+2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Bardzo mała <5%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
+3. akapit 15 px `--sub`: zdanie o zorzy (z kierunkiem patrzenia, gdy jest szansa) i zdanie o warunkach obserwacji (`conditionsText`: za jasno albo dobre / umiarkowane / słabe według chmur i jasnego Księżyca, z procentem zachmurzenia);
+4. zapowiedź 13 px `--sub-65`: zmiana chmur i najlepsza godzina, przy innej strefie także czas użytkownika.
 
 ## Kafelek
 
@@ -65,7 +75,7 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 
 Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
 
-- Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, nagłówek i treść 24 px od krawędzi.
+- Tło #1E2226 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, nagłówek i treść 24 px od krawędzi.
 - Nagłówek: 20 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
 - Wysokość panelu zależy od treści (najwyżej ekran minus 40 px). Bloki nie mają wspólnego odstępu, każdy ma własny padding. Kolejno:
   1. Metryka (`infoHero`), bez paddingu: liczba z jednostką 28/34 px medium, biała, jednostka w tym samym rozmiarze. 4 px pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px semibold).

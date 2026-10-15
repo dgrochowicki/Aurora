@@ -31,6 +31,20 @@ export function moonLabel(sky) {
   return `Księżyc ${Math.round(sky.moonIllum * 100)}% • ${sky.moonAlt < 15 ? "nisko" : "wysoko"}`;
 }
 
+// Słowny opis szansy na zorzę, pokazywany obok liczby procent.
+// Poziom 0–4 steruje też zorzą w tle strony.
+export const chanceLevel = (score) => (score < 5 ? 0 : score < 15 ? 1 : score < 40 ? 2 : score < 70 ? 3 : 4);
+export const chanceLabel = (score) => ["Bardzo mała", "Mała", "Umiarkowana", "Duża", "Bardzo duża"][chanceLevel(score)];
+
+// Zdanie o warunkach obserwacji w danej godzinie: jasność nieba, chmury i jasny Księżyc wysoko.
+export function conditionsText(r) {
+  const cloud = `zachmurzenie ${Math.round(r.cloud)}%`;
+  if (!r.night) return `Teraz jest za jasno na obserwację, ${cloud}.`;
+  const brightMoon = r.sky.moonAlt > 15 && r.sky.moonIllum > 0.5;
+  const quality = r.cloud >= 70 ? "słabe" : r.cloud >= 30 || brightMoon ? "umiarkowane" : "dobre";
+  return `Warunki obserwacji są ${quality}, ${cloud}${brightMoon ? ", jasny Księżyc" : ""}.`;
+}
+
 // Czym da się zobaczyć zorzę przy danej szansie. Poniżej progu aparatu nic nie dopisujemy.
 export const viewLabel = (score) => (score >= 48 ? "widoczna gołym okiem" : score >= 14 ? "widoczna przez aparat" : null);
 

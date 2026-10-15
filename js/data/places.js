@@ -1,6 +1,10 @@
 // Pogoda, wyszukiwanie miejsc i zapisane miejsca.
 import { fetchJSON } from "../util.js";
 
+// Miejsca testowe do oglądania wyglądu przy mocnej zorzy: prawdziwe dane z Abisko, podmieniona tylko szansa (pole „test”).
+// Widoczne tylko z adresem zakończonym ?test.
+const TEST_ON = new URLSearchParams(globalThis.location?.search).has("test");
+export const TEST_PLACES = (TEST_ON ? [67, 99] : []).map((test) => ({ name: `Test ${test}`, country: `Abisko · szansa ${test}%`, lat: 68.35, lon: 18.83, test }));
 export const FALLBACK = { name: "Szczecin", country: "Polska", lat: 53.4285, lon: 14.5528, isDefault: true };
 const KEY = "aurora-places";
 

@@ -6,7 +6,7 @@ export function renderHours(container, rows, glow = []) {
   container.innerHTML = rows
     .map(
       (r, i) =>
-        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"${glow[i] ? ` style="--aurora:${glow[i].toFixed(2)}"` : ""}><time>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
+        `<button type="button" class="hour" data-i="${i}" aria-pressed="false"${glow[i] ? ` style="--aurora:${glow[i].toFixed(2)}"` : ""}><time${r.label === "Teraz" ? ' class="now"' : ""}>${r.label}</time>${weatherIcon(r.night, r.cloud)}<strong>${r.score}%</strong></button>`,
     )
     .join("");
 }
