@@ -137,6 +137,10 @@
   white-space: nowrap;
   color: var(--sub);
 }
+/* „Teraz” na biało, żeby odróżniało się od kolejnych godzin. */
+.hour time.now {
+  color: var(--text);
+}
 .hour strong {
   font-size: 0.9375rem;
   line-height: 20px;
