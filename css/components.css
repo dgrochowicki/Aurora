@@ -348,15 +348,17 @@
 .sheet-header {
   flex: none;
 }
-/* Nagłówek z makiety: 24 px nad i pod. Po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
+/* Nagłówek z makiety: 20 px nad i pod, 24 px z boków. Po przewinięciu treści cienka linia, żeby treść nie wchodziła wizualnie pod tytuł. */
 .info-sheet .sheet-header {
   margin-bottom: 0;
-  padding: 24px;
+  padding: 20px 24px;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
 .info-sheet .sheet-scroll {
   padding-inline: 24px;
+  /* Odstęp od dołu daje stopka ze źródłem (.source-note). */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .info-sheet.scrolled .sheet-header {
   border-bottom-color: var(--card-border);
@@ -478,11 +480,15 @@ html.sheet-open body {
   padding-inline: var(--text-inset);
 }
 /* Treść panelu szczegółów według makiety (STYL.md, „Panel szczegółów”): metryka, wykres od krawędzi do krawędzi,
-   dane w dwóch kolumnach, wyjaśnienie i źródła. Odstęp między blokami 20 px. */
+   dane w kolumnach, wyjaśnienie i źródła. Bloki nie mają wspólnego odstępu, każdy ma własny padding. */
 .info-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+}
+.info-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .info-value {
   font-size: 1.75rem;
@@ -509,14 +515,14 @@ html.sheet-open body {
 .info-stats {
   display: grid;
   grid-template-columns: repeat(var(--cols, 2), 1fr);
-  gap: 12px 20px;
-  padding: 12px 0;
+  gap: 0 20px;
 }
+/* 16 px od wykresu nad i od linii pod wartością. */
 .info-stats > div {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-bottom: 12px;
+  gap: 4px;
+  padding: 16px 0;
   border-bottom: 1px solid var(--track);
   font-size: 0.8125rem;
   line-height: 18px;
@@ -528,6 +534,7 @@ html.sheet-open body {
   font-weight: 600;
 }
 .info-text {
+  padding: 16px 0;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--sub);
@@ -539,12 +546,16 @@ html.sheet-open body {
   margin-top: 16px;
 }
 .info-sheet .source-note {
-  margin: 20px 0 0;
+  margin: 0;
+  padding-bottom: 48px;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--sub-65);
 }
 /* Tymczasowo, do projektu: paski „Skąd ten wynik” w karcie. */
+.info-card {
+  margin: 16px 0;
+}
 .info-card .card-title {
   margin-bottom: 12px;
 }

@@ -66,16 +66,16 @@ Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę 
 Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
 
 - Tło #1C2127 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, nagłówek i treść 24 px od krawędzi.
-- Nagłówek: 24 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
-- Treść: odstęp między blokami 20 px. Kolejno:
-  1. Metryka (`infoHero`): liczba z jednostką 28/34 px medium, biała, jednostka w tym samym rozmiarze. Zaraz pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px semibold).
+- Nagłówek: 20 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
+- Wysokość panelu zależy od treści (najwyżej ekran minus 40 px). Bloki nie mają wspólnego odstępu, każdy ma własny padding. Kolejno:
+  1. Metryka (`infoHero`), bez paddingu: liczba z jednostką 28/34 px medium, biała, jednostka w tym samym rozmiarze. 4 px pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px semibold).
   2. Wykres z 2 godzin (`infoChart`, `ui/chart.js`). Linia i podziałka od krawędzi do krawędzi panelu, bez paddingu. Podziałka: co najmniej 3 linie co 48 px, przerywane 4/4 px (`--track`), na „ładnych” wartościach (krok 1, 2, 2,5 albo 5 razy potęga 10), więc przy Bz zero jest zawsze linią. Liczby osi Y po prawej, 24 px od krawędzi i 4 px nad swoją linią. Oś X (początek, środek, koniec) 24 px od krawędzi, 12 px pod wykresem. Liczby 13 px `--sub-65`. Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. Linia 2,3 px (jak w starym wykresie; w Figmie 3 px), zielona z gradientem pod spodem. Bz jest dwukolorowy: poniżej zera linia `--warn`, bez gradientu. Kolory każdego wykresu autor ustali osobno.
      Prognoza Kp to wykres słupkowy (`barChart`): doba, czyli 8 bloków 3-godzinnych, cała skala 0–9 (linie 0, 3, 6, 9). Słupki 24 px na środku równych części pasa 24 px od krawędzi, zaokrąglone u góry 4 px, zielone tym jaśniejsze, im wyższe Kp (krycie 20% przy 0 do 100% przy 9). Nad słupkiem wartość 13 px `--sub`, pod nim godzina początku bloku.
      „Światło tej nocy” to łuki Słońca i Księżyca (`ui/sky-chart.js`): oś 16:00–10:00, wysokość 176 px, linia horyzontu (biały 30%) i przerywana −18°, Słońce `--yellow` z gradientem nad horyzontem, Księżyc `--moon` (#C9D6E3), pod horyzontem łuki przygaszone do 35%. Zielony pas (8%) to najciemniejsze niebo, kropki 12 px to „teraz”. Nad wykresem legenda z kropkami, pod nim godziny co 6 h. W danych: wschody i zachody, „Najciemniej”, tarcza Księżyca.
      Zachmurzenie to wykres liniowy na 12 godzin prognozy, żółty (`--yellow`, #FFC867) z gradientem, stała skala 0–100% (linie 0, 50, 100).
-  3. Dane (`infoStats`): padding 12 px góra i dół, dwie kolumny z odstępem 20 px (warstwy chmur: trzy w jednym rzędzie). W każdej etykieta 13 px `--sub`, pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
-  4. Wyjaśnienie 13/18 `--sub`, akapity co 16 px.
-  5. Źródła 13 px `--sub-65`.
+  3. Dane (`infoStats`): dwie albo trzy kolumny obok siebie z odstępem 20 px (warstwy chmur: trzy w jednym rzędzie). W każdej 16 px nad i pod treścią (od wykresu i od kreski), etykieta 13 px `--sub`, 4 px pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
+  4. Wyjaśnienie 13/18 `--sub`, padding 16 px góra i dół, akapity co 16 px.
+  5. Źródła 13 px `--sub-65`, bez odstępu nad (daje go wyjaśnienie), 48 px pod, do dołu strony.
 - Treści bez projektu (paski „Skąd ten wynik”) leżą tymczasowo w kartach (`infoCard`).
 - Puste części pasków, mierników, kreski i linie siatki mają `--track` (biały 10%).
 
@@ -92,5 +92,5 @@ Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej p
 - Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
 - Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
 - Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Do dopracowania: wykres zachmurzenia jest kanciasty (wygładzić linię, np. krzywą monotoniczną, żeby nie wychodziła poza 0–100%), a panele są za wysokie (wykres łuków w „Świetle tej nocy” też ciut za wysoki). W panelu zachmurzenia nie widać, że warstwy (niskie, średnie, wysokie) dotyczą tylko bieżącej godziny, a wykres i liczba to całkowite zachmurzenie, które nie jest sumą warstw. Do omówienia z autorem.
+- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Do dopracowania: wykres zachmurzenia jest kanciasty (wygładzić linię, np. krzywą monotoniczną, żeby nie wychodziła poza 0–100%), a wykres łuków w „Świetle tej nocy” jest ciut za wysoki. W panelu zachmurzenia nie widać, że warstwy (niskie, średnie, wysokie) dotyczą tylko bieżącej godziny, a wykres i liczba to całkowite zachmurzenie, które nie jest sumą warstw. Do omówienia z autorem.
 - Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
