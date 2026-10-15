@@ -20,7 +20,7 @@ Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` 
 | `--sub-65` | #AFC7C2 65% | notki, opis zmiany w kafelku, data w nagłówku |
 | `--card` | #AEFFE9 8% | tło kart i kafelków |
 | `--card-border` | #AEFFE9 4% | obwódka kart |
-| `--glow` | #05805F | poświata pigułek godzin |
+| `--glow` | #5AC369 | poświata pigułek godzin |
 | `--sheet` | #1C2127 | tło panelu szczegółów |
 
 Autor chciał notek przy 50% krycia. Przy tak małym tekście kontrast wynosi wtedy 3,4:1, a minimum to 4,5:1, więc na razie jest 65%. Pełną paletę sprawdzimy razem, gdy będzie gotowa.
