@@ -532,12 +532,6 @@ html.sheet-open body {
     transition: none !important;
   }
 }
-.leaflet-container {
-  font-family: inherit;
-}
-.leaflet-control-attribution {
-  font-size: 9px !important;
-}
 .hourly::-webkit-scrollbar {
   display: none;
 }
@@ -931,7 +925,12 @@ html.sheet-open body {
 #auroraMap {
   position: absolute;
   inset: 0;
-  background: #10242a;
+  background: var(--bg);
+}
+/* Ciemna mapa: odwracamy jasne kafelki OpenStreetMap i przywracamy odcienie, żeby pasowały do grafitowego tła.
+   Filtr dotyczy tylko podkładu, kropki zorzy i znacznik miejsca zostają w swoich kolorach. */
+#auroraMap .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.4);
 }
 .leaflet-container {
   font-family: inherit;
