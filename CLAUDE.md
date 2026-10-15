@@ -99,5 +99,6 @@ Od najstarszych:
 10. **Panele szczegółów według makiety autora** (14.10.2026): tło #1C2127, nagłówek z ✕ 44×44, uchwyt w pasku 12 px. Treść w jednym układzie: metryka 28 px ze stanem jak w kafelku, wykres od krawędzi do krawędzi (`ui/chart.js`: podziałka co 48 px, oś Y po prawej, prognoza Kp jako słupki 0–9, zachmurzenie jako żółta linia), dane w dwóch kolumnach z „Oceną”, wyjaśnienie i źródła. Klocki w `ui/parts.js`. Panel chowa się w dół zamiast znikać. Szczegóły w `STYL.md`, „Panel szczegółów”.
 11. **Łuki Słońca i Księżyca** (14.10.2026): w panelu „Światło tej nocy” zamiast pasków osi nocy wykres wysokości Słońca i Księżyca jak w pogodzie Apple (`ui/sky-chart.js`, dane z `nightTimeline().arcs`), z horyzontem, linią −18°, pasem najciemniejszego nieba i kropkami „teraz”.
 12. **Niższe panele szczegółów** (15.10.2026): odstępy według wymiarów autora. Bloki bez wspólnego odstępu, każdy z własnym paddingiem: nagłówek 20 px nad i pod, dane i wyjaśnienie po 16 px, źródła 48 px nad dołem. Panele z wykresem są o 40 px niższe.
+13. **Wykres w panelu według makiety** (15.10.2026): linie podziałki co 53 px (liczba 16 px, 4 px przerwy, linia, 32 px do następnej liczby), oś godzin 8 px pod dolną linią. Przy 3 liniach wykres ma 153 px.
 
 Nowe istotne zmiany dopisuj na końcu tej listy.
