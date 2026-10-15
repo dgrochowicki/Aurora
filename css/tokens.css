@@ -1,8 +1,9 @@
 /* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  --bg: #091216;
-  --bg-top: #002f2b;
+  --bg: #15191d;
+  /* Góra gradientu tła: --bg przykryte czarnym 20%. */
+  --bg-top: #111417;
   --text: #ffffff;
   --sub: #afc7c2;
   --sub-65: rgba(175, 199, 194, 0.65);
@@ -13,12 +14,12 @@
   --glow-rgb: 5 128 95;
   --violet: #c4a1ff;
   --line: rgba(255, 255, 255, 0.09);
-  --card: rgba(174, 255, 233, 0.08);
-  --card-border: rgba(174, 255, 233, 0.04);
-  --card-soft: rgba(174, 255, 233, 0.04);
+  --card: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.04);
+  --card-soft: rgba(255, 255, 255, 0.04);
   /* Tło pustej części pasków, mierników i linii siatki. */
   --track: rgba(255, 255, 255, 0.1);
-  --fab: rgba(16, 60, 54, 0.88);
+  --fab: rgba(0, 0, 0, 0.7);
   --sheet: #1c2127;
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
