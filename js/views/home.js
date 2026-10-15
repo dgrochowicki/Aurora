@@ -2,7 +2,7 @@
 import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
 import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
-import { activityLabel, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { activityLabel, chanceLabel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -12,7 +12,7 @@ import { DETAILS } from "./details.js";
 
 const els = {
   score: $("#score"),
-  verdict: $("#verdict"),
+  chance: $("#chanceText"),
   summary: $("#summary"),
   updated: $("#updatedText"),
   hourly: $("#hourly"),
@@ -73,6 +73,7 @@ export function clearHome() {
   state = null;
   info.close();
   els.score.textContent = "—";
+  els.chance.textContent = "—";
   [...ACTIVITY_TILES, ...CONDITION_TILES].forEach(({ key }) => setTile(document, key));
   els.hourly.innerHTML = "";
   els.hourDetail.textContent = "";
@@ -89,6 +90,7 @@ function clearPlaceTime() {
 
 export const showLoading = () => {
   els.score.textContent = "—";
+  els.chance.textContent = "Sprawdzam…";
 };
 
 // Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
@@ -123,6 +125,7 @@ export function renderForecast(loc, w, grid, space) {
   state = { loc, grid, space, rows, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
   els.score.textContent = `${first.score}%`;
+  els.chance.textContent = chanceLabel(first.score);
   renderSpaceTiles(space);
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
   const cloudNow = Math.round(first.cloud);
@@ -166,8 +169,8 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
   clearPlaceTime();
-  els.verdict.textContent = "Nie znamy teraz zachmurzenia.";
-  els.summary.textContent = `Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
+  els.chance.textContent = "Brak prognozy";
+  els.summary.textContent = `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
 }
 
 // Data w czasie miejsca i godzina pobrania danych w czasie użytkownika.
@@ -194,35 +197,17 @@ function renderConfidence(space, grid) {
   els.confidence.textContent = `Pewność prognozy: ${confidence} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
 }
 
-// Werdykt i zdanie pod wynikiem. „where” to kierunek patrzenia: na północ albo na południe.
+// Akapit pod wynikiem: co z zorzą (z kierunkiem patrzenia, gdy jest szansa) i jakie są warunki obserwacji teraz.
+// „where” to kierunek: na północ albo na południe.
 function renderVerdict(first, best, activity, where) {
-  let verdict, reason;
-  if (activity < 8 && best.score < 10) {
-    verdict = "Dziś zorzy nie zobaczysz";
-    reason = "Aktywność zorzowa jest zbyt niska dla Twojej lokalizacji.";
-  } else if (!first.night && best.score < 10) {
-    verdict = "Dziś w nocy szanse będą niskie";
-    reason = "Nawet po zmroku przewidywana aktywność, chmury lub Księżyc nie dają dobrej szansy.";
-  } else if (!first.night && best.score >= 10) {
-    verdict = "Zorza może być widoczna po zmroku";
-    reason = "Teraz jest za jasno. Najlepsze godziny są podświetlone poniżej.";
-  } else if (first.cover >= 75 && first.act >= 8) {
-    verdict = "Zorzę zasłaniają teraz chmury";
-    reason = `Zachmurzenie wynosi ${Math.round(first.cloud)}%. Sprawdź późniejsze godziny.`;
-  } else if (first.score >= 70) {
-    verdict = "Wyjdź teraz — zorza jest aktywna";
-    reason = `Warunki sprzyjają obserwacji gołym okiem. Patrz ${where}.`;
-  } else if (first.score >= 40) {
-    verdict = "Zorza może być widoczna gołym okiem";
-    reason = `Patrz ${where}, z dala od świateł miasta.`;
-  } else if (first.score >= 14) {
-    verdict = "Zorza może być widoczna przez aparat";
-    reason = `Gołym okiem może być bardzo słaba. Skieruj aparat ${where} i spróbuj trybu nocnego.`;
-  } else {
-    verdict = "Zorza jest aktywna, ale trudno ją teraz zobaczyć";
-    reason = first.cover >= 50 ? "Przeszkodą jest duże zachmurzenie." : "Aktywność jest jeszcze zbyt słaba dla obserwacji gołym okiem.";
-  }
-  // Werdykt i uzasadnienie płyną jednym akapitem, bez łamania wiersza między nimi.
-  els.verdict.textContent = `${verdict}.`;
-  els.summary.textContent = reason;
+  let reason;
+  if (activity < 8 && best.score < 10) reason = "Aktywność zorzy jest zbyt niska dla Twojej lokalizacji.";
+  else if (!first.night && best.score < 10) reason = "Nawet po zmroku aktywność, chmury lub Księżyc nie dadzą dobrej szansy.";
+  else if (!first.night) reason = "Zorza może być widoczna po zmroku. Najlepsze godziny są podświetlone poniżej.";
+  else if (first.cover >= 75 && first.act >= 8) reason = "Zorza jest aktywna, ale zasłaniają ją chmury. Sprawdź późniejsze godziny.";
+  else if (first.score >= 70) reason = `Wyjdź teraz, zorza jest aktywna. Patrz ${where}.`;
+  else if (first.score >= 40) reason = `Zorza może być widoczna gołym okiem. Patrz ${where}, z dala od świateł miasta.`;
+  else if (first.score >= 14) reason = `Zorza może być widoczna przez aparat. Skieruj go ${where} i spróbuj trybu nocnego.`;
+  else reason = "Zorza jest aktywna, ale za słaba, żeby ją teraz zobaczyć.";
+  els.summary.textContent = `${reason} ${conditionsText(first)}`;
 }

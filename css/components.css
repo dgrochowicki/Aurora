@@ -36,11 +36,11 @@
   transform: scale(var(--press-scale));
 }
 
-/* Karta szansy: zielona poświata w lewym dolnym rogu, cała karta otwiera „Skąd ten wynik”. */
+/* Szansa na zorzę: tekst wprost na tle, bez ramki. Całość otwiera „Skąd ten wynik”. */
 .hero-card {
-  padding: 20px;
-  /* Poświata w lewym dolnym rogu. Bez powtarzania: inaczej wraca pod górną i lewą krawędzią obwódki. */
-  background: radial-gradient(ellipse 260px 290px at 0 100%, var(--glow), rgba(5, 128, 95, 0.45) 42%, rgba(5, 128, 95, 0.12) 56%, transparent 70%) no-repeat border-box;
+  position: relative;
+  padding-inline: var(--text-inset);
+  color: var(--text);
 }
 .hero-link {
   width: 100%;
@@ -56,23 +56,29 @@
   inset: 0;
   border-radius: inherit;
 }
-.score {
-  display: block;
-  margin-top: 28px;
-  font-size: 4rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.02em;
+/* Słowny opis szansy po lewej, liczba procent po prawej, oba 28 px. */
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 1.75rem;
+  line-height: 34px;
 }
+.score-row strong {
+  font-weight: 500;
+}
+/* Między wszystkimi tekstami w bloku szansy jest 8 px. */
 .summary {
-  margin: 24px 0 0;
+  margin: 8px 0 0;
   font-size: 0.9375rem;
   line-height: 20px;
   color: var(--sub);
 }
 /* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
 .outlook {
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   font-size: 0.8125rem;
   line-height: 1.45;
   color: var(--sub-65);

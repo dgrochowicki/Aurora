@@ -20,7 +20,7 @@ Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` 
 | `--sub-65` | #AFC7C2 65% | notki, opis zmiany w kafelku, data w nagłówku |
 | `--card` | #AEFFE9 8% | tło kart i kafelków |
 | `--card-border` | #AEFFE9 4% | obwódka kart |
-| `--glow` | #05805F | poświata w karcie szansy |
+| `--glow` | #05805F | poświata pigułek godzin |
 | `--sheet` | #1C2127 | tło panelu szczegółów |
 
 Autor chciał notek przy 50% krycia. Przy tak małym tekście kontrast wynosi wtedy 3,4:1, a minimum to 4,5:1, więc na razie jest 65%. Pełną paletę sprawdzimy razem, gdy będzie gotowa.
@@ -31,17 +31,21 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 
 | Element | Rozmiar | Grubość | Kolor |
 |---|---|---|---|
-| Nazwa miejsca | 28 | semibold | biały |
+| Nazwa miejsca | 21 | semibold | biały |
 | Tytuł sekcji | 15 | semibold | biały |
 | Tytuł karty i kafelka | 13 | medium | `--sub` |
-| Wynik w karcie szansy | 64 | medium | biały |
+| Szansa: opis słowny i procent | 28 / linia 34 | medium | biały |
 | Wartość w kafelku | 21 / linia 27 | medium | biały, jednostka tak samo |
 | Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
-## Karta szansy
+## Szansa na zorzę
 
-Tytuł bez strzałki; cała karta otwiera „Skąd ten wynik”. Wynik zawsze jako zaokrąglona liczba procent, także 0% (bez „<1%”). Poświata w lewym dolnym rogu, bez powtarzania tła pod obwódką. Werdykt i uzasadnienie to jeden akapit bez łamania wiersza. Na dole karty, jako część podsumowania, jest zapowiedź (13 px, `--sub-65`): zmiana chmur i najlepsza godzina z jej szansą, a przy innej strefie także czas użytkownika. Niżej widać to samo w poświacie godzin.
+Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`). Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px:
+1. tytuł „Szansa na zorzę” (13 px, `--sub`);
+2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Bardzo mała <5%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
+3. akapit 15 px `--sub`: zdanie o zorzy (z kierunkiem patrzenia, gdy jest szansa) i zdanie o warunkach obserwacji (`conditionsText`: za jasno albo dobre / umiarkowane / słabe według chmur i jasnego Księżyca, z procentem zachmurzenia);
+4. zapowiedź 13 px `--sub-65`: zmiana chmur i najlepsza godzina, przy innej strefie także czas użytkownika.
 
 ## Kafelek
 
