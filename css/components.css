@@ -42,6 +42,10 @@
   padding: 32px var(--text-inset);
   color: var(--text);
 }
+/* Sekcja pod blokiem szansy: blok ma już własne 32 px, więc dokładamy tylko 16. */
+.chance + .section {
+  margin-top: 16px;
+}
 .chance-link {
   width: 100%;
   border: 0;
