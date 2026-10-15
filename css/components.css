@@ -73,9 +73,9 @@
 .score-row strong {
   font-weight: 500;
 }
-/* Między wszystkimi tekstami w bloku szansy jest 8 px. */
+/* W bloku szansy teksty są co 8 px, tylko pod opisem szansy 16 px. */
 .summary {
-  margin: 8px 0 0;
+  margin: 16px 0 0;
   font-size: 0.9375rem;
   line-height: 20px;
   color: var(--sub);
