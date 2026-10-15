@@ -126,7 +126,8 @@ button,
   .app-shell {
     border: 1px solid var(--line);
     border-radius: 36px;
-    background: rgba(4, 14, 18, 0.55);
+    /* To samo tło co na telefonie, żeby ramka nie zmieniała kolorów. */
+    background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px, var(--bg) 100%) var(--bg-top);
     min-height: 900px;
   }
 }
