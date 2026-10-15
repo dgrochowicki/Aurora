@@ -36,6 +36,84 @@
   transform: scale(var(--press-scale));
 }
 
+/* Zorza w tle strony: zielona i fioletowa plama, które rosną z poziomem szansy (data-level 0–4, jak opis słowny)
+   i powoli falują. Przy małej szansie świecą przy prawej krawędzi obok bloku szansy, przy bardzo dużej zalewają górę ekranu. */
+.aurora-sky {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 900px;
+  pointer-events: none;
+}
+.aurora-sky i {
+  position: absolute;
+  translate: -50% -50%;
+  border-radius: 50%;
+  transition:
+    left 2s ease,
+    top 2s ease,
+    width 2s ease,
+    height 2s ease,
+    opacity 2s ease;
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+.aurora-green {
+  left: var(--g-x);
+  top: var(--g-y);
+  width: var(--g-w);
+  height: var(--g-h);
+  opacity: var(--g-o);
+  background: radial-gradient(closest-side, var(--aurora-green), rgb(90 195 105 / 0.5) 45%, transparent);
+}
+.aurora-violet {
+  z-index: -1;
+  left: var(--v-x);
+  top: var(--v-y);
+  width: var(--v-w);
+  height: var(--v-h);
+  opacity: var(--v-o);
+  background: radial-gradient(closest-side, var(--aurora-violet), rgb(65 43 93 / 0.6) 50%, transparent);
+  animation-duration: 23s;
+  animation-direction: alternate-reverse;
+}
+/* Bez danych zorza jest schowana. */
+.aurora-sky:not([data-level]) i {
+  opacity: 0;
+}
+.aurora-sky[data-level="0"] {
+  --g-x: 104%; --g-y: 230px; --g-w: 200px; --g-h: 320px; --g-o: 0.4;
+  --v-x: 86%; --v-y: 250px; --v-w: 200px; --v-h: 280px; --v-o: 0.7;
+}
+.aurora-sky[data-level="1"] {
+  --g-x: 98%; --g-y: 220px; --g-w: 320px; --g-h: 400px; --g-o: 0.55;
+  --v-x: 78%; --v-y: 290px; --v-w: 280px; --v-h: 320px; --v-o: 0.8;
+}
+.aurora-sky[data-level="2"] {
+  --g-x: 82%; --g-y: 190px; --g-w: 520px; --g-h: 500px; --g-o: 0.7;
+  --v-x: 60%; --v-y: 380px; --v-w: 460px; --v-h: 320px; --v-o: 0.9;
+}
+.aurora-sky[data-level="3"] {
+  --g-x: 64%; --g-y: 150px; --g-w: 760px; --g-h: 580px; --g-o: 0.85;
+  --v-x: 48%; --v-y: 480px; --v-w: 640px; --v-h: 320px; --v-o: 1;
+}
+.aurora-sky[data-level="4"] {
+  --g-x: 50%; --g-y: 120px; --g-w: 960px; --g-h: 660px; --g-o: 1;
+  --v-x: 45%; --v-y: 570px; --v-w: 820px; --v-h: 340px; --v-o: 1;
+}
+@keyframes aurora-drift {
+  from {
+    transform: translate(-6%, 2%) scale(1) rotate(-4deg);
+  }
+  to {
+    transform: translate(6%, -3%) scale(1.12) rotate(4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-sky i {
+    animation: none;
+  }
+}
+
 /* Blok szansy: tekst wprost na tle, bez ramki, 32 px nad i pod. Całość otwiera „Skąd ten wynik”. */
 .chance {
   position: relative;
@@ -105,7 +183,7 @@
   display: none;
 }
 /* Wymiary z Figmy: 70×123, padding 20/16, gap 12. Wybrana godzina ma tło i obwódkę kafelka, pozostałe słabsze tło bez obwódki.
-   Bez backdrop-filter z Figmy: pod pigułkami jest jednolite tło, a w przewijanym pasku Chromium rysował je wtedy jako puste prostokąty. */
+   Rozmycie tła (szkło) jest wspólne z kafelkami, przy regule .data-tile. */
 .hour {
   flex: 0 0 70px;
   height: 123px;
@@ -178,6 +256,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--gap);
+}
+/* Kafelki i pigułki godzin to szkło: rozmywają zorzę w tle. */
+.data-tile,
+.hour {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 .data-tile {
   display: flex;

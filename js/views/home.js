@@ -2,7 +2,7 @@
 import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt } from "../model/sky.js";
 import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
-import { activityLabel, chanceLabel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -13,6 +13,8 @@ import { DETAILS } from "./details.js";
 const els = {
   score: $("#score"),
   chance: $("#chanceText"),
+  sky: $("#auroraSky"),
+  activityLevel: $("#activityLevel"),
   summary: $("#summary"),
   updated: $("#updatedText"),
   hourly: $("#hourly"),
@@ -74,6 +76,8 @@ export function clearHome() {
   info.close();
   els.score.textContent = "—";
   els.chance.textContent = "—";
+  els.sky.removeAttribute("data-level");
+  els.activityLevel.textContent = "";
   [...ACTIVITY_TILES, ...CONDITION_TILES].forEach(({ key }) => setTile(document, key));
   els.hourly.innerHTML = "";
   els.hourDetail.textContent = "";
@@ -126,6 +130,8 @@ export function renderForecast(loc, w, grid, space) {
 
   els.score.textContent = `${first.score}%`;
   els.chance.textContent = chanceLabel(first.score);
+  els.sky.dataset.level = chanceLevel(first.score);
+  els.activityLevel.textContent = activityLabel(first.act);
   renderSpaceTiles(space);
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
   const cloudNow = Math.round(first.cloud);
@@ -170,6 +176,8 @@ export function renderSpaceOnly(loc, grid, space) {
   els.outlook.hidden = true;
   clearPlaceTime();
   els.chance.textContent = "Brak prognozy";
+  els.sky.removeAttribute("data-level");
+  els.activityLevel.textContent = activityLabel(act);
   els.summary.textContent = `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
 }
 

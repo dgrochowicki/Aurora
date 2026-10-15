@@ -39,6 +39,12 @@ Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobieran
 | Opis wartości | 15 / linia 20 | regular | `--sub` |
 | Opis zmiany, notki | 13 | regular | `--sub-65` |
 
+## Zorza w tle
+
+Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny). Przy „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Plamy powoli falują (18 i 23 s), a przy zmianie poziomu przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
+
+Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytułu „Aktywność zorzy” po prawej jest poziom aktywności (Niska / Umiarkowana / Wysoka), 15 px regular `--sub`.
+
 ## Blok szansy
 
 W kodzie `.chance`. Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`), padding 32 px nad i pod. Nad nim 16 px od nagłówka z datą, pod nim 16 px do sekcji „Najbliższe godziny”. Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px (tylko między opisem szansy a akapitem 16 px):

@@ -26,6 +26,10 @@ button,
   -webkit-touch-callout: none;
 }
 .app-shell {
+  position: relative;
+  /* Zorza w tle leży pod treścią, ale nad tłem strony. Wystające plamy przycinamy, żeby nie było przewijania w bok. */
+  isolation: isolate;
+  overflow-x: clip;
   width: min(100%, 560px);
   margin: 0 auto;
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) calc(108px + env(safe-area-inset-bottom));
@@ -63,10 +67,18 @@ button,
   margin-top: 32px;
 }
 .section-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
   font-size: 0.9375rem;
   font-weight: 600;
   margin: 0 0 16px;
   padding-inline: var(--text-inset);
+}
+/* Wartość po prawej od tytułu sekcji, np. poziom aktywności zorzy. */
+.section-value {
+  font-weight: 400;
+  color: var(--sub);
 }
 /* Pływające przyciski mapy i miejsc (72×48, 24 px od krawędzi). Treść przewija się pod nimi, stąd rozmycie tła. */
 .fab-bar {

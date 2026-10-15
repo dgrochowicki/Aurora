@@ -13,6 +13,9 @@
   --glow: #5ac369;
   --glow-rgb: 90 195 105;
   --violet: #c4a1ff;
+  /* Kolory zorzy w tle strony. */
+  --aurora-green: #5ac369;
+  --aurora-violet: #412b5d;
   --line: rgba(255, 255, 255, 0.09);
   --card: rgba(255, 255, 255, 0.08);
   --card-border: rgba(255, 255, 255, 0.04);

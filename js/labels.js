@@ -32,8 +32,9 @@ export function moonLabel(sky) {
 }
 
 // Słowny opis szansy na zorzę, pokazywany obok liczby procent.
-export const chanceLabel = (score) =>
-  score < 5 ? "Bardzo mała" : score < 15 ? "Mała" : score < 40 ? "Umiarkowana" : score < 70 ? "Duża" : "Bardzo duża";
+// Poziom 0–4 steruje też zorzą w tle strony.
+export const chanceLevel = (score) => (score < 5 ? 0 : score < 15 ? 1 : score < 40 ? 2 : score < 70 ? 3 : 4);
+export const chanceLabel = (score) => ["Bardzo mała", "Mała", "Umiarkowana", "Duża", "Bardzo duża"][chanceLevel(score)];
 
 // Zdanie o warunkach obserwacji w danej godzinie: jasność nieba, chmury i jasny Księżyc wysoko.
 export function conditionsText(r) {
