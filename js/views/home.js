@@ -1,6 +1,7 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
 import { $, fmtNum, browserOffset } from "../util.js";
-import { phaseAt } from "../model/sky.js";
+import { phaseAt, moonLitRight } from "../model/sky.js";
+import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
@@ -143,7 +144,7 @@ export function renderForecast(loc, w, grid, space) {
     status: cloudLabel(cloudNow),
     next: change?.short || "Bez większych zmian",
   });
-  setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), next: night.nextText });
+  setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), statusIcon: moonPhaseIcon(nowSky.moonIllum, moonLitRight(now, loc.lat, loc.lon)), next: night.nextText });
 
   const diffH = (browserOffset() - offset) / 3600000;
   showUpdated(now, offset);

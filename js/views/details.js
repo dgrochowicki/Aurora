@@ -2,7 +2,7 @@
 // Układ wspólny dla wszystkich paneli: metryka ze stanem, wykres, dane, na końcu wyjaśnienie (klocki z ui/parts.js).
 // Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
 import { fmtNum, localHM, browserOffset } from "../util.js";
-import { skyAt, magLat, phaseAt } from "../model/sky.js";
+import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
@@ -215,9 +215,7 @@ export const DETAILS = {
       illum = Math.round(sky.moonIllum * 100);
     const moonNow = `Księżyc jest teraz ${sky.moonAlt > 0 ? "nad" : "pod"} horyzontem, tarcza oświetlona w ${illum}%.`;
     const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)} – ${hm(g.to)}`).join(", ") : "Brak";
-    // Przybywa tarczy, gdy za 6 h będzie jaśniejsza. Na półkuli południowej oświetlona strona jest odwrotnie.
-    const waxing = skyAt(now + 6 * 3600000, st.loc.lat, st.loc.lon).moonIllum > sky.moonIllum;
-    const phase = moonPhaseIcon(sky.moonIllum, waxing !== st.loc.lat < 0);
+    const phase = moonPhaseIcon(sky.moonIllum, moonLitRight(now, st.loc.lat, st.loc.lon));
     // Pierwszy wschód i zachód na osi doby; kreska, gdy go nie ma.
     const ev = (list, rise) => {
       const e = list.find((e) => e.rise === rise);

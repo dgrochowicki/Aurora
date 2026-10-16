@@ -43,6 +43,12 @@ export function skyAt(ms, lat, lon) {
   return { sunAlt, moonAlt, moonIllum: (1 + Math.cos(inc)) / 2 };
 }
 
+// Czy oświetlona jest prawa strona tarczy: na półkuli północnej, gdy Księżyca przybywa (za 6 h tarcza jaśniejsza), na południowej odwrotnie.
+export function moonLitRight(ms, lat, lon) {
+  const waxing = skyAt(ms + 6 * 3600000, lat, lon).moonIllum > skyAt(ms, lat, lon).moonIllum;
+  return waxing !== lat < 0;
+}
+
 // Ciemność 0–1: zmierzch żeglarski przy -12°, astronomiczny przy -18°. Jasny Księżyc wysoko na niebie obniża wynik nawet o połowę.
 export function darknessOf(sky) {
   const a = sky.sunAlt;

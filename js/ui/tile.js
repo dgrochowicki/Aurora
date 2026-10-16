@@ -13,8 +13,8 @@ export function renderTiles(container, tiles) {
 }
 
 // Brak wartości to kreska bez jednostki i bez ikony. icon to gotowy SVG z ui/icons.js.
-// level (0–3) ustawia kolor stanu kafelka: kropkę przy opisie i wskaźnik. viz to gotowy HTML z ui/spark.js.
-export function setTile(root, key, { value = null, status = "", next = "", icon = "", level = null, viz = "" } = {}) {
+// statusIcon: gotowy SVG za opisem, np. faza Księżyca. level (0–3) ustawia kolor stanu kafelka: kropkę przy opisie i wskaźnik. viz to gotowy HTML z ui/spark.js.
+export function setTile(root, key, { value = null, status = "", next = "", icon = "", level = null, viz = "", statusIcon = "" } = {}) {
   const tile = root.querySelector(`[data-detail="${key}"]`);
   if (!tile) return;
   const part = (name) => tile.querySelector(`[data-part="${name}"]`);
@@ -22,6 +22,7 @@ export function setTile(root, key, { value = null, status = "", next = "", icon 
   if (part("unit")) part("unit").hidden = value == null;
   if (part("icon")) part("icon").innerHTML = value == null ? "" : icon;
   part("status").textContent = status;
+  if (statusIcon) part("status").insertAdjacentHTML("beforeend", statusIcon);
   if (part("next")) part("next").textContent = next;
   if (part("viz")) part("viz").innerHTML = viz;
   if (level == null) delete tile.dataset.level;
