@@ -5,6 +5,9 @@ import { clamp, esc, localHM } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
 const STEP = 18;
+// Kolory łuków jak --sun i --moon w tokens.css. Wpisane wprost, bo Safari nie zawsze bierze zmienne CSS w gradientach SVG.
+const SUN = "#cc9200",
+  MOON = "#c9d6e3";
 
 // n: wynik nightTimeline(), offset: strefa miejsca.
 export function skyChart(n, { offset, now = Date.now(), label }) {
@@ -16,11 +19,16 @@ export function skyChart(n, { offset, now = Date.now(), label }) {
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
-  // Jasność łuku zależy od wysokości: pełna u góry wykresu, mniej niż połowa na horyzoncie, ledwo widoczna na dole.
-  const off = (a) => (y(a) / H).toFixed(3);
+  // Nad horyzontem łuk ma pełny kolor, pod nim zaczyna od połowy jasności i gaśnie w dół: ok. 20% przy −18°, 8% na dole.
+  // Każdy łuk jest rysowany dwa razy, przycięty nad i pod horyzontem.
+  const y0 = y(0).toFixed(1);
   const fade = (id, color) =>
-    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${H}"><stop offset="0" style="stop-color:var(${color})"/><stop offset="${off(0)}" style="stop-color:var(${color});stop-opacity:0.45"/><stop offset="${off(-STEP)}" style="stop-color:var(${color});stop-opacity:0.2"/><stop offset="1" style="stop-color:var(${color});stop-opacity:0.12"/></linearGradient>`;
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", "--sun")}${fade("skyMoon", "--moon")}</defs><path class="sky-arc" stroke="url(#skyMoon)" d="${path("moon")}"/><path class="sky-arc" stroke="url(#skySun)" d="${path("sun")}"/></svg>`;
+    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="0.5"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.2"/><stop offset="1" stop-color="${color}" stop-opacity="0.08"/></linearGradient>`;
+  const arc = (d, id, color) =>
+    `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="url(#${id})" clip-path="url(#skyBelow)" d="${d}"/>`;
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", SUN)}${fade("skyMoon", MOON)}
+<clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
+<clipPath id="skyBelow"><rect x="-1" y="${y0}" width="102" height="${H + 10}"/></clipPath></defs>${arc(path("moon"), "skyMoon", MOON)}${arc(path("sun"), "skySun", SUN)}</svg>`;
   const lines = [];
   for (let a = hi; a >= lo; a -= STEP) {
     const pos = `top:${y(a).toFixed(1)}px`;
