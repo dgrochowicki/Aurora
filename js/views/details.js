@@ -5,7 +5,7 @@ import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
-import { skyChart } from "../ui/sky-chart.js";
+import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
@@ -195,22 +195,30 @@ export const DETAILS = {
     const off = st.offset,
       hm = (ms) => localHM(ms + off),
       near = (a, b) => Math.abs(a - b) < 15 * 60000;
-    const title = n.cur ? "Najciemniej teraz" : n.next ? `Ciemniej po ${hm(n.next.from)}` : "Tej nocy bez pełnej ciemności";
-    // Dlaczego wtedy robi się ciemniej: zachodzi Księżyc albo zaczyna się noc astronomiczna.
+    // Pora dnia jako tytuł, pod nią kiedy jest pełna ciemność i dlaczego wtedy: zachodzi Księżyc albo zaczyna się noc astronomiczna.
+    const now = Date.now();
     const why = n.next
       ? n.moonEv.some((e) => !e.rise && near(e.t, n.next.from))
-        ? "Wtedy zajdzie Księżyc."
+        ? ", gdy zajdzie Księżyc"
         : n.sun.some((g) => g.v === "night" && near(g.from, n.next.from))
-          ? "Wtedy zaczyna się noc astronomiczna."
+          ? ", gdy zacznie się noc astronomiczna"
           : ""
-      : n.cur
-        ? `Pełna ciemność potrwa do ${hm(n.cur.to)}.`
-        : "Słońce nie schodzi dość nisko albo przeszkadza jasny Księżyc.";
-    const sky = skyAt(Date.now(), st.loc.lat, st.loc.lon),
+      : "";
+    const dark = n.cur
+      ? `Pełna ciemność potrwa do ${hm(n.cur.to)}.`
+      : n.next
+        ? `Pełna ciemność od ${hm(n.next.from)}${why}.`
+        : n.dark.length
+          ? "Najciemniejsza pora tej nocy już minęła."
+          : "Tej nocy bez pełnej ciemności: Słońce nie schodzi dość nisko albo przeszkadza jasny Księżyc.";
+    const sky = skyAt(now, st.loc.lat, st.loc.lon),
       illum = Math.round(sky.moonIllum * 100);
     const moonNow = `Księżyc jest teraz ${sky.moonAlt > 0 ? "nad" : "pod"} horyzontem, tarcza oświetlona w ${illum}%.`;
-    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)}–${hm(g.to)}`).join(", ") : "Brak";
-    // Pierwszy wschód i zachód na osi nocy; kreska, gdy go nie ma.
+    const windows = n.dark.length ? n.dark.map((g) => `${hm(g.from)} – ${hm(g.to)}`).join(", ") : "Brak";
+    // Przybywa tarczy, gdy za 6 h będzie jaśniejsza. Na półkuli południowej oświetlona strona jest odwrotnie.
+    const waxing = skyAt(now + 6 * 3600000, st.loc.lat, st.loc.lon).moonIllum > sky.moonIllum;
+    const phase = moonPhaseIcon(sky.moonIllum, waxing !== st.loc.lat < 0);
+    // Pierwszy wschód i zachód na osi doby; kreska, gdy go nie ma.
     const ev = (list, rise) => {
       const e = list.find((e) => e.rise === rise);
       return e ? hm(e.t) : "—";
@@ -219,26 +227,23 @@ export const DETAILS = {
       title: "Światło tej nocy",
       source: "Położenie Słońca i Księżyca liczone w przeglądarce",
       html:
-        infoHero(title, "", { text: true, status: `${why} ${moonNow}`.trim() }) +
-        infoChart(
-          skyChart(n, {
-            offset: off,
-            illum: sky.moonIllum,
-            label: `Wysokość Słońca i Księżyca tej nocy. Najciemniej: ${windows}.`,
-          }),
-        ) +
-        infoStats([
-          ["Zachód Słońca", ev(n.sunEv, false)],
-          ["Wschód Słońca", ev(n.sunEv, true)],
-          ["Wschód Księżyca", ev(n.moonEv, true)],
-          ["Zachód Księżyca", ev(n.moonEv, false)],
-          ["Najciemniej", windows],
-          ["Tarcza Księżyca", `${illum}%`],
-        ]) +
+        infoHero(phaseAt(now, st.loc), "", { text: true, status: `${dark} ${moonNow}` }) +
+        infoChart(skyChart(n, { offset: off, now, label: `Wysokość Słońca i Księżyca od ${hm(n.start)} do ${hm(n.end)}. Najciemniej: ${windows}.` })) +
         infoText(
-          "Łuki pokazują wysokość Słońca i Księżyca nad horyzontem. Najciemniej jest wtedy, gdy Słońce zejdzie poniżej −18° (noc astronomiczna), a Księżyc jest pod horyzontem albo bardzo słaby. Te godziny zaznacza zielony pas.",
-          "Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy.",
-        ),
+          "Łuki pokazują wysokość Słońca i Księżyca nad horyzontem. Najciemniej jest wtedy, gdy Słońce zejdzie poniżej −18° (noc astronomiczna), a Księżyc jest pod horyzontem albo bardzo słaby.",
+        ) +
+        infoStats(
+          [
+            ["Zachód Słońca", ev(n.sunEv, false)],
+            ["Wschód Słońca", ev(n.sunEv, true)],
+            ["Najciemniej", windows],
+            ["Wschód Księżyca", ev(n.moonEv, true)],
+            ["Zachód Księżyca", ev(n.moonEv, false)],
+            ["Tarcza Księżyca", `${illum}%${phase}`],
+          ],
+          3,
+        ) +
+        infoText("Ciemniejsze niebo ułatwia obserwację, ale nie oznacza silniejszej zorzy."),
     };
   },
 };

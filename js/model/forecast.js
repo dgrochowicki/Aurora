@@ -115,14 +115,15 @@ export function dayLabel(ms, offset) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-// Oś nocy od 16:00 do 10:00 czasu miejsca, co 5 minut: Słońce, Księżyc i okna pełnej ciemności.
+// Oś doby od 12:00 do 12:00 czasu miejsca, co 5 minut: Słońce, Księżyc i okna pełnej ciemności.
+// Przed południem to noc, która właśnie mija, po południu nadchodząca.
 export function nightTimeline(loc, now, offset) {
   const STEP = 5 * 60000,
     nowLocal = now + offset,
     day = Math.floor(nowLocal / DAY_MS) * DAY_MS,
     h = (nowLocal - day) / 3600000;
-  const start = day + (h < 10 ? -8 : 16) * 3600000 - offset,
-    end = start + 18 * 3600000;
+  const start = day + (h < 12 ? -12 : 12) * 3600000 - offset,
+    end = start + 24 * 3600000;
   const samples = [];
   for (let t = start; t <= end; t += STEP) {
     const sky = skyAt(t, loc.lat, loc.lon);

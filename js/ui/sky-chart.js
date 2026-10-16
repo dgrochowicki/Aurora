@@ -1,46 +1,51 @@
-// Wykres łuków Słońca i Księżyca na osi nocy 16:00–10:00, jak łuk Słońca w pogodzie Apple.
-// Linia horyzontu, przerywana linia −18° (początek nocy astronomicznej), zielony pas najciemniejszego nieba
-// i kropki „teraz” na obu łukach. Część łuku pod horyzontem jest przygaszona.
+// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, jak łuk Słońca w pogodzie Apple, według makiety autora.
+// Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są tylko horyzont (linia ciągła) i −18°
+// (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Duże kropki to „teraz”, małe na horyzoncie to wschody i zachody.
 import { clamp, esc, localHM } from "../util.js";
+import { ROW_DENSE } from "./chart.js";
 
-const H = 176;
+const STEP = 18;
 
-// n: wynik nightTimeline(), offset: strefa miejsca, illum: oświetlona część tarczy Księżyca (0–1).
-export function skyChart(n, { offset, illum, now = Date.now(), label }) {
+// n: wynik nightTimeline(), offset: strefa miejsca.
+export function skyChart(n, { offset, now = Date.now(), label }) {
   const alts = n.arcs.flatMap((a) => [a.sun, a.moon]);
-  // Zakres pionowy z zapasem: zawsze widać horyzont i linię −18°.
-  const hi = Math.max(10, Math.ceil(Math.max(...alts) / 10) * 10 + 5),
-    lo = Math.min(-24, Math.floor(Math.min(...alts) / 10) * 10 - 5);
+  // Linie co 18° obejmujące oba łuki; zawsze co najmniej od +18° do −36°, żeby było widać horyzont i −18°.
+  const hi = Math.max(STEP, Math.ceil(Math.max(...alts) / STEP) * STEP),
+    lo = Math.min(-2 * STEP, Math.floor(Math.min(...alts) / STEP) * STEP);
+  const H = ((hi - lo) / STEP) * ROW_DENSE;
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
-  const sun = path("sun"),
-    moon = path("moon"),
-    y0 = y(0).toFixed(1);
-  // Każdy łuk dwa razy: pełny nad horyzontem i przygaszony pod nim.
-  const arc = (d, cls) =>
-    `<path class="sky-arc ${cls}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc ${cls} is-below" clip-path="url(#skyBelow)" d="${d}"/>`;
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>
-<clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
-<clipPath id="skyBelow"><rect x="-1" y="${y0}" width="102" height="${H}"/></clipPath>
-<linearGradient id="skySunFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--yellow);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--yellow);stop-opacity:0.04"/></linearGradient>
-</defs><path class="sky-sun-fill" clip-path="url(#skyAbove)" d="${sun}L100 ${y0}L0 ${y0}Z"/>${arc(moon, "is-moon")}${arc(sun, "is-sun")}</svg>`;
-  const bands = n.dark
-    .map((g) => `<i class="sky-dark" style="left:${x(g.from).toFixed(2)}%;width:${(x(g.to) - x(g.from)).toFixed(2)}%"></i>`)
-    .join("");
-  const lines = `<i class="sky-horizon" style="top:${y0}px"></i><span class="chart-y" style="top:${y0}px">Horyzont</span><i class="chart-grid" style="top:${y(-18).toFixed(1)}px"></i><span class="chart-y" style="top:${y(-18).toFixed(1)}px">−18°</span>`;
+  // Jasność łuku zależy od wysokości: pełna u góry wykresu, mniej niż połowa na horyzoncie, ledwo widoczna na dole.
+  const off = (a) => (y(a) / H).toFixed(3);
+  const fade = (id, color) =>
+    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${H}"><stop offset="0" style="stop-color:var(${color})"/><stop offset="${off(0)}" style="stop-color:var(${color});stop-opacity:0.45"/><stop offset="${off(-STEP)}" style="stop-color:var(${color});stop-opacity:0.2"/><stop offset="1" style="stop-color:var(${color});stop-opacity:0.12"/></linearGradient>`;
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", "--sun")}${fade("skyMoon", "--moon")}</defs><path class="sky-arc" stroke="url(#skyMoon)" d="${path("moon")}"/><path class="sky-arc" stroke="url(#skySun)" d="${path("sun")}"/></svg>`;
+  const lines = [];
+  for (let a = hi; a >= lo; a -= STEP) {
+    const pos = `top:${y(a).toFixed(1)}px`;
+    lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);
+    if (a === 0 || a === -STEP) lines.push(`<span class="chart-y" style="${pos}">${a ? "−18°" : "Horyzont"}</span>`);
+  }
+  const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
+  // Wschody i zachody: małe kropki tam, gdzie łuk przecina horyzont (Słońce górną krawędzią tarczy, −0,833°).
+  const events = [...n.sunEv.map((e) => dot(e.t, -0.833, "is-sun is-event")), ...n.moonEv.map((e) => dot(e.t, 0, "is-moon is-event"))];
   // Kropki „teraz” w miejscu najbliższej próbki.
   let dots = "";
   if (now > n.start && now < n.end) {
     const a = n.arcs[clamp(Math.round((now - n.start) / (n.arcs[1].t - n.start)), 0, n.arcs.length - 1)];
-    const dot = (alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(now).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
-    dots = dot(a.moon, "is-moon") + dot(a.sun, "is-sun");
+    dots = dot(now, a.moon, "is-moon") + dot(now, a.sun, "is-sun");
   }
-  // Podpisy co 6 godzin czasu miejsca, w miejscu swojej godziny.
-  const ticks = [];
-  for (let t = Math.ceil((n.start + offset) / 3600000) * 3600000 - offset; t < n.end; t += 3600000)
-    if (new Date(t + offset).getUTCHours() % 6 === 0 && t > n.start)
-      ticks.push(`<span style="left:${x(t).toFixed(2)}%">${localHM(t + offset)}</span>`);
-  const legend = `<div class="sky-legend" aria-hidden="true"><span class="is-sun">Słońce</span><span class="is-moon">Księżyc ${Math.round(illum * 100)}%</span></div>`;
-  return `<div class="chart sky-chart" role="img" aria-label="${esc(label)}">${legend}<div class="chart-plot" style="height:${H}px">${bands}${lines}${svg}${dots}</div><div class="sky-x" aria-hidden="true">${ticks.join("")}</div></div>`;
+  // Godziny co 6 h od początku osi, rozłożone równo jak na pozostałych wykresach.
+  const ticks = Array.from({ length: 5 }, (_, i) => `<span>${localHM(n.start + i * 6 * 3600000 + offset)}</span>`);
+  return `<div class="chart sky-chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${lines.join("")}${svg}${events.join("")}${dots}</div><div class="chart-x" aria-hidden="true">${ticks.join("")}</div></div>`;
+}
+
+// Faza Księżyca 14 px: ciemna tarcza i oświetlona część. illum: część tarczy 0–1, right: oświetlona prawa strona
+// (na półkuli północnej, gdy Księżyca przybywa). Oświetlony brzeg to półokrąg, terminator to półelipsa.
+export function moonPhaseIcon(illum, right) {
+  const r = 7,
+    rx = (Math.abs(1 - 2 * illum) * r).toFixed(2);
+  const lit = `M0 ${-r}A${r} ${r} 0 0 1 0 ${r}A${rx} ${r} 0 0 ${illum > 0.5 ? 1 : 0} 0 ${-r}Z`;
+  return `<svg class="moon-phase" viewBox="-7 -7 14 14" aria-hidden="true"><circle r="7" fill="rgba(255,255,255,0.2)"/><path d="${lit}" fill="var(--moon)"${right ? "" : ' transform="scale(-1 1)"'}/></svg>`;
 }

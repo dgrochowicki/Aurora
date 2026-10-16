@@ -58,14 +58,14 @@ test("oś nocy ma zachód i wschód Słońca we właściwej kolejności", () => 
   assert.equal(n.sunEv.length, 2);
   assert.equal(n.sunEv[0].rise, false);
   assert.equal(n.sunEv[1].rise, true);
-  assert.ok(n.end - n.start === 18 * 3600000);
+  assert.ok(n.end - n.start === 24 * 3600000);
 });
 
 test("łuki nocy mają wysokości co 5 minut, a Słońce w nocy schodzi poniżej −18°", () => {
   const n = nightTimeline(SZCZECIN, Date.parse("2026-10-04T19:00:00Z"), 7200000);
-  assert.equal(n.arcs.length, 18 * 12 + 1);
+  assert.equal(n.arcs.length, 24 * 12 + 1);
   assert.equal(n.arcs[0].t, n.start);
-  assert.ok(n.arcs[0].sun > 0, "o 16:00 Słońce jest nad horyzontem");
+  assert.ok(n.arcs[0].sun > 0, "o 12:00 Słońce jest nad horyzontem");
   assert.ok(Math.min(...n.arcs.map((a) => a.sun)) < -18);
 });
 

@@ -811,37 +811,12 @@ html.sheet-open body {
   font-size: 0.8125rem;
   color: var(--sub-65);
 }
-/* Łuki Słońca i Księżyca (ui/sky-chart.js): od krawędzi do krawędzi jak inne wykresy, legenda i godziny 24 px od krawędzi. */
-.sky-chart {
-  padding-top: 0;
-}
-.sky-legend {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
-  padding-inline: 24px;
-}
-.sky-legend span::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: var(--sky);
-  vertical-align: 1px;
-}
+/* Łuki Słońca i Księżyca (ui/sky-chart.js): od krawędzi do krawędzi jak inne wykresy, linie co 37 px. */
 .sky-chart .is-sun {
-  --sky: var(--yellow);
+  --sky: var(--sun);
 }
 .sky-chart .is-moon {
   --sky: var(--moon);
-}
-.sky-dark {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  background: rgb(var(--green-rgb) / 0.08);
 }
 .sky-horizon {
   position: absolute;
@@ -852,37 +827,32 @@ html.sheet-open body {
 }
 .sky-arc {
   fill: none;
-  stroke: var(--sky);
-  stroke-width: 2.3px;
+  stroke-width: 5px;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
-/* Pod horyzontem łuk jest przygaszony. */
-.sky-arc.is-below {
-  opacity: 0.35;
-}
-.sky-sun-fill {
-  fill: url(#skySunFill);
-}
+/* Kropka „teraz” 18 px; mała kropka to wschód albo zachód na horyzoncie. */
 .sky-dot {
   position: absolute;
   z-index: 1;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border: 2px solid var(--sheet);
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
   border-radius: 50%;
   background: var(--sky);
 }
-.sky-x {
-  position: relative;
-  height: 18px;
-  margin-top: 12px;
+.sky-dot.is-event {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
 }
-.sky-x span {
-  position: absolute;
-  transform: translateX(-50%);
+/* Faza Księżyca obok procentu tarczy. */
+.moon-phase {
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  vertical-align: -2px;
 }
 .factor {
   padding: 12px 0;
