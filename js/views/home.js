@@ -138,13 +138,15 @@ export function renderForecast(loc, w, grid, space) {
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
   const cloudNow = Math.round(first.cloud);
   const phase = phaseAt(now, loc);
+  // Faza Księżyca tylko, gdy jest na niebie; pod horyzontem nic nie świeci.
+  const moonUp = nowSky.moonAlt > 0;
   setTile(els.conditionTiles, "cloud", {
     value: String(cloudNow),
     icon: weatherIcon(first.night, cloudNow),
     status: cloudLabel(cloudNow),
     next: change?.short || "Bez większych zmian",
   });
-  setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), statusIcon: moonPhaseIcon(nowSky.moonIllum, moonLitRight(now, loc.lat, loc.lon)), next: night.nextText });
+  setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), statusIcon: moonUp ? moonPhaseIcon(nowSky.moonIllum, moonLitRight(now, loc.lat, loc.lon)) : "", next: night.nextText });
 
   const diffH = (browserOffset() - offset) / 3600000;
   showUpdated(now, offset);
