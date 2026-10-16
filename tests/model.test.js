@@ -71,7 +71,7 @@ test("łuki nocy mają wysokości co 5 minut, a Słońce w nocy schodzi poniżej
 
 test("szansa jest zerowa przy pełnym zachmurzeniu i wyższa przy czystym niebie", () => {
   const now = Date.parse("2026-10-04T20:00:00Z");
-  const times = Array.from({ length: 12 }, (_, h) => new Date(now + 7200000 + h * 3600000).toISOString().slice(0, 16));
+  const times = Array.from({ length: 24 }, (_, h) => new Date(now + 7200000 + h * 3600000).toISOString().slice(0, 16));
   const weather = (c) => ({
     utc_offset_seconds: 7200,
     hourly: { time: times, cloud_cover: times.map(() => c), cloud_cover_low: times.map(() => c), cloud_cover_mid: times.map(() => 0), cloud_cover_high: times.map(() => 0) },
@@ -84,6 +84,10 @@ test("szansa jest zerowa przy pełnym zachmurzeniu i wyższa przy czystym niebie
   assert.ok(clear.first.score > 0);
   assert.equal(clear.rows.length, 12);
   assert.equal(clear.rows[0].label, "Teraz");
+  // Wykres zachmurzenia: pełne 12 h, czyli 13 punktów co godzinę.
+  assert.equal(cloudy.clouds.length, 13);
+  assert.equal(cloudy.clouds[12].t - cloudy.clouds[0].t, 12 * 3600000);
+  assert.equal(cloudy.clouds[0].v, 100);
 });
 
 test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {

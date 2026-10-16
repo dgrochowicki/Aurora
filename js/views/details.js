@@ -4,7 +4,7 @@
 import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt } from "../model/sky.js";
 import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
-import { lineChart, barChart } from "../ui/chart.js";
+import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
@@ -157,12 +157,15 @@ export const DETAILS = {
       html:
         infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) }) +
         chart(
-          rows.map((h) => ({ t: h.ms, v: h.cloud })),
+          st.clouds,
           {
-            label: `Zachmurzenie w najbliższych godzinach: ${rows.map((h) => `${h.label} ${h.cloud}%`).join(", ")}`,
+            label: `Zachmurzenie w najbliższych godzinach: ${st.clouds.map((p) => `${localHM(p.t + st.offset)} ${p.v}%`).join(", ")}`,
             offset: st.offset,
-            ticks: [100, 50, 0],
+            ticks: [100, 80, 60, 40, 20, 0],
+            row: ROW_DENSE,
+            unit: "%",
             tone: "yellow",
+            every: 3,
             empty: "Brak prognozy zachmurzenia.",
           },
         ) +

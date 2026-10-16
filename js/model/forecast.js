@@ -45,6 +45,12 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
       score,
     });
   }
+  // Zachmurzenie na wykres: 13 godzin, czyli pełne 12 h, żeby podpisy co 3 h trafiały w oba końce.
+  const clouds = [];
+  for (let i = Math.max(0, idx); i < Math.min(w.hourly.time.length, Math.max(0, idx) + 13); i++) {
+    const total = Number(w.hourly.cloud_cover?.[i]);
+    clouds.push({ t: localMs(w.hourly.time[i]) - offset, v: Number.isFinite(total) ? Math.round(total) : Math.round((1 - clearSky(w.hourly, i)) * 100) });
+  }
   const nowSky = skyAt(now, loc.lat, loc.lon);
   const first = rows[0] || {
     score: 0,
@@ -58,7 +64,7 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   };
   const best = rows.reduce((a, b) => (b.score > a.score ? b : a), rows[0] || first);
   const maxAct = Math.max(first.act, ...rows.map((r) => r.act));
-  return { rows, first, best, maxAct, nowSky, offset, tz: w.timezone_abbreviation || "" };
+  return { rows, clouds, first, best, maxAct, nowSky, offset, tz: w.timezone_abbreviation || "" };
 }
 
 // Aktywność bez prognozy pogody: tylko NOAA.

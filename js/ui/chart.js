@@ -4,6 +4,8 @@
 import { esc, fmtNum, localHM } from "../util.js";
 
 const ROW = 53;
+// Gęstsza podziałka (np. zachmurzenie co 20%): 16 px zamiast 32 od linii do liczby nad następną, przy 6 liniach wykres ma 232 px.
+export const ROW_DENSE = 37;
 
 // „Ładny” krok podziałki: 1, 2, 2,5 albo 5 razy potęga dziesięciu, nie mniejszy niż raw.
 const niceStep = (raw) => {
@@ -31,20 +33,20 @@ export function niceTicks(lo, hi, min = 3) {
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 
 // Skala pionowa z podziałki: wysokość w px i położenie wartości od góry.
-function scale(ticks) {
+function scale(ticks, row = ROW) {
   const top = ticks[0],
     bottom = ticks[ticks.length - 1],
-    H = (ticks.length - 1) * ROW;
+    H = (ticks.length - 1) * row;
   return { H, y: (v) => ((top - v) / (top - bottom)) * H };
 }
 
-// Przerywane linie podziałki z liczbami osi Y po prawej.
-function gridHTML(ticks, y) {
+// Przerywane linie podziałki z liczbami osi Y po prawej. unit: dopisek przy liczbach innych niż zero, np. „%”.
+function gridHTML(ticks, y, unit = "") {
   const d = decimals(ticks);
   return ticks
     .map((v) => {
       const pos = `top:${y(v).toFixed(1)}px`;
-      return `<i class="chart-grid" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}</span>`;
+      return `<i class="chart-grid" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}${v ? unit : ""}</span>`;
     })
     .join("");
 }
@@ -52,7 +54,9 @@ function gridHTML(ticks, y) {
 // series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
 // offset: strefa, w której podpisujemy godziny. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
 // tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony).
-export function lineChart(series, { zero = false, label, offset = 0, ticks: fixed = null, tone = "", empty = "Brak danych z ostatnich 2 godzin." }) {
+// unit: dopisek przy liczbach osi Y poza zerem. row: odstęp linii podziałki w px (domyślnie 53).
+// every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego początek, środek i koniec.
+export function lineChart(series, { zero = false, label, offset = 0, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin." }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -62,7 +66,7 @@ export function lineChart(series, { zero = false, label, offset = 0, ticks: fixe
     hi = Math.max(hi, 0);
   }
   const ticks = fixed || niceTicks(lo, hi),
-    { H, y } = scale(ticks);
+    { H, y } = scale(ticks, row);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100;
@@ -77,7 +81,10 @@ export function lineChart(series, { zero = false, label, offset = 0, ticks: fixe
   const hm = (t) => localHM(t + offset);
   // Środkowy podpis to czas środkowego punktu danych, żeby przy prognozie godzinowej była pełna godzina.
   const mid = series[Math.floor((series.length - 1) / 2)].t;
-  return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}${svg}</div><div class="chart-x" aria-hidden="true"><span>${hm(t0)}</span><span>${hm(mid)}</span><span>${hm(t1)}</span></div></div>`;
+  // Godziny pod osią: co every-ty punkt (i zawsze ostatni), rozłożone równo jak początek, środek i koniec.
+  const marks = every ? series.filter((_, i) => i % every === 0 || i === series.length - 1).map((p) => p.t) : [t0, mid, t1];
+  const axis = `<div class="chart-x" aria-hidden="true">${marks.map((t) => `<span>${hm(t)}</span>`).join("")}</div>`;
+  return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y, unit)}${svg}</div>${axis}</div>`;
 }
 
 // Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, a}] od najwcześniejszego.

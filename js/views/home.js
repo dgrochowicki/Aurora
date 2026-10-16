@@ -123,11 +123,11 @@ export function renderForecast(loc, w, grid, space) {
   const now = Date.now();
   const fc = buildForecast(loc, w, grid, space, now);
   if (loc.test) applyTest(fc, loc.test);
-  const { rows, first, best, maxAct, nowSky, offset, tz } = fc;
+  const { rows, clouds, first, best, maxAct, nowSky, offset, tz } = fc;
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
     night = nightTimeline(loc, now, offset);
-  state = { loc, grid, space, rows, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
+  state = { loc, grid, space, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
   els.score.textContent = `${first.score}%`;
   els.chance.textContent = chanceLabel(first.score);
@@ -174,7 +174,7 @@ function applyTest(fc, pct) {
 // Bez prognozy pogody nie policzymy szansy, ale nadal pokazujemy aktywność, Kp i Bz z NOAA.
 export function renderSpaceOnly(loc, grid, space) {
   const act = activityOnly(loc, grid, space);
-  state = { loc, grid, space, rows: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
+  state = { loc, grid, space, rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
   // Bez prognozy pogody nie znamy strefy miejsca, więc datę podajemy według przeglądarki.
   showUpdated(Date.now(), browserOffset());
   renderSpaceTiles(space);
