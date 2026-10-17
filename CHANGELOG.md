@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — mapa zorzy jako płynna warstwa
+
+- Zamiast kropek (co trzeci punkt siatki, stała wielkość w pikselach, po przybliżeniu rozsypane) model OVATION jest rysowany jako ciągła, półprzezroczysta plama w kolorach legendy, poprawna przy każdym przybliżeniu. Prośba autora: „dziwnie wyglądają kropki po zoomie”.
+- `ovationField()` w `js/model/aurora.js` (interpolacja dwuliniowa, opcjonalne wygładzenie 3×3, z testami) i warstwa kafelków `L.gridLayer` w `js/views/map.js`. Próg widoczności 8 bez zmian.
+
 ## 17.10.2026 — CI, Leaflet z SRI, fokus w panelach
 
 - Testy uruchamiają się na GitHubie przy każdym pushu i pull requeście (`.github/workflows/test.yml`, Node 20, `npm test`).

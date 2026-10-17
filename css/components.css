@@ -906,7 +906,7 @@ html.sheet-open body {
   background: var(--bg);
 }
 /* Ciemna mapa: odwracamy jasne kafelki OpenStreetMap i przywracamy odcienie, żeby pasowały do grafitowego tła.
-   Filtr dotyczy tylko podkładu, kropki zorzy i znacznik miejsca zostają w swoich kolorach. */
+   Filtr dotyczy tylko podkładu, warstwa zorzy i znacznik miejsca zostają w swoich kolorach. */
 #auroraMap .leaflet-tile-pane {
   filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.4);
 }

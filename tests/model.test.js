@@ -181,3 +181,25 @@ test("w dzień szansa jest zerowa nawet przy mocnej zorzy i czystym niebie", () 
   assert.ok(fc.rows[0].act > 50);
   assert.equal(fc.rows[0].score, 0);
 });
+
+test("pole OVATION do mapy: wartości w węzłach, płynnie między nimi, z zawinięciem długości", async () => {
+  const { ovationField } = await import("../js/model/aurora.js");
+  const f = ovationField({ coords: [[359, 65, 40], [0, 65, 20], [0, 66, 0]] });
+  assert.equal(f(65, 0), 20);
+  assert.equal(f(65, -1), 40);
+  assert.equal(f(65, 359.5), 30);
+  assert.equal(f(65.5, 0), 10);
+  assert.equal(f(-90, 0), 0);
+  assert.equal(f(90, 0), 0);
+});
+
+test("wygładzone pole OVATION zachowuje poziom i rozmywa pojedynczy szczyt", async () => {
+  const { ovationField } = await import("../js/model/aurora.js");
+  const coords = [];
+  for (let lon = 0; lon < 360; lon++) for (let lat = 60; lat <= 70; lat++) coords.push([lon, lat, 30]);
+  coords.find((p) => p[0] === 10 && p[1] === 65)[2] = 120;
+  const f = ovationField({ coords }, { smooth: 1 });
+  assert.equal(f(65, 100), 30);
+  assert.equal(f(65, 10), 40);
+  assert.equal(f(65, 11), 40);
+});
