@@ -24,7 +24,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 
 - Statyczna aplikacja internetowa bez frameworka i kroku kompilacji, w języku polskim.
 - Moduły ES uruchamiane przez serwer (`npm start` lub `python3 -m http.server 4173`), nie przez `file://`.
-- Testy: `npm test` (Node 18+, `node --test`, bez zewnętrznych zależności testowych).
+- Testy: `npm test` (Node 18+, `node --test`, bez zewnętrznych zależności testowych). GitHub Actions uruchamia je przy każdym pushu (`.github/workflows/test.yml`); czerwony wynik blokuje „puść na mastera”, dopóki nie poprawimy.
 - Strona na GitHub Pages z gałęzi `main`: https://dgrochowicki.github.io/Aurora/.
 - Zapis miejsc w `localStorage`, bez konta użytkownika.
 - Makiety autora z Figmy w lokalnym `Research/`; nie commitować katalogu z referencjami. Wymiary i aktualne tokeny są w `STYL.md`.
@@ -96,7 +96,7 @@ Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z l
 - Dla testów UI preferować dane deterministyczne, przechwycone żądania (`page.route`) i stałą datę (`page.clock.setFixedTime`), a następnie porównać zrzuty przed i po.
 - Na Macu autora sieć działa, więc testujemy na prawdziwych danych: `npm start` i Playwright z Chromium z `~/Library/Caches/ms-playwright/` (np. `chromium_headless_shell-1243`), widok referencyjny 402 × 874. Zachowań iOS (Safari, `:active`, zaznaczanie tekstu) nie da się tak sprawdzić; potwierdza je autor na telefonie.
 - We wcześniejszym środowisku chmurowym sieć blokowała NOAA/Open-Meteo (także przez WebFetch); stronę testowaliśmy tam w Playwright z przechwyconymi zapytaniami i danymi przykładowymi, z Chromium w `/opt/pw-browsers/chromium`. **Nie zakładać**, że każde środowisko ma identyczne ograniczenia. Jeśli połączenie nie działa, nie twierdzić, że przetestowano prawdziwe dane.
-- Projekt korzysta z lokalnych SVG ikon (Phosphor) w `js/ui/icons.js`, więc podstawowe ikony nie wymagają pobierania biblioteki z CDN; Leaflet jest ładowany osobno z unpkg.
+- Projekt korzysta z lokalnych SVG ikon (Phosphor) w `js/ui/icons.js`, więc podstawowe ikony nie wymagają pobierania biblioteki z CDN; Leaflet jest ładowany osobno z unpkg z sumą `integrity`; przy zmianie wersji Leaflet trzeba podmienić obie sumy w `index.html` (z leafletjs.com).
 
 ## Historia zmian
 

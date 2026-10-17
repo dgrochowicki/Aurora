@@ -443,6 +443,11 @@
 }
 /* Wspólne dla paneli (.sheet): wysuwanie od dołu i układ, w którym nagłówek stoi w miejscu, a przewija się tylko .sheet-scroll.
    Wysokość w dvh, bo na iPhonie vh nie uwzględnia paska adresu. */
+/* Panel dostaje fokus po otwarciu (ui/sheet.js); bez obwódki, bo to nie jest kontrolka. */
+.sheet:focus {
+  outline: none;
+}
+
 .sheet {
   position: fixed;
   z-index: 21;
@@ -901,7 +906,7 @@ html.sheet-open body {
   background: var(--bg);
 }
 /* Ciemna mapa: odwracamy jasne kafelki OpenStreetMap i przywracamy odcienie, żeby pasowały do grafitowego tła.
-   Filtr dotyczy tylko podkładu, kropki zorzy i znacznik miejsca zostają w swoich kolorach. */
+   Filtr dotyczy tylko podkładu, warstwa zorzy i znacznik miejsca zostają w swoich kolorach. */
 #auroraMap .leaflet-tile-pane {
   filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.4);
 }

@@ -6,6 +6,50 @@ import { RAD } from "./sky.js";
 export const HORIZON_KM = 1000;
 export const visWeight = (km) => clamp(1 - km / HORIZON_KM, 0, 1);
 
+// Model OVATION jako ciągłe pole: wartość w dowolnym punkcie z interpolacji dwuliniowej między węzłami siatki 1°.
+// Do mapy, żeby po przybliżeniu nie było widać pojedynczych punktów siatki. lon dowolna (zawijamy), lat −90…90.
+// smooth: ile razy uśrednić węzły z sąsiadami (3×3), żeby szum siatki nie rysował pasów. 0 to surowe wartości.
+export function ovationField(grid, { smooth = 0 } = {}) {
+  const W = 360,
+    H = 181;
+  let v = new Float32Array(W * H);
+  for (const p of grid.coords) {
+    const x = ((Math.round(p[0]) % W) + W) % W,
+      y = Math.round(p[1]) + 90;
+    if (y >= 0 && y < H) v[y * W + x] = Number(p[2]) || 0;
+  }
+  for (let s = 0; s < smooth; s++) {
+    const out = new Float32Array(W * H);
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++) {
+        let sum = 0,
+          n = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          const yy = y + dy;
+          if (yy < 0 || yy >= H) continue;
+          for (let dx = -1; dx <= 1; dx++) {
+            sum += v[yy * W + ((x + dx + W) % W)];
+            n++;
+          }
+        }
+        out[y * W + x] = sum / n;
+      }
+    v = out;
+  }
+  return (lat, lon) => {
+    const fy = clamp(lat + 90, 0, H - 1),
+      fx = (((lon % W) + W) % W);
+    const x0 = Math.floor(fx),
+      y0 = Math.min(Math.floor(fy), H - 2),
+      x1 = (x0 + 1) % W,
+      tx = fx - x0,
+      ty = fy - y0;
+    const a = v[y0 * W + x0] * (1 - tx) + v[y0 * W + x1] * tx,
+      b = v[(y0 + 1) * W + x0] * (1 - tx) + v[(y0 + 1) * W + x1] * tx;
+    return a * (1 - ty) + b * ty;
+  };
+}
+
 // Najwyższa widoczna aktywność z modelu OVATION w promieniu 1000 km. null, gdy modelu brak.
 export function auroraAt(lat, lon, grid) {
   if (!grid.coords.length) return null;
