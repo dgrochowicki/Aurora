@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — „Jasność nieba” zamiast „Światło w nocy”
+
+- Kafelek „Światło w nocy” i panel „Światło tej nocy” nazywają się teraz „Jasność nieba”. Stara nazwa nie pasowała w dzień, a panel pokazuje całą dobę 12:00–12:00. Decyzja autora.
+
 ## 17.10.2026 — próg mapy zorzy 10 zamiast 8
 
 - Warstwa zorzy na mapie zaczyna się od wartości OVATION 10 (jak na mapie NOAA), a nie 8. Przy 8–10 zorzy praktycznie nie widać nawet pod nią, więc mapa sugerowała za dużo. Decyzja autora.

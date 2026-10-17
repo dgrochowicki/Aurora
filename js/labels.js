@@ -58,6 +58,6 @@ export function conditionsText(r) {
 // Czym da się zobaczyć zorzę przy danej szansie. Poniżej progu aparatu nic nie dopisujemy.
 export const viewLabel = (score) => (score >= 48 ? "widoczna gołym okiem" : score >= 14 ? "widoczna przez aparat" : null);
 
-// Krótszy opis do kafelka „Światło w nocy”.
+// Krótszy opis do kafelka „Jasność nieba”.
 export const moonTileLabel = (sky) =>
   sky.moonAlt <= 0 ? "Księżyc pod horyzontem" : `Księżyc ${Math.round(sky.moonIllum * 100)}% tarczy`;

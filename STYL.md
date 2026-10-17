@@ -124,11 +124,11 @@ Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałk
 
 13 punktów na 12 h prognozy, żółta linia z gradientem, skala 0–100%, linie co 20%, gęstszy odstęp 37 px (`ROW_DENSE`), wysokość około 232 px. Oś godzin co 3 h (5 podpisów). Informacje o niskiej/średniej/wysokiej warstwie obok wartości bieżącej dotyczą pierwszej godziny, **nie są sumą** i nie muszą zgadzać się z procentem całkowitym.
 
-### Światło tej nocy
+### Jasność nieba (dawniej „Jasność nieba”)
 
 Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 5 px pełnym kolorem nad horyzontem. Pod horyzontem gradient od 50% do 20% przy −18° i 8% u dołu. Kropki „teraz” 18 px, wschody/zachody 8 px. Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
 
-Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Światło w nocy” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
+Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Jasność nieba” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
 
 ## 10. Menu, mapa i miejsca
 

@@ -41,7 +41,7 @@ const ACTIVITY_TILES = [
 ];
 const CONDITION_TILES = [
   { key: "cloud", label: "Zachmurzenie", unit: "%", tight: true, icon: true, wide: true },
-  { key: "light", label: "Światło w nocy", icon: true, wide: true },
+  { key: "light", label: "Jasność nieba", icon: true, wide: true },
 ];
 
 // Tymczasowo, do wyboru wariantu przez autora: ?kafelki=paski pokazuje we wszystkich kafelkach ten sam miernik zamiast mini wykresów.

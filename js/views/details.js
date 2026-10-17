@@ -209,7 +209,7 @@ export const DETAILS = {
     const n = st.night;
     if (!n)
       return {
-        title: "Światło tej nocy",
+        title: "Jasność nieba",
         source: "Obliczenia w przeglądarce",
         html: infoHero(null) + infoText("Bez prognozy pogody nie znamy strefy czasowej miejsca, więc nie pokazujemy godzin."),
       };
@@ -242,7 +242,7 @@ export const DETAILS = {
       return e ? hm(e.t) : "—";
     };
     return {
-      title: "Światło tej nocy",
+      title: "Jasność nieba",
       source: "Położenie Słońca i Księżyca liczone w przeglądarce",
       html:
         infoHero(phaseAt(now, st.loc), "", { text: true, status: `${dark} ${moonNow}` }) +
