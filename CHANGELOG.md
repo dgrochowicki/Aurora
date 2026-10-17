@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — próg mapy zorzy 10 zamiast 8
+
+- Warstwa zorzy na mapie zaczyna się od wartości OVATION 10 (jak na mapie NOAA), a nie 8. Przy 8–10 zorzy praktycznie nie widać nawet pod nią, więc mapa sugerowała za dużo. Decyzja autora.
+
 ## 17.10.2026 — mapa zorzy jako płynna warstwa
 
 - Zamiast kropek (co trzeci punkt siatki, stała wielkość w pikselach, po przybliżeniu rozsypane) model OVATION jest rysowany jako ciągła, półprzezroczysta plama w kolorach legendy, poprawna przy każdym przybliżeniu. Prośba autora: „dziwnie wyglądają kropki po zoomie”.

@@ -16,10 +16,10 @@ const sheet = createSheet({
 });
 
 // Kolory warstwy zorzy, te same co w legendzie (.map-legend i): płynnie od turkusu przy słabej do czerwieni przy silnej.
-// a: krycie. Poniżej 8 (jak dawniej przy kropkach) warstwa jest przezroczysta, a nawet najsilniejsza zorza nie zasłania całkiem podkładu.
+// a: krycie. Poniżej 10 (jak na mapie NOAA) warstwa jest przezroczysta, a nawet najsilniejsza zorza nie zasłania całkiem podkładu.
 const STOPS = [
-  { v: 8, c: [82, 217, 186], a: 0 },
-  { v: 14, c: [82, 217, 186], a: 0.35 },
+  { v: 10, c: [82, 217, 186], a: 0 },
+  { v: 16, c: [82, 217, 186], a: 0.35 },
   { v: 25, c: [180, 255, 99], a: 0.5 },
   { v: 45, c: [255, 228, 91], a: 0.6 },
   { v: 70, c: [255, 109, 90], a: 0.7 },
@@ -113,7 +113,7 @@ async function showMap(current) {
     auroraLayer.createTile = drawTile;
     auroraLayer.addTo(map);
   } else auroraLayer.redraw();
-  const shown = grid.coords.some((p) => Number(p[2]) >= 8);
+  const shown = grid.coords.some((p) => Number(p[2]) >= 10);
   note.textContent = shown
     ? `Model NOAA OVATION • aktualizacja ${grid.time ? new Date(grid.time).toLocaleString("pl-PL") : "bieżąca"}`
     : "Aktualnie model nie pokazuje wyraźnej aktywności.";
