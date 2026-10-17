@@ -5,7 +5,8 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 18.10.2026 — przyciski mapy i lot do lokalizacji
 
 - ✕ na mapie w tym samym wymiarze i z tą samą ikoną bold co w panelach szczegółów, na ciemnym szkle; pod nim nowy przycisk „Wróć do lokalizacji” (celownik Phosphor gps-fix bold).
-- Po otwarciu mapy płynne przybliżenie z widoku świata do bieżącej lokalizacji (do przybliżenia 4); przycisk celownika wraca tam z dowolnego miejsca mapy. Własna animacja zamiast `flyTo` z Leaflet, który po drodze oddalał mapę i wyjeżdżał poza jej ramkę (uwaga autora). Bez animacji przy ograniczonym ruchu.
+- Mapa otwiera się od razu na bieżącej lokalizacji w przybliżeniu 4. Animację przybliżania po otwarciu wypróbowaliśmy i usunęliśmy: `flyTo` z Leaflet oddalał mapę i wyjeżdżał poza ramkę, a własna animacja klatka po klatce zostawiała pustą mapę, zanim wczytały się kafelki. Decyzja autora: bez animacji.
+- Przycisk celownika płynnie przesuwa mapę do lokalizacji z dowolnego miejsca (zwykła animacja przesunięcia z Leaflet, w granicach mapy).
 - Przyciski mapy i panel legendy mniej przezroczyste: czarne 85% (prośba autora).
 - Legenda nie zaznacza się przy przeciąganiu palcem.
 - Pomysł autora na później: zapisane miejsca na mapie jako funkcja płatna (`UWAGI.md`).
