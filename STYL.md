@@ -1,106 +1,144 @@
-# Styl UI
+# Styl Aurora Now — aktualna specyfikacja UI
 
-Ustalenia z autorem dotyczące wyglądu. Makiety: `Research/Aurora_main_00.png` (strona główna) i `Aurora_main_01.png` (z menu), lokalnie u autora, poza repo. Projektujemy na telefon o szerokości 402 px. Wersja na desktop na razie zostaje w ramce „telefonu”.
+**Stan na 17.10.2026.** Obowiązujące wartości tokenów sprawdzono z `css/tokens.css` w commicie `4b8fae35`. Historyczne palety i makiety nie są źródłem aktualnych kolorów. Makiety autora z Figmy (`Research/Aurora_main_00.png` i `Aurora_main_01.png`) znajdują się lokalnie, poza repozytorium. Bazowy ekran projektowy: **402 px**; desktop na razie pozostaje w ramce przypominającej telefon.
 
-## Odstępy
+> **Zasada utrzymania:** zmieniając wygląd, aktualizuj `STYL.md` w tym samym PR co CSS. Nie przywracaj starych wartości z historycznych commitów. Przy rozbieżności wartości bieżące wynikają z `css/tokens.css` i pozostałych stylów, a nie z tej tabeli.
 
-- Karty i kafelki: 20 px od krawędzi ekranu (`--gutter`).
-- Tekst leżący wprost na tle (nazwa miejsca, tytuły sekcji, notki): 24 px, czyli dodatkowe 4 px wcięcia optycznego (`--text-inset`).
-- Między kafelkami 12 px w poziomie i w pionie (`--gap`), między pigułkami godzin 8 px.
-- Pasek godzin przewija się aż do krawędzi ekranu.
+## 1. Układ i odstępy
 
-## Kolory
+- Gutter kart i kafelków: **20 px** (`--gutter`).
+- Tekst bezpośrednio na tle (nazwa miejsca, tytuły sekcji, notki): o dodatkowe **4 px** wcięcia (`--text-inset`), razem 24 px od krawędzi.
+- Odstęp między kafelkami: **12 px** (`--gap`) w pionie i poziomie.
+- Odstęp między godzinami: **8 px**; pasek pigułek przewijany poziomo do krawędzi ekranu.
+- Wersja na desktop zachowuje ograniczenie szerokości do **560 px** i prezentację w ramce.
 
-| Token | Wartość | Użycie |
+## 2. Kolory — aktualny stan
+
+Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab` są **nieaktualne**. Aktualny zestaw:
+
+| Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
-| `--bg` | #091216 | tło strony |
-| `--bg-top` | #002F2B | gradient u góry strony, do 600 px |
-| `--text` | #FFFFFF | liczby i tytuły sekcji |
-| `--sub` | #AFC7C2 | tytuły kart, opisy wartości |
-| `--sub-65` | #AFC7C2 65% | notki, opis zmiany w kafelku, data w nagłówku |
-| `--card` | #AEFFE9 8% | tło kart i kafelków |
-| `--card-border` | #AEFFE9 4% | obwódka kart |
-| `--glow` | #5AC369 | poświata pigułek godzin |
-| `--sheet` | #1E2226 | tło panelu szczegółów (biały 4% na `--bg`) |
+| `--bg` | `#15191D` | Tło główne |
+| `--bg-top` | `#111417` | Góra gradientu |
+| `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
+| `--sub` | `#AFC7C2` | Tytuły kart, opisy |
+| `--sub-65` | `rgba(175, 199, 194, 0.65)` | Notki i tekst drugorzędny |
+| `--green` | `#68F7BB` | Akcent aktywności |
+| `--yellow` | `#FFC867` | Chmury/ostrzeżenia |
+| `--glow` | `#5AC369` | Poświata godzin |
+| `--violet` | `#C4A1FF` | Mocno sprzyjające warunki |
+| `--aurora-green` | `#5AC369` | Zielona plama w tle |
+| `--aurora-violet` | `#412B5D` | Fioletowa plama w tle |
+| `--line` | `rgba(255, 255, 255, 0.09)` | Linie |
+| `--card` | `rgba(255, 255, 255, 0.08)` | Karty i kafelki |
+| `--card-border` | `rgba(255, 255, 255, 0.04)` | Obwódki |
+| `--card-soft` | `rgba(255, 255, 255, 0.04)` | Tła łagodniejsze, pigułki |
+| `--track` | `rgba(255, 255, 255, 0.10)` | Tła mierników, paski, kreski |
+| `--fab` | `rgba(0, 0, 0, 0.70)` | Pływające przyciski |
+| `--sheet` | `#1E2226` | Tło paneli |
+| `--surface` | `rgba(13, 32, 37, 0.78)` | Dodatkowe powierzchnie |
+| `--on-accent` | `#062117` | Tekst na akcentach |
+| `--warn` | `#FFC867` | Ostrzeżenie / Bz |
+| `--sun` | `#CC9200` | Łuk Słońca |
+| `--moon` | `#C9D6E3` | Łuk Księżyca |
 
-Autor chciał notek przy 50% krycia. Przy tak małym tekście kontrast wynosi wtedy 3,4:1, a minimum to 4,5:1, więc na razie jest 65%. Pełną paletę sprawdzimy razem, gdy będzie gotowa.
+Ciemna, neutralna baza; zieleń i fiolet mają wskazywać obecność i skalę zorzy, nie barwić całego interfejsu. Tekst notek ma 65% krycia. We wcześniejszych próbach 50% dawało zbyt niski kontrast (~3,4:1 dla małego tekstu), stąd obecna decyzja; weryfikować rzeczywisty kontrast przy przyszłych zmianach.
 
-## Typografia
+## 3. Typografia
 
-Czcionka systemowa (SF Pro na iPhonie). `Inter` w `tokens.css` nie jest pobierany.
+Czcionka systemowa (SF Pro na iPhone), z zapasową definicją `Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; `Inter` nie jest osobno pobierany.
 
-| Element | Rozmiar | Grubość | Kolor |
+| Element | Rozmiar / interlinia | Grubość | Kolor |
 |---|---|---|---|
-| Nazwa miejsca | 21 | semibold | biały |
-| Tytuł sekcji | 15 | semibold | biały |
-| Tytuł karty i kafelka | 13 | medium | `--sub` |
-| Szansa: opis słowny i procent | 28 / linia 34 | medium | biały |
-| Wartość w kafelku | 21 / linia 27 | medium | biały, jednostka tak samo |
-| Opis wartości | 15 / linia 20 | regular | `--sub` |
-| Opis zmiany, notki | 13 | regular | `--sub-65` |
+| Nazwa miejsca | 21 px | semibold | biały |
+| Tytuł sekcji | 15 px | semibold | biały |
+| Tytuł karty/kafelka | 13 px | medium | `--sub` |
+| Szansa: opis + procent | 28 / 34 px | medium | biały |
+| Liczba w kafelku | 21 / 27 px | medium | biały |
+| Opis wartości | 15 / 20 px | regular | `--sub` |
+| Notki, opis zmiany | 13 px | regular | `--sub-65` |
 
-## Zorza w tle
+Wszystkie konkretne wymiary z makiet wymagają okresowego sprawdzenia na rzeczywistym ekranie, szczególnie w Mobile Safari.
 
-Dwie rozmyte plamy pod treścią strony (`.aurora-sky` w `.app-shell`): zielona `--aurora-green` #5AC369 i fioletowa `--aurora-violet` #412B5D. Ich wielkość i jasność zależą od poziomu szansy 0–4 (`chanceLevel`, te same progi co opis słowny, „Brak” jak „Bardzo mała”). Przy „Braku” i „Bardzo małej” świecą przy prawej krawędzi obok bloku szansy, przy „Bardzo dużej” zieleń zalewa górę ekranu, a fiolet schodzi pod godziny. Stoją w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się nad nimi. Trzecia, mniejsza zielona plama zmienia kształt zorzy. Ruch jest delikatny: przesunięcie ±3%, powiększenie do 110%, obrót ±3° (13–23 s), a jasność oddycha od 70% do 100% (8–11 s). Przy zmianie poziomu plamy przechodzą płynnie przez 2 s. Bez danych są schowane. Pozycje to pierwsza wersja, autor jeszcze testuje opcje.
+## 4. Zorza w tle strony
 
-Kafelki i pigułki godzin są szklane: `backdrop-filter: blur(20px)`. Obok tytułu „Aktywność zorzy” po prawej jest poziom aktywności (Niska / Umiarkowana / Wysoka), 15 px regular `--sub`.
+W `#auroraSky` wewnątrz `.app-shell` są dwie zasadnicze plamy (zielona i fioletowa) oraz trzecia, mniejsza plama zielona wpływająca na kształt. Efekt stoi w miejscu przy przewijaniu (`position: fixed`), treść przesuwa się na nim. Wielkość i jasność rosną według poziomu wskaźnika 0–4 w `chanceLevel()`, przy „Brak” i „Bardzo mała” mają tę samą dyskretną formę. Przy „Bardzo duża” zieleń zajmuje górę, fiolet może schodzić poniżej paska godzin.
 
-## Blok szansy
+Ruch jest powolny: przesunięcie ~±3%, skala do 110%, rotacja ~±3° w 13–23 s, oddychanie jasności 70–100% w 8–11 s, przejścia poziomów około 2 s. Przy braku danych plamy są ukrywane. Przy `prefers-reduced-motion: reduce` animacje powinny być wyłączane. Pozycja i siła efektu pozostają tematem iteracji projektowej.
 
-W kodzie `.chance`. Bez ramki i bez tła, tekst wprost na tle (wcięcie `--text-inset`), padding 32 px nad i pod. Nad nim 16 px od nagłówka z datą, pod nim 16 px do sekcji „Najbliższe godziny”. Cały blok otwiera „Skąd ten wynik”. Kolejno, co 8 px (tylko między opisem szansy a akapitem 16 px):
-1. tytuł „Szansa na zorzę” (13 px, `--sub`);
-2. opis słowny szansy po lewej (`chanceLabel` w `labels.js`: Brak 0–2%, Bardzo mała <10%, Mała <15%, Umiarkowana <40%, Duża <70%, Bardzo duża) i zaokrąglona liczba procent po prawej, także 0%, oba 28 px medium;
-3. akapit 15 px `--sub`: zdanie o zorzy (z kierunkiem patrzenia, gdy jest szansa) i zdanie o warunkach obserwacji (`conditionsText`: za jasno albo dobre / umiarkowane / słabe według chmur i jasnego Księżyca, z procentem zachmurzenia);
-4. zapowiedź 13 px `--sub-65`: zmiana chmur i najlepsza godzina, przy innej strefie także czas użytkownika.
+Szkło w kartach i kafelkach: `backdrop-filter: blur(20px)`, zgodnie z rzeczywistym CSS. Ikony podstawowego UI to lokalnie zdefiniowane SVG oparte na Phosphor w `js/ui/icons.js`, **nie zewnętrznie ładowany font ikon**.
 
-## Kafelek
+## 5. Blok „Szansa na zorzę”
 
-Padding 16 px, zaokrąglenie 20 px. Kolejno: tytuł ze strzałką „›”, odstęp 20 px, metryka (ikona 24×24, liczba, opis, co 4 px), odstęp 20 px i opis zmiany. Ikony pochodzą z zestawu Phosphor (styl fill), a kod jest w `js/ui/icons.js`.
+`.chance` nie ma obramowanej karty. Treść jest bezpośrednio na tle, wcięta o `--text-inset`, z paddingiem 32 px nad i pod. Między nagłówkiem z datą a blokiem około 16 px; pod blokiem około 16 px do kolejnej sekcji.
 
-Kafelki aktywności mówią, co pomiar znaczy dla zorzy, w czterech poziomach z progów w `labels.js`: „Nie sprzyja” (`--sub-65`), „Neutralnie” (`--sub`), „Sprzyja zorzy” (`--green`), „Mocno sprzyja” (`--violet`, #C4A1FF). Kolor poziomu ma kropka przy opisie i wskaźnik pod nim (wysokość 32 px, 16 px pod opisem): Kp to miernik z 9 segmentów, a Magnetometr, Bz i Wiatr słoneczny to mini wykres z 2 godzin bez osi. Bz ma linię zera i podświetlony obszar pod nią, wiatr przerywaną linię progu 500 km/s. Opis fizyczny („Na południe”, „Burza G2”) zostaje w panelu szczegółów.
+Kolejność: tytuł 13 px (`--sub`), opis słowny i procent po 28 px, akapit o aktywności i warunkach, na dole zapowiedź godzin. Odstępy przeważnie 8 px, między wartością a akapitem 16 px. Po stuknięciu tytułu otwierany jest panel „Skąd ten wynik”.
 
-## Godziny
+`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
 
-Pigułka 70×123 px, padding 20/16, gap 12, zaokrąglenie 30 px. Rozmycia tła 7 px z Figmy nie używamy, bo pod pigułkami nic nie ma, a psuło rysowanie w Chromium. Wybrana: tło #AEFFE9 8% i obwódka 4%. Pozostałe: tło 4% bez obwódki.
+## 6. Kafelki i wskaźniki
 
-Zamiast osobnej karty „Najlepszy moment” pigułki mają zieloną poświatę od dołu (`--glow`), symulującą zorzę. Jej siła (`--aurora`, 0–1) ma dawać wrażenie narastania i gaśnięcia: najlepsza godzina świeci najmocniej (od 0,5 przy szansie 10% do 1 przy 70%), a pozostałe proporcjonalnie słabiej. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny. Informacje ze starej karty: kierunek patrzenia jest w zdaniu pod wynikiem, „widoczna gołym okiem / przez aparat” w linii wybranej godziny.
+Kafelek: padding 16 px, radius 20 px. Tytuł ze strzałką `›`, zwykle 20 px przerwy, metryka z ikoną 24 × 24 (jeżeli dotyczy), wartość i status, potem wskaźnik lub tekst najbliższej zmiany. Typowe odstępy wewnętrzne 4–20 px zależnie od części.
 
-## Ruch
+W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--sub-65`), „Neutralnie” (`--sub`), „Sprzyja zorzy” (`--green`), „Mocno sprzyja” (`--violet`). Poziom ma kropkę przy opisie i miernik/miniwykres o wysokości około 32 px pod statusem.
 
-- Wciśnięcie karty, kafelka lub godziny płynnie ją zmniejsza do 94% (`--press-scale`, przejście `--press`, 0,2 s). Na iOS działa dzięki nasłuchiwaniu `touchstart` w `main.js`.
-- Panele wysuwają się od dołu (0,4 s) i chowają tak samo w dół, szybciej (0,25 s, ta sama krzywa), a tło się przyciemnia i rozjaśnia. Przy ustawieniu „ogranicz ruch” animacje są wyłączone.
-- Panel ma najwyżej wysokość ekranu minus 40 px (w `dvh`, żeby uwzględnić pasek adresu Safari). Nagłówek z ✕ stoi w miejscu, przewija się tylko treść, a strona pod panelem jest zablokowana.
+- Magnetometr GOES, Bz, prędkość wiatru: miniwykresy z 2 h; Bz ma linię zera i wyróżnienie ujemnych wartości, wiatr próg 500 km/s.
+- Kp: miernik segmentowy (skala /9).
+- Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
+- Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
 
-## Panel szczegółów
+## 7. Pasek godzin
 
-Jeden wspólny układ dla wszystkich paneli (klocki w `js/ui/parts.js`), dalej poprawiamy każdy osobno.
+Pigułka około 70 × 123 px, padding 20/16, gap 12, radius 30. Wybrana: białe tło 8% i obwódka 4%, pozostałe: białe tło 4%, bez aktywnej obwódki. Pigułki poziomo przewijane.
 
-- Tło #1E2226 (`--sheet`), obwódka `--card-border`, zaokrąglenie u góry 32 px, nagłówek i treść 24 px od krawędzi.
-- Nagłówek: 20 px nad i pod. Tytuł 21/27 semibold, odstęp liter −0,01 em, biały. ✕ 44×44 w kółku z tłem #FFFFFF 4%, padding 12, ramka ikony 20×20 z krzyżykiem 14×14 (Phosphor bold). Najechanie i wciśnięcie podnosi tło do 8%. Uchwyt zostaje: 44×4, biały 30%, ma swój pasek 12 px (8 odstępu i 4 uchwytu), a pod nim zaczyna się nagłówek. Po przewinięciu pod nagłówkiem pojawia się linia.
-- Wysokość panelu zależy od treści (najwyżej ekran minus 40 px). Bloki nie mają wspólnego odstępu, każdy ma własny padding. Kolejno:
-  1. Metryka (`infoHero`), bez paddingu: liczba z jednostką 28/34 px medium, biała, jednostka w tym samym rozmiarze. 4 px pod nią stan 15 px regular `--sub`: to samo co w kafelku („Neutralnie”, „Sprzyja zorzy”). W panelu „Światło” zamiast liczby jest zdanie (28 px semibold).
-  2. Wykres z 2 godzin (`infoChart`, `ui/chart.js`). Linia i podziałka od krawędzi do krawędzi panelu, bez paddingu. Podziałka: co najmniej 3 linie co 53 px (liczba 16 px, 4 px przerwy, linia 1 px i 32 px do liczby nad następną linią; przy 3 liniach wykres z osią godzin ma 153 px), przerywane 4/4 px (`--track`), na „ładnych” wartościach (krok 1, 2, 2,5 albo 5 razy potęga 10), więc przy Bz zero jest zawsze linią. Liczby osi Y po prawej, 24 px od krawędzi i 4 px nad swoją linią. Oś X (początek, środek, koniec) 24 px od krawędzi, 8 px pod dolną linią, wysokość 18 px. Liczby 13 px `--sub-65`. Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. Linia 2,3 px (jak w starym wykresie; w Figmie 3 px), zielona z gradientem pod spodem. Bz jest dwukolorowy: poniżej zera linia `--warn`, bez gradientu. Kolory każdego wykresu autor ustali osobno.
-     Prognoza Kp to wykres słupkowy (`barChart`): doba, czyli 8 bloków 3-godzinnych, cała skala 0–9 (linie 0, 3, 6, 9). Słupki 24 px na środku równych części pasa 24 px od krawędzi, zaokrąglone u góry 4 px, zielone tym jaśniejsze, im wyższe Kp (krycie 20% przy 0 do 100% przy 9). Nad słupkiem wartość 13 px `--sub`, pod nim godzina początku bloku.
-     „Światło tej nocy” według makiety autora (16.10.2026): tytuł to pora dnia (Noc, Zmierzch…), pod nim zdanie o pełnej ciemności i Księżycu. Łuki Słońca i Księżyca (`ui/sky-chart.js`): oś doby 12:00–12:00 (godziny co 6 h, rozłożone równo), linie co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; ciągła linia horyzontu (biały 30%) z podpisem „Horyzont”, przerywane pozostałe, podpisana tylko −18°. Łuki 5 px: Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), nad horyzontem w pełnym kolorze, pod nim gasną od 50% przy horyzoncie przez 20% przy −18° do 8% na dole (gradient z kolorem wpisanym w kod, bo Safari nie zawsze bierze zmienne CSS w SVG). Kropki 18 px to „teraz”, kropki 8 px na horyzoncie to wschody i zachody. Pod wykresem wyjaśnienie, potem dane w 3 kolumnach (Zachód i Wschód Słońca, Najciemniej; Wschód i Zachód Księżyca, Tarcza z ikoną fazy) i zdanie o ciemności a sile zorzy.
-     Zachmurzenie to wykres liniowy na pełne 12 godzin prognozy (13 punktów co godzinę), żółty (`--yellow`, #FFC867) z gradientem, stała skala 0–100% z liniami co 20% i „%” przy liczbach poza zerem. Gęstsza podziałka: 16 px zamiast 32 od linii do liczby nad następną (co 37 px), cały wykres 232 px. Oś X: 5 godzin co 3 h, rozłożonych równo jak początek, środek i koniec.
-  3. Dane (`infoStats`): dwie albo trzy kolumny obok siebie z odstępem 20 px (warstwy chmur: trzy w jednym rzędzie). W każdej 16 px nad i pod treścią (od wykresu i od kreski), etykieta 13 px `--sub`, 4 px pod nią wartość 13 px semibold i kreska `--track`. Opis fizyczny („Spokojnie”, „Na południe”) jest tu jako „Ocena”.
-  4. Wyjaśnienie 13/18 `--sub`, padding 16 px góra i dół, akapity co 16 px.
-  5. Źródła 13 px `--sub-65`, bez odstępu nad (daje go wyjaśnienie), 48 px pod, do dołu strony.
-- Treści bez projektu (paski „Skąd ten wynik”) leżą tymczasowo w kartach (`infoCard`).
-- Puste części pasków, mierników, kreski i linie siatki mają `--track` (biały 10%).
+Zielona poświata od dołu (`--glow`, zmienna `--aurora`) pokazuje narastanie i gaśnięcie wyników, nie osobny pomiar. Najlepsza godzina ma świecić z siłą 0,5 przy wyniku 10 i dochodzić do 1 przy 70; pozostałe proporcjonalnie do własnego wyniku. Gdy maksimum <10, godziny pozostają ciemne.
 
-## Menu, mapa i miejsca
+Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem, status obserwacyjny („aparat” / „gołe oko”) w linii wybranej godziny, najlepsza godzina w tekście na dole bloku szansy.
 
-- Dwa pływające przyciski 72×48, zaokrąglenie 24, 24 px od krawędzi i od dołu, tło `--fab` (#103C36, 88%) z rozmyciem. Globus otwiera mapę, strzałka ekran miejsc.
-- Mapa na pełnym ekranie, ✕ (44 px) w prawym górnym rogu, legenda w karcie na dole.
-- Ekran miejsc na pełnym ekranie, bez ✕: na górze wyszukiwarka, potem oglądane miejsce („Teraz”), „Moja lokalizacja” i zapisane miejsca. Zamyka go wybór miejsca albo Escape. Stuknięcie w nazwę miejsca w nagłówku też go otwiera.
+## 8. Ruch i zachowania mobilne
 
-## Do ustalenia
+- Naciśnięcie przycisku/karty może zmniejszać element do 94% (`--press-scale`) przez około 0,2 s.
+- Safari iOS potrzebuje nasłuchiwania `touchstart`, aby pokazać `:active`; obsługuje to `js/main.js`.
+- Panele wysuwane od dołu, zamykane krótszą animacją; strona pod panelem ma blokadę przewijania i `inert`.
+- Przy `prefers-reduced-motion: reduce` animacje powinny się wyłączać.
+- Maksymalna wysokość paneli z uwzględnieniem `dvh` i pasków Mobile Safari; tytuł nieruchomy, przewija się treść.
 
-- Wariant wskaźników w kafelkach aktywności (gałąź `kafelki-wskazniki`): mieszany (domyślnie) albo ten sam miernik z 4 segmentów wszędzie (`?kafelki=paski`). Po wyborze usuwamy drugi wariant z kodu. Do potwierdzenia też słowa i kolory czterech poziomów.
-- Paleta: neutralna, granatowa baza i zielony tylko jako sygnał zorzy, fiolet dla mocnej aktywności. Warianty do porównania na zrzutach.
-- Przyciski menu zlewają się z treścią pod spodem. Trzeba je wyraźniej oddzielić (tło, obwódka albo cień).
-- Wygląd ekranu miejsc i mapy według projektu autora; ciemne kafelki mapy.
-- Skala nazw zachmurzenia. Tymczasowo: Brak <10%, Małe <30%, Umiarkowane <60%, Duże <80%, Bardzo duże.
-- Panele szczegółów: wspólny styl jest gotowy, teraz poprawki każdego panelu osobno. Do dopracowania: wykres zachmurzenia jest kanciasty (wygładzić linię, np. krzywą monotoniczną, żeby nie wychodziła poza 0–100%). W panelu zachmurzenia nie widać, że warstwy (niskie, średnie, wysokie) dotyczą tylko bieżącej godziny, a wykres i liczba to całkowite zachmurzenie, które nie jest sumą warstw. Do omówienia z autorem.
-- Wysokość linii dla tekstu 13 px i dużego wyniku oraz nazwa czcionki z Figmy.
+## 9. Panele szczegółów
+
+Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1E2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
+
+Metryka: 28/34 px, jednostka w tym samym rozmiarze, status 15 px, 4 px niżej. W panelu „Światło” zamiast liczby może być tytuł pory dnia. Między blokami nie ma jednego wspólnego marginesu; dane i wyjaśnienia mają zwykle własne paddingi po 16 px, źródła zostawiają około 48 px do dołu.
+
+### Wykresy Bz, GOES, wiatru
+
+`js/ui/chart.js`: co najmniej trzy linie podziałki co 53 px (`ROW`), „ładne” kroki 1, 2, 2,5, 5 × potęga 10. Przy trzech liniach wykres z osią X około 153 px. Podpisy osi Y po prawej, 24 px od krawędzi i 4 px nad linią; godziny początku, środka i końca. Linia ok. 2,3 px, przy Bz ujemny fragment innym kolorem i bez standardowego gradientu. Znany problem: w pobliżu zera podpis „0” może nachodzić na skrajny odczyt.
+
+Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki ok. 24 px, łagodne zaokrąglenie u góry, jasność zależna od Kp. Pod każdym jest początek odpowiedniego bloku, nad nim wartość.
+
+### Zachmurzenie
+
+13 punktów na 12 h prognozy, żółta linia z gradientem, skala 0–100%, linie co 20%, gęstszy odstęp 37 px (`ROW_DENSE`), wysokość około 232 px. Oś godzin co 3 h (5 podpisów). Informacje o niskiej/średniej/wysokiej warstwie obok wartości bieżącej dotyczą pierwszej godziny, **nie są sumą** i nie muszą zgadzać się z procentem całkowitym.
+
+### Światło tej nocy
+
+Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 5 px pełnym kolorem nad horyzontem. Pod horyzontem gradient od 50% do 20% przy −18° i 8% u dołu. Kropki „teraz” 18 px, wschody/zachody 8 px. Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
+
+Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Światło w nocy” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
+
+## 10. Menu, mapa i miejsca
+
+Dwa pływające przyciski 72 × 48 px, radius 24 px, 24 px od krawędzi i dołu; czarne tło 70% z rozmyciem (`--fab`) i jasna obwódka. Ikona globu otwiera pełnoekranową mapę z ✕ w prawym górnym rogu, legenda w dolnej karcie. Ikona strzałki otwiera ekran miejsc.
+
+Ekran miejsc: pełny ekran, wyszukiwarka, aktualne miejsce oznaczone „Teraz”, „Moja lokalizacja” i zapisane miejscowości. Nie ma osobnego widocznego ✕; zamyka wybór miejsca albo Escape. Stuknięcie nazwy lokalizacji w nagłówku również otwiera ekran miejsc. Mapa bazuje na Leaflet i kafelkach OpenStreetMap ze stylizacją ciemną.
+
+## 11. Do ustalenia z autorem
+
+- [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
+- [ ] Potwierdzić opisy i kolory czterech poziomów „sprzyja zorzy”.
+- [ ] Dopracować oddzielenie pływających przycisków od treści pod spodem (cień, tło, ramka).
+- [ ] Dokończyć projekt ekranu miejsc i mapy oraz szczegóły paneli, bez przywracania starej palety.
+- [ ] Potwierdzić progi nazw zachmurzenia: Brak <10, Małe <30, Umiarkowane <60, Duże <80, Bardzo duże ≥80.
+- [ ] Rozważyć wygładzanie linii zachmurzenia (monotonicznie, bez wyjścia poza 0–100%) oraz jasne oznaczanie, że warstwy dotyczą jednej godziny.
+- [ ] Sprawdzić wysokość linii dla tekstu 13 px i dużej liczby oraz nazwę czcionki referencyjnej z Figmy.
+
+**Uwaga:** propozycje poprawy modelu widoczności i interpretacji procentów nie są kwestią stylu; znajdują się w [UWAGI.md](UWAGI.md), a aktualną implementację opisuje [MODEL.md](MODEL.md).

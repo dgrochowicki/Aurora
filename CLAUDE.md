@@ -1,107 +1,93 @@
-# Aurora Now: wiedza dla agentów
+# Aurora Now — instrukcje dla agentów
 
-Plik czytany na starcie każdej sesji. Opisuje projekt, ustalenia z autorem i historię zmian. Otwarte zadania, ustalenia dotyczące modelu i plan są w `UWAGI.md`, ustalenia dotyczące wyglądu w `STYL.md`, a opis dla użytkowników w `README.md`.
+**Cel:** utrzymywać mobilną stronę po polsku, która ocenia orientacyjne warunki obserwacji zorzy w wybranej lokalizacji. **Nie traktować wyświetlanego procentu jako statystycznie skalibrowanego prawdopodobieństwa.**
 
-## Projekt w skrócie
+Na początku każdej pracy przeczytaj, zależnie od zakresu:
 
-Mobilna strona po polsku, która pokazuje szansę zobaczenia zorzy polarnej w wybranym miejscu. Wynik to **widoczna aktywność × ciemność × część czystego nieba**, liczony w przeglądarce z danych NOAA i Open-Meteo. Szczegóły wzoru są w `UWAGI.md` w sekcji „Ustalenia”.
+- [MODEL.md](MODEL.md) — **obecnie działający** algorytm, źródła, fallbacki, znane ograniczenia;
+- [UWAGI.md](UWAGI.md) — zadania i decyzje do podjęcia, nie opis zaimplementowanych funkcji;
+- [STYL.md](STYL.md) — aktualny system wizualny i otwarte kwestie interfejsu;
+- [README.md](README.md) — funkcje dla użytkownika i uruchomienie;
+- [CHANGELOG.md](CHANGELOG.md) — historia prac, nie źródło dzisiejszych parametrów.
 
-- Statyczna strona bez frameworka i bez kroku budowania. Skrypty to moduły ES.
-- Uruchomienie: `npm start` (albo `python3 -m http.server 4173`), potem `http://localhost:4173`. Z `file://` nie zadziała, bo moduły wymagają serwera.
-- Testy modelu: `npm test` (Node 18+, `node --test`, bez zależności).
-- Wzorem wyglądu są makiety autora z Figmy (`Research/`, tylko lokalnie u autora, w `.gitignore`; nie commitować). Wymiary i kolory z makiet są spisane w `STYL.md`.
+## Zasady niepodlegające domniemaniu
 
-## Struktura
+1. Nie zmieniaj samodzielnie definicji wskaźnika, progów, modelu NOAA/Kp ani fallbacków na podstawie samego audytu — wymagają wyraźnej decyzji autora.
+2. Nie ukrywaj brakujących lub starych danych pod zerem, wartością domyślną albo godziną najnowszego odświeżenia UI. Obecny kod ma takie ograniczenia; dopóki nie są naprawione, dokumentuj je rzetelnie.
+3. **Stan wdrożony ≠ propozycja.** `MODEL.md` opisuje bieżący kod, a propozycje z audytu wpisujemy do `UWAGI.md`.
+4. Każda zmiana modelu, parserów danych, czasu, fallbacków i progów wymaga odpowiednich testów. Testuj także `null`, brak danych, stale data, niepoprawne formaty i granice godzin.
+5. Opisuj wszystkie zmiany w dokumentacji z tego samego PR: model w `MODEL.md`, UI w `STYL.md`, funkcje użytkownika w `README.md`, historię w `CHANGELOG.md`, a status zadań w `UWAGI.md`.
+6. Zachowuj ustalenia autora — nie przywracaj dawnych barw lub układów na podstawie historycznych wpisów.
 
-```
-index.html            szkielet strony, kontenery kafelków (#activityTiles, #conditionTiles), pływające przyciski, panele (szczegóły, mapa, miejsca)
-css/tokens.css        kolory, odstępy i czcionka (zmienne CSS), wartości z makiety autora
-css/base.css          reset, układ, nagłówek, sekcje, pływające przyciski, toast
-css/components.css    karta szansy, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
-js/main.js            start, loadLocation(), geolokalizacja, pływające przyciski mapy i miejsc, odświeżanie co 5 min
-js/util.js            $, esc, fmtNum (polski zapis), fetchJSON, localMs/localHM (czas miejsca)
-js/labels.js          słowne opisy wartości, progi i poziomy 0–3 „sprzyja zorzy” (Kp, Bz, wiatr, GOES, chmury, Księżyc)
-js/data/noaa.js       OVATION, Kp, prognoza Kp, Bz, wiatr słoneczny, magnetometr GOES; cache 5 min
-js/data/places.js     Open-Meteo (pogoda, geokodowanie), BigDataCloud, localStorage
-js/model/sky.js       Słońce i Księżyc (wzory SunCalc), ciemność, pora dnia, szerokość geomagnetyczna
-js/model/aurora.js    widoczna aktywność (OVATION w promieniu 1000 km, Kp), część czystego nieba
-js/model/forecast.js  buildForecast() dla 12 godzin, poświata godzin, zmiana chmur, opis nocy, data w nagłówku, oś doby 12:00–12:00
-js/ui/                komponenty: tile, spark (miernik i mini wykres w kafelku), sheet, chart, timeline, hours, parts, toast, icons (Phosphor)
-js/views/home.js      strona główna, konfiguracja kafelków (ACTIVITY_TILES, CONDITION_TILES)
-js/views/details.js   treść paneli szczegółów (DETAILS: score, mag, bz, kp, wind, cloud, light)
-js/views/map.js       mapa Leaflet z modelem OVATION na pełnym ekranie, zamykana ✕
-js/views/places.js    ekran wyboru miejsca na pełnym ekranie: wyszukiwarka, moja lokalizacja, zapisane miejsca
-tests/model.test.js   testy modelu
-```
+## Projekt
 
-Zasady podziału:
-- `js/model/` nie dotyka DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
-- Tekst i progi opisów wartości są w `labels.js`, żeby kafelek i panel mówiły to samo.
-- Nowy kafelek to wpis w `ACTIVITY_TILES` albo `CONDITION_TILES` w `home.js`, funkcja w `DETAILS` w `details.js` i wywołanie `setTile()`.
-- Wszystkie panele (szczegóły, mapa, ekran miejsc) używają `createSheet()` z `ui/sheet.js` i klasy `.sheet`. Obsługuje on animację, Escape, powrót fokusu, nieaktywne tło i blokadę przewijania strony.
+- Statyczna aplikacja internetowa bez frameworka i kroku kompilacji, w języku polskim.
+- Moduły ES uruchamiane przez serwer (`npm start` lub `python3 -m http.server 4173`), nie przez `file://`.
+- Testy: `npm test` (Node 18+, `node --test`, bez zewnętrznych zależności testowych).
+- Strona na GitHub Pages z gałęzi `main`: https://dgrochowicki.github.io/Aurora/.
+- Zapis miejsc w `localStorage`, bez konta użytkownika.
+- Makiety autora z Figmy w lokalnym `Research/`; nie commitować katalogu z referencjami. Wymiary i aktualne tokeny są w `STYL.md`.
 
-## Źródła danych
+## Struktura i odpowiedzialności
 
-| Dane | Adres | Uwagi |
+| Plik / katalog | Funkcja |
+|---|---|
+| `index.html` | Szkielet widoku i kontenery paneli |
+| `css/tokens.css` | Kolory, wymiary, typografia — punkt odniesienia dla bieżących tokenów |
+| `css/base.css` | Układ, nagłówek, pływające przyciski, toast |
+| `css/components.css` | Kafelki, godziny, panele, wykresy, mapa, wybór miejsc |
+| `js/main.js` | Uruchomienie, lokalizacja, wybór miejsca, odświeżanie co 5 minut |
+| `js/util.js` | Pomocnicze funkcje, formatowanie, `fetchJSON`, czas |
+| `js/labels.js` | Opisy wartości, kategorie i progi |
+| `js/data/noaa.js` | OVATION, Kp, Bz, wiatr, GOES; cache NOAA |
+| `js/data/places.js` | Pogoda Open-Meteo, geokodowanie, BigDataCloud, zapisane miejsca |
+| `js/model/sky.js` | Słońce, Księżyc, ciemność, szerokość geomagnetyczna |
+| `js/model/aurora.js` | Aktywność OVATION/Kp, część czystego nieba |
+| `js/model/forecast.js` | Prognoza 12 h, oś nocy, godziny i poświata |
+| `js/ui/` | `tile`, `spark`, `sheet`, `chart`, `sky-chart`, `hours`, `parts`, `toast`, `icons` |
+| `js/views/home.js` | Strona główna i definicje kafelków |
+| `js/views/details.js` | Panele szczegółów `score`, `mag`, `bz`, `kp`, `wind`, `cloud`, `light` |
+| `js/views/map.js` | Mapa Leaflet z modelem OVATION |
+| `js/views/places.js` | Wyszukiwanie i wybór lokalizacji |
+| `tests/model.test.js` | Testy obliczeń modelu |
+| `tests/chart.test.js` | Testy podziałki wykresów |
+
+**Zasady podziału kodu:** `js/model/` nie korzysta z DOM; `labels.js` jest miejscem wspólnych opisów i progów; nowy kafelek wymaga wpisu w `ACTIVITY_TILES` albo `CONDITION_TILES` w `home.js`, funkcji `DETAILS` w `details.js` i obsługi przez `setTile()`; panele używają `createSheet()` z `js/ui/sheet.js`.
+
+## Źródła danych i pułapki
+
+| Źródło | Adres | Ważne informacje |
 |---|---|---|
-| Model OVATION | `services.swpc.noaa.gov/json/ovation_aurora_latest.json` | siatka [lon 0–360, lat, wartość] |
-| Kp teraz | `/products/noaa-planetary-k-index.json` | obsługujemy format tablic i obiektów |
-| Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | bloki 3-godzinne, czas UTC bez „Z” |
-| Bz | `/json/rtsw/rtsw_mag_1m.json` | kilka sond naraz, oficjalne tylko `active: true`; wiersze od najnowszego |
-| Wiatr słoneczny | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active` |
-| Magnetometr | `/json/goes/primary/magnetometers-6-hour.json` | składowa `Hp` z satelity GOES; sortujemy sami |
-| Pogoda | `api.open-meteo.com/v1/forecast` | czas lokalny miejsca bez strefy, przesunięcie w `utc_offset_seconds` |
-| Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | wyszukiwanie i nazwa bieżącej lokalizacji |
+| OVATION | `services.swpc.noaa.gov/json/ovation_aurora_latest.json` | Siatka `[lon 0–360, lat, value]`; model krótkoterminowy |
+| Kp | `/products/noaa-planetary-k-index.json` | Bieżący indeks; formaty w kodzie |
+| Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | Bloki 3 h, znaczniki UTC |
+| Bz | `/json/rtsw/rtsw_mag_1m.json` | Preferować `active: true`; kod ma także fallback do innych wierszy |
+| Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active` |
+| GOES | `/json/goes/primary/magnetometers-6-hour.json` | Hp z orbity, nie regionalna stacja |
+| Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |
+| Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | Geokodowanie i nazwa lokalizacji |
 
-Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z liczb z ostatnich 2 godzin.
+Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru. Wynik procentowy może pochodzić z modelu awaryjnego. Pełna specyfikacja w `MODEL.md`.
 
-## Ustalenia z autorem
+## Ustalenia pracy z autorem
 
-- Rozmawiamy po polsku. Komentarze w kodzie, commity i opisy pull requestów też po polsku.
-- Autor pracuje z różnych komputerów i sesji, więc wszystko ma trafiać na GitHub. Strona na żywo to GitHub Pages z `main`: https://dgrochowicki.github.io/Aurora/.
-- Większe zmiany robimy na osobnej gałęzi i wypychamy bez pytania; autor ogląda je na podglądzie (raw.githack z hashem commitu). Na `main` trafiają, gdy autor powie „puść na mastera”: przez pull request albo, gdy nie ma `gh` (np. na Macu autora), przez lokalne `git merge --no-ff` i push. Drobne poprawki, o które autor prosi wprost, mogą iść od razu na `main`. Po wypchnięciu `main` sprawdzamy, czy Pages serwuje nowe `?v=`.
-- Zamiast dolnej nawigacji są dwa pływające przyciski: mapa (pełny ekran, ✕) i miejsca (pełny ekran, zamykany tylko wyborem miejsca albo Escape). Nazwa miejsca w nagłówku też otwiera ekran miejsc.
-- Magnetometr ma być w kafelkach jak w prototypie. Autor wybrał GOES z NOAA, bo stacje naziemne (FMI/IMAGE) wymagają innego źródła.
-- Kolejność dalszych prac (szczegóły w `UWAGI.md`, „Plan dalszych prac”):
-  1. **Styl UI od autora.** Strona główna i menu są gotowe. Czekamy na projekty paneli szczegółów, ekranu miejsc, mapy i pozostałych elementów z `STYL.md` („Do ustalenia”).
-  2. **Wykresy:** strefy tła, znacznik „teraz”, odczyt po dotknięciu, zakres 2 h / 6 h, czytelniejsze osie.
-  3. **Wyjaśnienia w panelach, na koniec.** Autor chce je dopisać na samym końcu.
+- Rozmowy, komentarze w kodzie, commity i opisy PR w języku polskim.
+- Autor pracuje z różnych urządzeń, dlatego stan pracy ma trafiać do GitHuba, nie wyłącznie do lokalnych plików.
+- **Duże zmiany:** osobna gałąź i podgląd. Merge do `main` tylko po jednoznacznej zgodzie autora („puść na mastera”). Drobne zmiany wyraźnie zlecone przez autora mogą trafiać bezpośrednio na `main` zgodnie z dotychczasową praktyką.
+- Podgląd gałęzi: `https://raw.githack.com/dgrochowicki/Aurora/<pełny-hash-commitu>/index.html` (hash, nie nazwa gałęzi, aby uniknąć mieszania wersji zasobów).
+- Po wdrożeniu kodu/UI na `main` weryfikować działanie strony Pages i wersje `?v=` w `index.html`. Zmiana samych dokumentów nie wymaga podbijania `?v=`.
+- Ustalona na dziś nawigacja: dwa pływające przyciski (mapa i miejsca), bez dolnego paska. Nazwa miejsca w nagłówku także otwiera ekran miejsc.
+- Magnetometr to dane GOES Hp, a nie naziemne IMAGE/FMI — do czasu decyzji autora nie zastępować źródła.
+- Aktualna kolejność prac jest w `UWAGI.md`; starszy porządek UI → wykresy → wyjaśnienia zachowano w historii, nie obowiązuje jako priorytet po audycie.
 
-## Praca w środowisku chmurowym i podgląd
+## Testowanie i podgląd
 
-- W chmurze sieć kontenera blokuje NOAA i Open-Meteo (także przez WebFetch). Stronę testujemy w Playwright z przechwyconymi zapytaniami (`page.route`) i danymi przykładowymi, a Chromium jest w `/opt/pw-browsers/chromium`. Na prawdziwych danych sprawdza autor.
-- Na Macu autora sieć działa, więc testujemy na prawdziwych danych: `npm start` i Playwright z Chromium z `~/Library/Caches/ms-playwright/` (np. `chromium_headless_shell-1243`), widok 402×874. Zachowań iOS (Safari, `:active`, zaznaczanie tekstu) nie da się tak sprawdzić; potwierdza je autor na telefonie.
-- Wygląd przy zmianach bez wpływu na UI sprawdzamy zrzutami ekranu przed i po, na tych samych danych przykładowych i z ustalonym czasem (`page.clock.setFixedTime`).
-- Podgląd dla autora: `https://raw.githack.com/dgrochowicki/Aurora/<pełny-hash-commitu>/index.html`. Zawsze z hashem commitu, nie z nazwą gałęzi. Link do gałęzi przez kilka minut po pushu miesza nowy `index.html` ze starymi skryptami i strona pokazuje same kreski.
-- Przy zmianach podbijamy `?v=` w `index.html` dla `js/main.js` i plików CSS.
+- Przed zmianami uruchomić `npm test`. Testy jednostkowe nie zastępują prób na rzeczywistych danych NOAA/Open-Meteo.
+- Dla testów UI preferować dane deterministyczne, przechwycone żądania (`page.route`) i stałą datę (`page.clock.setFixedTime`), a następnie porównać zrzuty przed i po.
+- Na Macu autora można testować lokalny serwer w Playwright/Chromium (przyjęty widok referencyjny 402 × 874), ale zachowanie Mobile Safari potwierdza się na urządzeniu.
+- We wcześniejszym środowisku chmurowym sieć blokowała NOAA/Open-Meteo; **nie zakładać**, że każde środowisko ma identyczne ograniczenia. Jeśli połączenie nie działa, nie twierdzić, że przetestowano prawdziwe dane.
+- Projekt korzysta z lokalnych SVG ikon (Phosphor) w `js/ui/icons.js`, więc podstawowe ikony nie wymagają pobierania biblioteki z CDN; Leaflet jest ładowany osobno z unpkg.
 
 ## Historia zmian
 
-Od najstarszych:
-
-1. **Pierwsza wersja** (przed pracą z agentem): jeden `app.js` z długimi liniami, `styles.css`, `index.html`. Przegląd z 24.09.2026 i jego poprawki są w `UWAGI.md`.
-2. **Strona główna według prototypu autora** (katalog `example/`, usunięty 29.09.2026) ([PR #1](https://github.com/dgrochowicki/Aurora/pull/1)):
-   - karta najbliższych godzin z wyborem godziny, linią szczegółów i zdaniem o nocy;
-   - kafelki Magnetometr, Bz, Kp i Wiatr słoneczny oraz Zachmurzenie i Światło tej nocy;
-   - panele szczegółów z wykresami z 2 godzin, prognozą Kp, warstwami chmur i osiami Słońca i Księżyca z oknem najciemniejszego nieba;
-   - panel „Skąd ten wynik” z rozbiciem szansy na paski (aktywność w zasięgu wzroku, ciemność, czyste niebo);
-   - nowe dane: wiatr słoneczny i magnetometr GOES; wynik poniżej 1% jako „<1%”.
-3. **Poprawki z przeglądu i podział na moduły** ([PR #2](https://github.com/dgrochowicki/Aurora/pull/2)):
-   - poprawki: czyszczenie kafelków po zmianie miejsca, błędy w kodzie nie udają braku pogody, wyścig w wyszukiwarce, daty na przełomie miesięcy, odświeżanie po nieudanym starcie, „null% chmur”, Escape i nieaktywne tło pod panelem;
-   - podział na `css/` i `js/` jak w sekcji „Struktura”, komponenty w `js/ui/`, kafelki z konfiguracji;
-   - testy modelu w `tests/`. Wygląd bez zmian, potwierdzony zrzutami ekranu.
-4. **Drobne poprawki z przeglądu 29.09.2026:** odświeżanie nie anuluje ustalania lokalizacji, czyszczenie notki o strefie i daty, `.gitignore`.
-5. **Nowy styl strony głównej według makiety autora** (29.09.2026): tło z gradientem, nagłówek z datą, karta szansy z poświatą, pigułki godzin z ikonami, nowe kafelki, płynny efekt wciśnięcia i wysuwane panele. Wynik bez „<1%”: pokazujemy zaokrągloną liczbę, także 0%. Szczegóły w `STYL.md`.
-6. **Menu z dwóch przycisków** (29.09.2026): mapa i ekran miejsc na pełnym ekranie zamiast dolnej nawigacji, widoku „Miejsca” i przycisku ⌖. Kolor paska Safari z tła `html`/`body` (iOS pomija `theme-color`).
-7. **Porządki w dokumentacji** (29.09.2026): `UWAGI.md` zawiera tylko otwarte zadania i ustalenia, usunięty prototyp `example/`.
-8. **Poświata godzin zamiast karty „Najlepszy moment”** (13.10.2026): pigułki godzin świecą na zielono, najmocniej w najlepszej godzinie i słabiej w sąsiednich, żeby było widać, jak zorza narasta i gaśnie. Karta usunięta: zapowiedź z najlepszą godziną jest na dole karty szansy, kierunek patrzenia w zdaniu pod wynikiem, a tryb obserwacji w linii wybranej godziny. Werdykt i jego uzasadnienie w karcie szansy płyną jednym akapitem.
-9. **Kafelki aktywności ze wskaźnikami** (13.10.2026): kafelki Magnetometr, Bz, Kp i Wiatr mówią, co pomiar znaczy dla zorzy (4 poziomy z `labels.js`), z kropką w kolorze poziomu i wskaźnikiem pod opisem: miernik dla Kp, mini wykres z 2 godzin dla reszty. Wariant `?kafelki=paski` czeka na wybór autora (`STYL.md`, „Do ustalenia”).
-10. **Panele szczegółów według makiety autora** (14.10.2026): tło #1C2127, nagłówek z ✕ 44×44, uchwyt w pasku 12 px. Treść w jednym układzie: metryka 28 px ze stanem jak w kafelku, wykres od krawędzi do krawędzi (`ui/chart.js`: podziałka co 48 px, oś Y po prawej, prognoza Kp jako słupki 0–9, zachmurzenie jako żółta linia), dane w dwóch kolumnach z „Oceną”, wyjaśnienie i źródła. Klocki w `ui/parts.js`. Panel chowa się w dół zamiast znikać. Szczegóły w `STYL.md`, „Panel szczegółów”.
-11. **Łuki Słońca i Księżyca** (14.10.2026): w panelu „Światło tej nocy” zamiast pasków osi nocy wykres wysokości Słońca i Księżyca jak w pogodzie Apple (`ui/sky-chart.js`, dane z `nightTimeline().arcs`), z horyzontem, linią −18°, pasem najciemniejszego nieba i kropkami „teraz”.
-12. **Niższe panele szczegółów** (15.10.2026): odstępy według wymiarów autora. Bloki bez wspólnego odstępu, każdy z własnym paddingiem: nagłówek 20 px nad i pod, dane i wyjaśnienie po 16 px, źródła 48 px nad dołem. Panele z wykresem są o 40 px niższe.
-13. **Wykres w panelu według makiety** (15.10.2026): linie podziałki co 53 px (liczba 16 px, 4 px przerwy, linia, 32 px do następnej liczby), oś godzin 8 px pod dolną linią. Przy 3 liniach wykres ma 153 px.
-14. **Neutralne kolory i zorza w tle** (15.10.2026): tło #15191D z gradientem od czarnego 20%, karty i kafelki biały 8%, pigułki 4%, przyciski czarny 70%, panele #1E2226. Zieleń tylko tam, gdzie jest zorza. Blok szansy bez ramki (`.chance`): opis słowny (Bardzo mała…Bardzo duża) i procent po 28 px, zdanie o zorzy i warunkach obserwacji. Zorza w tle (`.aurora-sky`): zielona i fioletowa plama rosną z poziomem szansy, stoją przy przewijaniu i powoli falują. Kafelki i pigułki jako szkło z rozmyciem, poświata godzin #5AC369, poziom aktywności obok „Aktywność zorzy”, ciemna mapa (filtr CSS na kafelkach OpenStreetMap). Miejsca „Test 67” i „Test 99” (Abisko z podmienioną szansą) widać tylko z `?test` w adresie. Szczegóły w `STYL.md`.
-15. **Wykres zachmurzenia** (16.10.2026): pełne 12 h prognozy (13 punktów, seria `clouds` z `buildForecast()`), 5 godzin na osi co 3 h, linie co 20% z „%”, gęstsza podziałka (`ROW_DENSE`, 37 px), wykres 232 px.
-16. **„Światło tej nocy” według makiety autora** (16.10.2026): tytuł to pora dnia, łuki na osi doby 12:00–12:00 (`nightTimeline()`), linie co 18° po 37 px, łuki 5 px w pełnym kolorze nad horyzontem i gasnące pod nim, kropki „teraz” 18 px i małe kropki wschodów i zachodów na horyzoncie. Bez legendy, zielonego pasa i wypełnienia pod Słońcem. Dane w 3 kolumnach, tarcza Księżyca z ikoną fazy (`moonPhaseIcon()`, strona z `moonLitRight()`); ta sama ikona stoi za opisem Księżyca w kafelku „Światło w nocy”, gdy Księżyc jest nad horyzontem.
-
-Nowe istotne zmiany dopisuj na końcu tej listy.
+Pełny chronologiczny zapis przeniesiono do [CHANGELOG.md](CHANGELOG.md). Historyczne decyzje pozostają jako ślad projektu, ale nie zastępują bieżącego modelu ani tokenów CSS.

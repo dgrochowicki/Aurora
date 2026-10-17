@@ -1,28 +1,65 @@
-# Zadania i ustalenia
+# Zadania, priorytety i decyzje — Aurora Now
 
-Lista otwartych zadań, ustalenia dotyczące modelu i plan dalszych prac. Ustalenia dotyczące wyglądu są w `STYL.md`, a historia zmian w `CLAUDE.md`. Naprawione pozycje z przeglądów z 24.09 i 29.09.2026 są w historii gita.
+**Stan planu: 17.10.2026, po audycie kodu.** Ten plik dotyczy **niewdrożonych** prac i decyzji. Stan aktualnego algorytmu opisuje [MODEL.md](MODEL.md), zasady UI [STYL.md](STYL.md), a historia [CHANGELOG.md](CHANGELOG.md).
 
-## Plan dalszych prac
+## Priorytety dalszych prac
 
-W tej kolejności:
+| Etap | Priorytet | Cel | Stan |
+|---|---|---|---|
+| 1 | P0 | Wiarygodność danych: braki, fallbacki, świeżość | Do wykonania |
+| 2 | P1 | Znaczenie wskaźnika i ograniczenia prognozy godzinowej | Decyzje + implementacja |
+| 3 | P1 | Geometria widoczności i warunki na horyzoncie | Analiza + testy |
+| 4 | P2 | Wykresy, dostępność, CI, UI | Do wykonania |
+| 5 | Rozwój | Archiwum prognoz i obserwacji, walidacja modelu | Pomysł |
 
-1. **Styl UI.** Strona główna i menu mają styl z makiety autora. Zostały projekty autora dla paneli szczegółów, ekranu miejsc i mapy oraz poprawka przycisków menu. Szczegóły w `STYL.md`, sekcja „Do ustalenia”.
-2. **Wykresy.** Kolorowe strefy tła (np. Bz poniżej zera, progi wiatru 500 i 700 km/s), znacznik „teraz” z ostatnią wartością, odczyt po dotknięciu, przełącznik zakresu 2 h / 6 h, czytelniejsze osie. Przy okazji: gdy Bz jest blisko zera, podpis „0” nakłada się na wartość skrajną.
-3. **Wyjaśnienia w panelach, na koniec.** Każdy panel w tym samym układzie: co to jest, co to znaczy teraz (zdanie zależne od wartości), jak czytać wykres, skala z progami.
+**Ważne:** zmiana priorytetów w dokumentacji nie upoważnia agenta do samodzielnej wymiany modelu prognozy ani zmiany wartości procentów. Algorytm pozostaje bez zmian do decyzji autora.
 
-## Otwarte zadania
+## P0 — wiarygodność i integralność danych
 
-- [ ] **Kierunek patrzenia zawsze „na północ”.** Można liczyć kierunek do najsilniejszej widocznej aktywności w owalu.
-- [ ] **Kp potrzebne dla miejsca.** Najmniejsze Kp, przy którym widoczna aktywność przekracza próg. Pasuje do panelu „Skąd ten wynik”, obok Kp teraz, szerokości magnetycznej i granicy owalu.
-- [ ] **Magnetometr naziemny.** Kafelek pokazuje składową Hp z satelity GOES. Pomiar regionalny, jak we wcześniejszym prototypie autora, wymagałby stacji naziemnej, np. z sieci IMAGE/FMI.
-- [ ] **Instalacja jako aplikacja.** Manifest i service worker pozwolą dodać stronę do ekranu głównego i pokazać ostatnią prognozę bez internetu.
-- [ ] **Leaflet z unpkg bez sumy kontrolnej.** Warto dodać atrybut `integrity` albo przejść na cdnjs.
+- [ ] Oddzielić dla OVATION, Kp, prognozy Kp, Bz, wiatru, GOES i Open-Meteo: czas obserwacji/prognozy, czas pobrania, wiek oraz status źródła (aktualne / nieaktualne / brak).
+- [ ] Ustalić maksymalny dopuszczalny wiek danych i zachowanie po jego przekroczeniu; czas odświeżenia widoku nie może udawać czasu pomiaru.
+- [ ] Jawnie oznaczać brak OVATION i przejście na model Kp. Obecny fallback po braku również Kp podstawia wartość 2 — rozstrzygnąć, czy wynik ma być wówczas wyłączony czy opatrzony ostrzeżeniem.
+- [ ] Naprawić konwersję `null`/braków zachmurzenia na 0%; brak nie może oznaczać bezchmurnego nieba.
+- [ ] Zweryfikować wybór aktywnej sondy NOAA dla Bz; obecnie istnieje zapasowa ścieżka używająca wierszy bez `active: true`.
+- [ ] Dodać testy danych niekompletnych, błędów dostawców, starych pomiarów, formatów odpowiedzi i fallbacków.
 
-## Ustalenia
+## P1 — semantyka i trafność prognozy
 
-- **Skala wyniku jest dobrana ręcznie.** Wynik to widoczna aktywność × ciemność × część czystego nieba, zaokrąglony do całych procent (także 0%). Widoczność maleje liniowo do zera w odległości 1000 km. Na najbliższą godzinę aktywność pochodzi z modelu OVATION, a przez kolejne 3 godziny płynnie przechodzi na prognozę Kp; długo ujemny Bz podnosi Kp na najbliższe godziny. Aktywność z Kp naśladuje profil OVATION: owal przesuwa się o 2° na punkt Kp. Chmury niskie zasłaniają w 100%, średnie w 85%, wysokie w 40%. Ciemność: 0,15 w zmierzchu cywilnym, 0,7 przy -12°, 1 poniżej -18°. Księżyc w pełni powyżej 30° obniża wynik o połowę. Te liczby warto poprawiać na podstawie prawdziwych obserwacji.
-- **Bz.** Plik NOAA zawiera kilka sond naraz; oficjalne są tylko wiersze z `active: true`. Opis kafelka i wynik używają średniej z 30 minut, a liczba w kafelku to ostatni odczyt.
-- **Godziny dla odległych miejsc.** Pokazujemy czas wybranego miejsca (Open-Meteo zwraca czas bez strefy, przeliczamy z `utc_offset_seconds`). Gdy strefa różni się od strefy użytkownika, pod godzinami jest notka o różnicy, a w zdaniu o najlepszej szansie podajemy też czas użytkownika.
-- **Świeżość danych.** Dane NOAA są ważne 5 minut, prognoza odświeża się co 5 minut, gdy karta jest widoczna. Gdy model OVATION jest starszy niż godzina, pewność prognozy spada do średniej. Bez prognozy pogody aplikacja nadal pokazuje dane NOAA i wyjaśnia, czego brakuje.
-- **Wersja plików.** Przy zmianach podbijamy `?v=` w `index.html` dla `js/main.js` i plików CSS. Moduły importowane przez `main.js` nie mają wersji w adresie, więc przez kilka minut po wdrożeniu przeglądarka może trzymać starą wersję któregoś z nich. Jeśli zacznie to przeszkadzać, można dodać mapę importów z wersjami.
-- **Wykresy są rysowane w aplikacji.** Magnetometr (GOES, składowa Hp), Bz i prędkość wiatru słonecznego to liczby z plików NOAA z ostatnich 2 godzin, a SVG rysuje `lineChart()` w `js/ui/chart.js`.
+- [ ] Zdecydować, czy zachować nazwę „% szansy” z bardzo wyraźnym zastrzeżeniem, czy przed walidacją prezentować „indeks warunków”. Dzisiaj wynik nie jest kalibrowanym prawdopodobieństwem.
+- [ ] Rozdzielić ocenę bliską (OVATION) od dalszych godzin (aproksymacja Kp), podać sposób wyznaczenia i zmianę niepewności wraz z horyzontem.
+- [ ] Zmienić mylące określenie „Pewność prognozy” lub uczynić je naukowo uzasadnionym; bieżąca etykieta w dużej mierze oznacza obecność kilku źródeł danych.
+- [ ] Doprecyzować „Teraz”: obecnie opiera się na godzinowej prognozie pogody z tolerancją około 30 minut, nie niezależnym pomiarze zachmurzenia w tej minucie.
+- [ ] Rozstrzygnąć dodatni wynik obserwacji przy Słońcu nad horyzontem — `darknessOf()` daje w dzień czynnik 0,05.
+- [ ] Testować granice czasu i DST; rozważyć znaczniki UTC/Unix i strefy IANA zamiast pojedynczego przesunięcia dla całej prognozy.
+- [ ] Zweryfikować progi „przez aparat” i „gołym okiem”, obecnie ustawione ręcznie.
+
+## P1 — geometria i warunki dla lokalizacji
+
+- [ ] **Kierunek patrzenia:** zastąpić regułę „na północ” / „na południe” obliczeniem azymutu najlepiej widocznego obszaru owalu.
+- [ ] Rozważyć faktyczną wysokość zorzy nad horyzontem zamiast samego zaniku z odległością do 1000 km.
+- [ ] Zbadać wpływ pojedynczego maksimum OVATION na wynik i porównać bardziej odporną agregację przestrzenną.
+- [ ] Uwzględnić zachmurzenie w kierunku obserwacji, a nie jedynie w punkcie miejscowości.
+- [ ] **Kp potrzebne dla miejsca:** wyliczyć orientacyjny próg aktywności dla lokalizacji, z podaniem niepewności.
+- [ ] Rozważyć lokalne zanieczyszczenie światłem i przesłonięcie horyzontu.
+
+## P2 — otwarte zadania techniczne
+
+- [ ] **Magnetometr naziemny.** Dziś kafelek bazuje na satelitarnym GOES Hp, nie pomiarze z lokalnej stacji. Ewentualne wprowadzenie stacji IMAGE/FMI wymaga nowego źródła.
+- [ ] **PWA / offline.** Manifest, service worker i możliwość odczytu zapisanej prognozy, zawsze z wyraźną informacją o jej wieku.
+- [ ] **Leaflet z CDN.** Rozważyć SRI (`integrity`) lub kontrolowaną wersję plików zamiast bezwarunkowego zaufania do CDN.
+- [ ] **CI.** Uruchamiać testy Node przy PR; dodać testy integracyjne z przykładowymi odpowiedziami NOAA/Open-Meteo.
+- [ ] **Dostępność.** Sprawdzić fokus i jego pułapkę w panelach, sterowanie klawiaturą, kontrasty, alternatywne opisy wykresów i tryb ograniczonego ruchu.
+- [ ] **Wykresy.** Kolorowe strefy tła (Bz poniżej 0, wiatr 500 i 700 km/s), znacznik „teraz”, odczyt po dotknięciu, zakres 2 h / 6 h, poprawa osi i kolizji zera przy Bz.
+- [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.
+- [ ] **UI.** Dokończyć uzgodnienia dotyczące ekranu miejsc, mapy, przycisków i szczegółowych paneli. Nieaktualne wartości stylu nie powinny wracać z dokumentacji; punkt odniesienia `STYL.md` i `css/tokens.css`.
+
+## Do decyzji autora
+
+- [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji?
+- [ ] Czy przy braku źródeł pokazujemy brak wyniku, czy wynik awaryjny z ostrzeżeniem?
+- [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
+- [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
+
+## Zasada porządku
+
+Aktualne wzory, parametry i ograniczenia zapisujemy w `MODEL.md`; ten plik służy wyłącznie do planowania. Zadanie przenosimy do historii w `CHANGELOG.md` po wdrożeniu i sprawdzeniu testów. Nie oznaczamy propozycji z audytu jako wykonanych.
