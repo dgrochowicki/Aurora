@@ -18,6 +18,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 4. Każda zmiana modelu, parserów danych, czasu, fallbacków i progów wymaga odpowiednich testów. Testuj także `null`, brak danych, stale data, niepoprawne formaty i granice godzin.
 5. Opisuj wszystkie zmiany w dokumentacji z tego samego PR: model w `MODEL.md`, UI w `STYL.md`, funkcje użytkownika w `README.md`, historię w `CHANGELOG.md`, a status zadań w `UWAGI.md`.
 6. Zachowuj ustalenia autora — nie przywracaj dawnych barw lub układów na podstawie historycznych wpisów.
+7. **Każda większa zmiana w aplikacji dostaje wpis w `CHANGELOG.md`**, dopisany w tym samym commicie albo PR co zmiana, a nie później. Wpis idzie na górę pliku, z datą i krótkim tytułem, a pod nim punkty: co się zmieniło dla użytkownika, które pliki lub funkcje i jakie decyzje autora za tym stoją. Większa zmiana to wszystko, co zmienia wygląd, działanie, model, dane albo ich źródła. Drobne poprawki literówek i samej dokumentacji wpisu nie wymagają.
 
 ## Projekt
 
