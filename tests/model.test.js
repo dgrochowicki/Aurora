@@ -39,8 +39,10 @@ test("owal zorzy przesuwa się na południe, gdy rośnie Kp", () => {
   assert.ok(kpActivity(75, 0) > kpActivity(65, 0));
 });
 
-test("ciemność: dzień prawie zero, noc astronomiczna bez Księżyca jeden", () => {
-  assert.equal(darknessOf({ sunAlt: 10, moonAlt: -5, moonIllum: 0 }), 0.05);
+test("ciemność: w dzień zero, noc astronomiczna bez Księżyca jeden", () => {
+  assert.equal(darknessOf({ sunAlt: 10, moonAlt: -5, moonIllum: 0 }), 0);
+  assert.equal(darknessOf({ sunAlt: 0, moonAlt: -5, moonIllum: 0 }), 0);
+  assert.equal(darknessOf({ sunAlt: -3, moonAlt: -5, moonIllum: 0 }), 0.15);
   assert.equal(darknessOf({ sunAlt: -20, moonAlt: -5, moonIllum: 1 }), 1);
   assert.equal(darknessOf({ sunAlt: -20, moonAlt: 45, moonIllum: 1 }), 0.5);
 });
@@ -131,4 +133,50 @@ test("poziomy pomiarów: w górę skali znaczy lepiej dla zorzy, a Bz sprzyja na
   assert.equal(bzLabel(-5), "Na południe · sprzyja");
   assert.equal(kpLabel(6.3), "Burza G2");
   assert.equal(windLabel(420), "Typowa prędkość");
+});
+
+// Prognoza w czasie miejsca UTC+2 od 12:00 4.10.2026, co godzinę. cloud(h): zachmurzenie godziny h (od 12:00).
+const localWeather = (cloud, current) => {
+  const days = Array.from({ length: 24 }, (_, h) => new Date(Date.parse("2026-10-04T12:00Z") + h * 3600000).toISOString().slice(0, 16));
+  const c = days.map((_, h) => cloud(h));
+  return { utc_offset_seconds: 7200, hourly: { time: days, cloud_cover: c, cloud_cover_low: c, cloud_cover_mid: c.map(() => 0), cloud_cover_high: c.map(() => 0) }, ...(current ? { current } : {}) };
+};
+const ABISKO = { lat: 68.35, lon: 18.83 };
+const strongGrid = { coords: [[18, 68, 90]], time: null };
+const strongSpace = { kp: 6, kpForecast: [], bzAvg: null };
+
+test("„Teraz” o 17:40 to godzina 17:00, a nie 18:00, a kolejne pigułki to pełne godziny", () => {
+  const now = Date.parse("2026-10-04T15:40:00Z"); // 17:40 w czasie miejsca
+  const fc = buildForecast(ABISKO, localWeather((h) => (h === 5 ? 0 : 100)), strongGrid, strongSpace, now);
+  assert.equal(fc.rows[0].label, "Teraz");
+  assert.equal(fc.rows[0].t, "2026-10-04T17:00");
+  assert.equal(fc.rows[0].cloud, 0);
+  // Słońce i Księżyc liczone dla tej chwili, nie dla pełnej godziny.
+  assert.equal(fc.rows[0].ms, now);
+  assert.equal(fc.rows[1].label, "18:00");
+  assert.equal(fc.rows[1].cloud, 100);
+  assert.equal(fc.rows.length, 12);
+  // Wykres zachmurzenia zaczyna się od godziny, w której jesteśmy.
+  assert.equal(fc.clouds[0].v, 0);
+});
+
+test("„Teraz” z bieżących danych Open-Meteo, gdy są", () => {
+  const now = Date.parse("2026-10-04T15:40:00Z");
+  const current = { time: "2026-10-04T17:30", cloud_cover: 40, cloud_cover_low: 40, cloud_cover_mid: 0, cloud_cover_high: 0 };
+  const fc = buildForecast(ABISKO, localWeather(() => 100, current), strongGrid, strongSpace, now);
+  assert.equal(fc.rows[0].label, "Teraz");
+  assert.equal(fc.rows[0].cloud, 40);
+  assert.equal(fc.rows[0].low, 40);
+  assert.equal(fc.rows[1].label, "18:00");
+  // Bieżące dane bez chmur: wracamy do prognozy z tej godziny.
+  const empty = { time: "2026-10-04T17:30", cloud_cover: null, cloud_cover_low: null, cloud_cover_mid: null, cloud_cover_high: null };
+  assert.equal(buildForecast(ABISKO, localWeather(() => 100, empty), strongGrid, strongSpace, now).rows[0].cloud, 100);
+});
+
+test("w dzień szansa jest zerowa nawet przy mocnej zorzy i czystym niebie", () => {
+  const noon = Date.parse("2026-10-04T10:30:00Z"); // 12:30 w Abisko
+  const fc = buildForecast(ABISKO, localWeather(() => 0), strongGrid, strongSpace, noon);
+  assert.ok(fc.rows[0].sky.sunAlt > 0);
+  assert.ok(fc.rows[0].act > 50);
+  assert.equal(fc.rows[0].score, 0);
 });

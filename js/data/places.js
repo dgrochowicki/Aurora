@@ -10,7 +10,7 @@ const KEY = "aurora-places";
 
 export const getWeather = (loc) =>
   fetchJSON(
-    `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&hourly=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high&current=cloud_cover&forecast_days=3&timezone=auto`,
+    `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&hourly=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high&current=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high&forecast_days=3&timezone=auto`,
   );
 
 export async function searchPlaces(q) {

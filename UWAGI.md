@@ -30,10 +30,8 @@ Nadal otwarte:
 ## P1 — semantyka i trafność prognozy
 
 - [ ] Zdecydować, czy zachować nazwę „% szansy” z bardzo wyraźnym zastrzeżeniem, czy przed walidacją prezentować „indeks warunków”. Dzisiaj wynik nie jest kalibrowanym prawdopodobieństwem.
-- [ ] Rozdzielić ocenę bliską (OVATION) od dalszych godzin (aproksymacja Kp), podać sposób wyznaczenia i zmianę niepewności wraz z horyzontem.
-- [ ] Zmienić mylące określenie „Pewność prognozy” lub uczynić je naukowo uzasadnionym; bieżąca etykieta w dużej mierze oznacza obecność kilku źródeł danych.
-- [ ] Doprecyzować „Teraz”: obecnie opiera się na godzinowej prognozie pogody z tolerancją około 30 minut, nie niezależnym pomiarze zachmurzenia w tej minucie.
-- [ ] Rozstrzygnąć dodatni wynik obserwacji przy Słońcu nad horyzontem — `darknessOf()` daje w dzień czynnik 0,05.
+- [ ] Rozdzielić ocenę bliską (OVATION) od dalszych godzin (aproksymacja Kp). **Decyzja autora 17.10.2026: na razie nie pokazujemy tego w UI**, bo wymagałoby tłumaczenia; ewentualnie później jako pomoc.
+- [ ] **Dzień i noc w całości:** autor ma pomysł, jak lepiej pokazać wynik w dzień (dziś 0%); wrócimy do tego.
 - [ ] Testować granice czasu i DST; rozważyć znaczniki UTC/Unix i strefy IANA zamiast pojedynczego przesunięcia dla całej prognozy.
 - [ ] Zweryfikować progi „przez aparat” i „gołym okiem”, obecnie ustawione ręcznie.
 
@@ -59,7 +57,7 @@ Nadal otwarte:
 
 ## Do ustalenia z autorem
 
-- [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji?
+- [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji? (17.10.2026: autor prosił o wyjaśnienie „indeksu warunków”, decyzja otwarta.)
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
 - [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
@@ -73,6 +71,7 @@ Nadal otwarte:
 ## Rozstrzygnięte przez autora (17.10.2026)
 
 - **Zieleń na mapie zostaje.** Znacznik bieżącej lokalizacji użytkownika (`#68F7BB`) i tło legendy bez zmian.
+- **W dzień szansa 0%**, „Pewność prognozy” zmieniona na „Kompletność danych”, „Teraz” jako bieżące warunki (wdrożone, opis w `MODEL.md`).
 - **Poświata godzin zostaje od 10%.** Delikatne świecenie od 8% (jak w makiecie) wprowadzimy dopiero wtedy, gdy będziemy wiedzieć z obserwacji, że przy takim wyniku zorzę faktycznie widać. Zależy od walidacji wyniku (P1, „Zweryfikować progi”).
 
 ## Zasada porządku
