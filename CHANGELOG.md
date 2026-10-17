@@ -2,6 +2,13 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — CI, Leaflet z SRI, fokus w panelach
+
+- Testy uruchamiają się na GitHubie przy każdym pushu i pull requeście (`.github/workflows/test.yml`, Node 20, `npm test`).
+- Leaflet z unpkg z sumą kontrolną (`integrity`, sha256 z leafletjs.com dla 1.9.4): podmieniony plik nie zostanie uruchomiony.
+- Fokus we wszystkich panelach przez `createSheet()`: po otwarciu na przycisku zamknięcia (mapa, szczegóły), a na ekranie miejsc na samym ekranie, żeby na telefonie nie wyskakiwała klawiatura. Po zamknięciu wraca do przycisku, który panel otworzył.
+- Decyzje autora: procent zostaje, limit GOES 30 min, „Aktualizacja” bez zmian, przejście OVATION → Kp bez oznaczenia na stronie głównej.
+
 ## 17.10.2026 — strefy czasu i zmiana czasu
 
 - Pogoda z Open-Meteo w czasie Unix (`timeformat=unixtime`), a wszystkie godziny formatowane w strefie miejsca (nazwa IANA, np. „Europe/Warsaw”) przez `Intl`: pigułki, „Najlepsza szansa około…”, data w nagłówku, oś i wschody w „Świetle tej nocy”, osie wykresów.

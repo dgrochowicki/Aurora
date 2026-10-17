@@ -22,10 +22,7 @@ Wdrożone 17.10.2026 (opis w `MODEL.md`, historia w `CHANGELOG.md`): limity wiek
 
 Nadal otwarte:
 
-- [ ] Przejście z OVATION na Kp widać dziś tylko w stopce „Skąd ten wynik”. Rozważyć oznaczenie na stronie głównej.
-- [ ] Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku. Rozważyć pokazanie obok wieku najstarszego użytego pomiaru.
 - [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).
-- [ ] Limit wieku dla GOES przyjęto taki jak dla Bz i wiatru (30 min); do potwierdzenia przez autora.
 
 ## P1 — semantyka i trafność prognozy
 
@@ -47,16 +44,14 @@ Nadal otwarte:
 
 - [ ] **Magnetometr naziemny.** Dziś kafelek bazuje na satelitarnym GOES Hp, nie pomiarze z lokalnej stacji. Ewentualne wprowadzenie stacji IMAGE/FMI wymaga nowego źródła.
 - [ ] **PWA / offline.** Manifest, service worker i możliwość odczytu zapisanej prognozy, zawsze z wyraźną informacją o jej wieku.
-- [ ] **Leaflet z CDN.** Rozważyć SRI (`integrity`) lub kontrolowaną wersję plików zamiast bezwarunkowego zaufania do CDN.
-- [ ] **CI.** Uruchamiać testy Node przy PR; dodać testy integracyjne z przykładowymi odpowiedziami NOAA/Open-Meteo.
-- [ ] **Dostępność.** Sprawdzić fokus i jego pułapkę w panelach, sterowanie klawiaturą, kontrasty, alternatywne opisy wykresów i tryb ograniczonego ruchu.
+- [ ] **Testy integracyjne** z zapisanymi prawdziwymi odpowiedziami NOAA/Open-Meteo (CI z `npm test` już działa).
+- [ ] **Dostępność.** Fokus w panelach jest zrobiony; zostały kontrasty, alternatywne opisy wykresów i tryb ograniczonego ruchu.
 - [ ] **Wykresy.** Kolorowe strefy tła (Bz poniżej 0, wiatr 500 i 700 km/s), znacznik „teraz”, odczyt po dotknięciu, zakres 2 h / 6 h, poprawa osi i kolizji zera przy Bz.
 - [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.
 - [ ] **UI.** Dokończyć uzgodnienia dotyczące ekranu miejsc, mapy, przycisków i szczegółowych paneli. Nieaktualne wartości stylu nie powinny wracać z dokumentacji; punkt odniesienia `STYL.md` i `css/tokens.css`.
 
 ## Do ustalenia z autorem
 
-- [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji? (17.10.2026: autor prosił o wyjaśnienie „indeksu warunków”, decyzja otwarta.)
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
 - [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
@@ -69,6 +64,10 @@ Nadal otwarte:
 
 ## Rozstrzygnięte przez autora (17.10.2026)
 
+- **Procent i opis słowny zostają** („Duża · 45%”); bez zmiany na „indeks warunków”.
+- **Limit wieku GOES 30 min zostaje.**
+- **„Aktualizacja 22:03” w nagłówku zostaje** jako sama godzina przeliczenia, bez wieku pomiarów.
+- **Przejścia z OVATION na Kp nie oznaczamy na stronie głównej** (brak miejsca); jest w stopce „Skąd ten wynik”.
 - **Zieleń na mapie zostaje.** Znacznik bieżącej lokalizacji użytkownika (`#68F7BB`) i tło legendy bez zmian.
 - **W dzień szansa 0%**, „Pewność prognozy” zmieniona na „Kompletność danych”, „Teraz” jako bieżące warunki (wdrożone, opis w `MODEL.md`).
 - **Poświata godzin zostaje od 10%.** Delikatne świecenie od 8% (jak w makiecie) wprowadzimy dopiero wtedy, gdy będziemy wiedzieć z obserwacji, że przy takim wyniku zorzę faktycznie widać. Zależy od walidacji wyniku (P1, „Zweryfikować progi”).

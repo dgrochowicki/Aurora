@@ -1,5 +1,7 @@
 // Panel wysuwany od dołu. Ten sam mechanizm obsługuje panele szczegółów, mapę i ekran miejsc.
 // backdrop i closeButton są opcjonalne: ekran miejsc zajmuje cały ekran i zamyka się wyborem miejsca albo klawiszem Escape.
+// Fokus: po otwarciu trafia do focusOn (domyślnie przycisk zamknięcia, a bez niego sam panel), po zamknięciu wraca do przycisku,
+// który panel otworzył. Reszta strony jest inert, więc Tab nie wychodzi z panelu.
 import { $ } from "../util.js";
 
 // Czas animacji zamykania z CSS (.sheet) z zapasem. Po nim panel dostaje hidden; wcześniej ucinało koniec ruchu.
@@ -13,7 +15,7 @@ const setInert = (on) => {
   document.documentElement.classList.toggle("sheet-open", on);
 };
 
-export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
+export function createSheet({ sheet, backdrop, closeButton, focusOn, onOpen, onClose }) {
   let opener = null,
     shown = false,
     hideTimer;
@@ -34,6 +36,7 @@ export function createSheet({ sheet, backdrop, closeButton, onOpen, onClose }) {
       if (!open.includes(api)) open.push(api);
       setInert(true);
       onOpen?.();
+      (focusOn || closeButton || sheet).focus({ preventScroll: true });
     },
     close() {
       if (!shown) return;

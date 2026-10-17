@@ -69,7 +69,6 @@ function openDetail(key, opener) {
   $("#infoScroll").scrollTop = 0;
   $("#infoSheet").classList.remove("scrolled");
   info.open(opener);
-  $("#closeInfo").focus({ preventScroll: true });
 }
 
 // Po zmianie miejsca czyścimy dane, żeby do czasu nowych nie pokazywać poprzedniego miejsca.

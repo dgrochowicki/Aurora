@@ -443,6 +443,11 @@
 }
 /* Wspólne dla paneli (.sheet): wysuwanie od dołu i układ, w którym nagłówek stoi w miejscu, a przewija się tylko .sheet-scroll.
    Wysokość w dvh, bo na iPhonie vh nie uwzględnia paska adresu. */
+/* Panel dostaje fokus po otwarciu (ui/sheet.js); bez obwódki, bo to nie jest kontrolka. */
+.sheet:focus {
+  outline: none;
+}
+
 .sheet {
   position: fixed;
   z-index: 21;
