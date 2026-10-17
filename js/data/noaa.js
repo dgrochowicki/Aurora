@@ -1,5 +1,5 @@
 // Dane pogody kosmicznej z NOAA SWPC: model OVATION, Kp, Bz, wiatr słoneczny i magnetometr GOES.
-import { fetchJSON } from "../util.js";
+import { fetchJSON, utcMs } from "../util.js";
 
 export const NOAA_TTL = 5 * 60 * 1000;
 const SWPC = "https://services.swpc.noaa.gov";
@@ -14,10 +14,16 @@ export async function getAuroraGrid() {
   if (auroraGrid && Date.now() - auroraGrid.fetchedAt < NOAA_TTL) return auroraGrid;
   try {
     const d = await fetchJSON(`${SWPC}/json/ovation_aurora_latest.json`);
-    auroraGrid = { coords: d.coordinates || [], time: d["Forecast Time"] || d["Observation Time"], fetchedAt: Date.now() };
+    // observed: czas pomiarów, z których policzono model. Od niego liczymy wiek danych, a nie od chwili pobrania.
+    auroraGrid = {
+      coords: d.coordinates || [],
+      time: d["Forecast Time"] || d["Observation Time"],
+      observed: utcMs(d["Observation Time"]),
+      fetchedAt: Date.now(),
+    };
     return auroraGrid;
   } catch {
-    return auroraGrid || { coords: [], time: null };
+    return auroraGrid || { coords: [], time: null, observed: NaN };
   }
 }
 
@@ -29,6 +35,19 @@ const lastHours = (rows, key) => {
     .filter((r) => t0 - r.t <= 2 * 3600000)
     .reverse();
 };
+
+// Plik RTSW zawiera dane z kilku sond naraz (np. DSCOVR i ACE), a oficjalne są tylko wiersze z active: true.
+// Gdy wierszy oficjalnej sondy brak, bierzemy sondę z najnowszym poprawnym odczytem i zwracamy jej nazwę jako „backup”,
+// żeby strona mogła oznaczyć dane jako zapasowe. „probe” to nazwa użytej sondy, także oficjalnej (do stopki panelu).
+// Wiersze są od najnowszego. Każda sonda osobno, bez mieszania.
+export function pickProbe(rows, ok) {
+  const active = rows.filter((r) => r && r.active === true && ok(r));
+  if (active.length) return { rows: active, backup: null, probe: active[0].source || null };
+  const first = rows.find((r) => r && ok(r));
+  if (!first) return { rows: [], backup: null, probe: null };
+  const name = first.source || "inna sonda";
+  return { rows: rows.filter((r) => r && r.source === first.source && ok(r)), backup: name, probe: name };
+}
 
 const settled = (r) => (r.status === "fulfilled" && Array.isArray(r.value) ? r.value : []);
 
@@ -54,24 +73,19 @@ export async function getSpaceWeather() {
       .reverse()
       .find((r) => Number.isFinite(Number(r[1])));
 
-  // Plik RTSW zawiera dane z kilku sond naraz, a oficjalne są tylko wiersze z active: true.
+  // Bz z jednej sondy: oficjalnej (active: true), a gdy jej brak, z zapasowej. Nazwa zapasowej trafia do bzBackup.
   const bzOk = (r) => r && r.bz_gsm != null && Number.isFinite(Number(r.bz_gsm));
-  const bzRow =
-    magRows.find((r) => r.active === true && bzOk(r)) ||
-    magRows.find(bzOk) ||
-    magRows
-      .slice(1)
-      .reverse()
-      .find((r) => Number.isFinite(Number(r[3])));
-  // Średni Bz z ostatnich 30 minut aktywnego satelity. Pojedynczy odczyt minutowy jest zbyt zaszumiony.
-  const activeMag = magRows.filter((r) => r && r.active === true && bzOk(r));
+  const { rows: activeMag, backup: bzBackup, probe: bzProbe } = pickProbe(magRows, bzOk);
+  const bzRow = activeMag[0];
+  // Średni Bz z ostatnich 30 minut tej sondy. Pojedynczy odczyt minutowy jest zbyt zaszumiony.
   const newest = activeMag.length ? Date.parse(activeMag[0].time_tag + "Z") : NaN;
   const recent = activeMag.filter((r) => newest - Date.parse(r.time_tag + "Z") < 30 * 60000);
   const bzAvg = recent.length ? recent.reduce((a, r) => a + Number(r.bz_gsm), 0) / recent.length : null;
 
-  // Prędkość i gęstość wiatru słonecznego z tego samego, aktywnego satelity.
-  const activeWind = settled(windResult).filter(
-    (r) => r && r.active === true && r.proton_speed != null && Number.isFinite(Number(r.proton_speed)),
+  // Prędkość i gęstość wiatru słonecznego z jednej sondy: oficjalnej, a gdy jej brak, z zapasowej (windBackup).
+  const { rows: activeWind, backup: windBackup, probe: windProbe } = pickProbe(
+    settled(windResult),
+    (r) => r.proton_speed != null && Number.isFinite(Number(r.proton_speed)),
   );
   const density = activeWind.find((r) => r.proton_density != null && Number.isFinite(Number(r.proton_density)))?.proton_density;
 
@@ -80,6 +94,7 @@ export async function getSpaceWeather() {
     .map((r) => ({
       t: Date.parse(/Z$/.test(r?.time_tag) ? r.time_tag : r?.time_tag + "Z"),
       v: r?.Hp == null ? NaN : Number(r.Hp),
+      sat: r?.satellite ?? null,
     }))
     .filter((r) => Number.isFinite(r.t) && Number.isFinite(r.v))
     .sort((a, b) => a.t - b.t);
@@ -102,25 +117,42 @@ export async function getSpaceWeather() {
     bzSeries: lastHours(activeMag, "bz_gsm"),
     windSeries: lastHours(activeWind, "proton_speed"),
     wind: activeWind.length ? Number(activeWind[0].proton_speed) : null,
+    windBackup,
+    windProbe,
     density: density != null ? Number(density) : null,
     goes: goesLast ? goesLast.v : null,
     goesRange: goesHour.length > 1 ? Math.max(...goesHour) - Math.min(...goesHour) : null,
     goesSeries,
     kpForecast,
     kp: kpRow ? Number(kpRow.Kp ?? kpRow[1]) : null,
-    bz: bzRow ? Number(bzRow.bz_gsm ?? bzRow[3]) : null,
+    bz: bzRow ? Number(bzRow.bz_gsm) : null,
+    bzBackup,
+    bzProbe,
+    // Numer satelity GOES, z którego jest ostatni odczyt, np. 19.
+    goesSat: goesLast ? goesLast.sat : null,
+    // Czas ostatniego pomiaru każdej wartości. Kp opisuje blok 3-godzinny, więc liczymy go od końca bloku.
+    times: {
+      kp: kpRow ? utcMs(kpRow.time_tag ?? kpRow[0]) + 3 * 3600000 : NaN,
+      bz: bzRow ? utcMs(bzRow.time_tag) : NaN,
+      wind: activeWind.length ? utcMs(activeWind[0].time_tag) : NaN,
+      goes: goesLast ? goesLast.t : NaN,
+    },
     fetchedAt: Date.now(),
   };
-  // Gdy NOAA chwilowo nie odpowiada, zostawiamy poprzednie wartości zamiast pustych.
+  // Gdy NOAA chwilowo nie odpowiada, zostawiamy poprzednie wartości razem z ich czasem pomiaru.
+  // O tym, czy są jeszcze dość świeże dla modelu, decyduje freshData() z model/fresh.js.
   if (old) {
     const s = spaceWeather;
-    if (s.kp == null) s.kp = old.kp;
-    if (s.bz == null) s.bz = old.bz;
-    if (s.bzAvg == null) s.bzAvg = old.bzAvg;
-    if (!s.bzSeries.length) s.bzSeries = old.bzSeries;
+    const keep = (key, fields) => {
+      if (s[fields[0]] != null) return;
+      for (const f of fields) s[f] = old[f];
+      s.times[key] = old.times[key];
+    };
+    keep("kp", ["kp"]);
+    keep("bz", ["bz", "bzAvg", "bzSeries", "bzBackup", "bzProbe"]);
+    keep("wind", ["wind", "density", "windSeries", "windBackup", "windProbe"]);
+    keep("goes", ["goes", "goesRange", "goesSeries", "goesSat"]);
     if (!s.kpForecast.length) s.kpForecast = old.kpForecast;
-    if (s.wind == null) Object.assign(s, { wind: old.wind, density: old.density, windSeries: old.windSeries });
-    if (s.goes == null) Object.assign(s, { goes: old.goes, goesRange: old.goesRange, goesSeries: old.goesSeries });
   }
   return spaceWeather;
 }

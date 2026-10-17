@@ -1,6 +1,13 @@
 // Słowne opisy wartości. Progi są w jednym miejscu, żeby kafelki i panele mówiły to samo.
 
-export const activityLabel = (a) => (a < 10 ? "Niska" : a < 35 ? "Umiarkowana" : "Wysoka");
+export const activityLabel = (a) => (a == null ? "Brak danych" : a < 10 ? "Niska" : a < 35 ? "Umiarkowana" : "Wysoka");
+
+// Wiek starego pomiaru, np. „Pomiar sprzed 45 min” albo „sprzed 3 h”. Bez znanego czasu tylko „Brak aktualnych danych”.
+export function ageLabel(t, now) {
+  if (!Number.isFinite(t)) return "Brak aktualnych danych";
+  const min = Math.max(0, Math.round((now - t) / 60000));
+  return min < 90 ? `Pomiar sprzed ${min} min` : `Pomiar sprzed ${Math.round(min / 60)} h`;
+}
 
 // Wielkość zachmurzenia. Progi tymczasowe, do potwierdzenia przez autora.
 export const cloudLabel = (c) => (c < 10 ? "Brak" : c < 30 ? "Małe" : c < 60 ? "Umiarkowane" : c < 80 ? "Duże" : "Bardzo duże");
@@ -40,6 +47,7 @@ export const chanceLevel = (score) => Math.max(0, chanceIndex(score) - 1);
 
 // Zdanie o warunkach obserwacji w danej godzinie: jasność nieba, chmury i jasny Księżyc wysoko.
 export function conditionsText(r) {
+  if (r.cloud == null) return r.night ? "Brak prognozy zachmurzenia, więc nie ocenimy warunków obserwacji." : "Teraz jest za jasno na obserwację, brak prognozy zachmurzenia.";
   const cloud = `zachmurzenie ${Math.round(r.cloud)}%`;
   if (!r.night) return `Teraz jest za jasno na obserwację, ${cloud}.`;
   const brightMoon = r.sky.moonAlt > 15 && r.sky.moonIllum > 0.5;

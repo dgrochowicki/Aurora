@@ -2,8 +2,9 @@
 import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt, moonLitRight } from "../model/sky.js";
 import { moonPhaseIcon } from "../ui/sky-chart.js";
-import { buildForecast, activityOnly, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
-import { activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
+import { freshData } from "../model/fresh.js";
+import { ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -100,13 +101,14 @@ export const showLoading = () => {
 
 // Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
 // Opis mówi, co pomiar znaczy dla zorzy, a wskaźnik pod nim pokazuje to samo kolorem: miernik dla Kp, mini wykres z 2 godzin dla reszty.
-function renderSpaceTiles(space) {
+// Za stary pomiar (stale z freshData) zostaje jako liczba, ale bez oceny i wskaźnika, z wiekiem zamiast opisu.
+function renderSpaceTiles(space, stale = {}, now = Date.now()) {
   const bzRef = space.bzAvg ?? space.bz;
   const tiles = [
-    { key: "mag", value: space.goes == null ? null : fmtNum(space.goes), level: space.goesRange == null ? null : goesLevel(space.goesRange) },
-    { key: "bz", value: space.bz == null ? null : fmtNum(space.bz), level: bzRef == null ? null : bzLevel(bzRef) },
-    { key: "kp", value: space.kp == null ? null : fmtNum(space.kp), level: space.kp == null ? null : kpLevel(space.kp) },
-    { key: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), level: space.wind == null ? null : windLevel(space.wind) },
+    { key: "mag", src: "goes", value: space.goes == null ? null : fmtNum(space.goes), level: space.goesRange == null ? null : goesLevel(space.goesRange) },
+    { key: "bz", src: "bz", value: space.bz == null ? null : fmtNum(space.bz), level: bzRef == null ? null : bzLevel(bzRef) },
+    { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), level: space.kp == null ? null : kpLevel(space.kp) },
+    { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), level: space.wind == null ? null : windLevel(space.wind) },
   ];
   const spark = {
     mag: () => sparkline(space.goesSeries || [], { minSpan: 40 }),
@@ -114,37 +116,44 @@ function renderSpaceTiles(space) {
     kp: () => meter(9, Math.round(space.kp)),
     wind: () => sparkline(space.windSeries || [], { threshold: WIND_FAST, minSpan: 150 }),
   };
-  for (const { key, value, level } of tiles) {
+  for (const { key, src, value, level } of tiles) {
+    if (src in stale) {
+      setTile(els.activityTiles, key, { value, status: ageLabel(stale[src], now) });
+      continue;
+    }
     const viz = level == null ? "" : (!BARS_ONLY && spark[key]()) || meter(4, level + 1);
-    setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : favorLabel(level) });
+    // Bz i wiatr z zapasowej sondy mają jej nazwę przy ocenie, np. „Neutralnie · ACE”.
+    const backup = { bz: space.bzBackup, wind: space.windBackup }[key];
+    const probe = backup && level != null ? ` · ${backup}` : "";
+    setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : favorLabel(level) + probe });
   }
 }
 
+// Do modelu trafiają tylko świeże dane NOAA (freshData). Kafelki i panele dostają wszystkie, razem z wiekiem starych pomiarów.
 export function renderForecast(loc, w, grid, space) {
   const now = Date.now();
-  const fc = buildForecast(loc, w, grid, space, now);
-  if (loc.test) applyTest(fc, loc.test);
+  const live = freshData(grid, space, now);
+  const fc = buildForecast(loc, w, live.grid, live.space, now);
+  if (loc.test && fc.activity) applyTest(fc, loc.test);
   const { rows, clouds, first, best, maxAct, nowSky, offset, tz } = fc;
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
     night = nightTimeline(loc, now, offset);
-  state = { loc, grid, space, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
+  state = { loc, grid, space, stale: live.stale, source: fc.source, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
-  els.score.textContent = `${first.score}%`;
-  els.chance.textContent = chanceLabel(first.score);
-  els.sky.dataset.level = chanceLevel(first.score);
-  els.activityLevel.textContent = activityLabel(first.act);
-  renderSpaceTiles(space);
+  showScore(first.score);
+  els.activityLevel.textContent = fc.activity ? activityLabel(first.act) : "";
+  renderSpaceTiles(space, live.stale, now);
   // Kafelki warunków: zachmurzenie teraz i kiedy się zmieni, światło teraz i kiedy będzie najciemniej.
-  const cloudNow = Math.round(first.cloud);
+  const cloudNow = first.cloud == null ? null : Math.round(first.cloud);
   const phase = phaseAt(now, loc);
   // Faza Księżyca tylko, gdy jest na niebie; pod horyzontem nic nie świeci.
   const moonUp = nowSky.moonAlt > 0;
   setTile(els.conditionTiles, "cloud", {
-    value: String(cloudNow),
+    value: cloudNow == null ? null : String(cloudNow),
     icon: weatherIcon(first.night, cloudNow),
-    status: cloudLabel(cloudNow),
-    next: change?.short || "Bez większych zmian",
+    status: cloudNow == null ? "Brak danych" : cloudLabel(cloudNow),
+    next: cloudNow == null ? "" : change?.short || "Bez większych zmian",
   });
   setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), statusIcon: moonUp ? moonPhaseIcon(nowSky.moonIllum, moonLitRight(now, loc.lat, loc.lon)) : "", next: night.nextText });
 
@@ -160,10 +169,30 @@ export function renderForecast(loc, w, grid, space) {
   selectHour(state.sel);
   // Przy miejscu w innej strefie najlepszą godzinę podajemy też w czasie użytkownika.
   const yours = diffH !== 0 && best.ms ? new Date(best.ms).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "";
-  els.outlook.textContent = outlookText(best, maxAct, change, yours);
-  els.outlook.hidden = !rows.length;
-  renderConfidence(space, grid);
-  renderVerdict(first, best, maxAct, loc.lat >= 0 ? "na północ" : "na południe");
+  // Bez danych o aktywności zapowiedź mówi tylko o chmurach.
+  els.outlook.textContent = fc.activity ? outlookText(best, maxAct, change, yours) : change?.sentence || "";
+  els.outlook.hidden = !rows.length || !els.outlook.textContent;
+  renderConfidence(live.space, live.grid);
+  if (!fc.activity) els.summary.textContent = `${noActivityText(live.stale, now)} ${conditionsText(first)}`;
+  else if (first.score == null)
+    els.summary.textContent = `Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy. Aktywność zorzy jest ${activityLabel(first.act).toLowerCase()}.`;
+  else renderVerdict(first, best, maxAct, loc.lat >= 0 ? "na północ" : "na południe");
+}
+
+// Wynik i jego opis słowny. null to kreska i „Brak danych”, bez zorzy w tle.
+function showScore(score) {
+  els.score.textContent = score == null ? "—" : `${score}%`;
+  els.chance.textContent = score == null ? "Brak danych" : chanceLabel(score);
+  if (score == null) els.sky.removeAttribute("data-level");
+  else els.sky.dataset.level = chanceLevel(score);
+}
+
+// Zdanie, gdy nie ma aktualnego OVATION ani Kp. Podajemy wiek ostatniego pomiaru, jeśli jakiś mamy.
+function noActivityText(stale, now) {
+  const last = Math.max(...[stale.ovation, stale.kp].filter(Number.isFinite));
+  return Number.isFinite(last)
+    ? `Brak aktualnych danych o zorzy z NOAA (ostatni ${ageLabel(last, now).toLowerCase()}), więc nie liczymy szansy.`
+    : "Brak danych o zorzy z NOAA, więc nie liczymy szansy.";
 }
 
 // Miejsce testowe: szansa teraz to „pct”, a kolejne godziny najpierw rosną, potem gasną, żeby było widać poświatę.
@@ -176,11 +205,13 @@ function applyTest(fc, pct) {
 
 // Bez prognozy pogody nie policzymy szansy, ale nadal pokazujemy aktywność, Kp i Bz z NOAA.
 export function renderSpaceOnly(loc, grid, space) {
-  const act = activityOnly(loc, grid, space);
-  state = { loc, grid, space, rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
+  const now = Date.now();
+  const live = freshData(grid, space, now);
+  const act = nowActivity(loc, live.grid, live.space);
+  state = { loc, grid, space, stale: live.stale, source: activitySource(live.grid, act), rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
   // Bez prognozy pogody nie znamy strefy miejsca, więc datę podajemy według przeglądarki.
-  showUpdated(Date.now(), browserOffset());
-  renderSpaceTiles(space);
+  showUpdated(now, browserOffset());
+  renderSpaceTiles(space, live.stale, now);
   setTile(els.conditionTiles, "cloud", { status: "Brak prognozy pogody" });
   setTile(els.conditionTiles, "light", { status: "Brak danych" });
   els.hourly.innerHTML = "";
@@ -189,8 +220,11 @@ export function renderSpaceOnly(loc, grid, space) {
   clearPlaceTime();
   els.chance.textContent = "Brak prognozy";
   els.sky.removeAttribute("data-level");
-  els.activityLevel.textContent = activityLabel(act);
-  els.summary.textContent = `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
+  els.activityLevel.textContent = act == null ? "" : activityLabel(act);
+  els.summary.textContent =
+    act == null
+      ? "Nie znamy teraz zachmurzenia ani aktualnej aktywności zorzy, więc nie policzymy szansy. Spróbuj ponownie za chwilę."
+      : `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
 }
 
 // Data w czasie miejsca i godzina pobrania danych w czasie użytkownika.
@@ -205,15 +239,19 @@ function selectHour(i) {
   state.sel = i;
   markHour(els.hourly, i);
   const r = state.rows[i];
-  els.hourDetail.textContent = [r.label, `${r.cloud}% chmur`, phaseAt(r.ms, state.loc).toLowerCase(), moonLabel(r.sky), viewLabel(r.score)]
+  els.hourDetail.textContent = [r.label, r.cloud == null ? "brak prognozy chmur" : `${r.cloud}% chmur`, phaseAt(r.ms, state.loc).toLowerCase(), moonLabel(r.sky), viewLabel(r.score)]
     .filter(Boolean)
     .join(" · ");
 }
 
+// Dostaje dane po freshData, więc siatka OVATION jest tu tylko wtedy, gdy ma mniej niż godzinę.
 function renderConfidence(space, grid) {
-  const gridFresh = grid.coords.length && Date.now() - Date.parse(grid.time) < 60 * 60000;
-  const confidence =
-    gridFresh && space.kp != null && space.kpForecast?.length ? "wysoka" : grid.coords.length || space.kp != null ? "średnia" : "niska";
+  const hasGrid = grid.coords.length > 0;
+  if (!hasGrid && space.kp == null) {
+    els.confidence.textContent = "Pewność prognozy: niska • brak aktualnych danych o aktywności zorzy";
+    return;
+  }
+  const confidence = hasGrid && space.kp != null && space.kpForecast?.length ? "wysoka" : "średnia";
   els.confidence.textContent = `Pewność prognozy: ${confidence} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
 }
 

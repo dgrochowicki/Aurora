@@ -19,8 +19,9 @@ export const icon = (name) =>
   `<svg class="icon" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="${PATHS[name]}"/></svg>`;
 
 // Pogoda na daną porę: w nocy Księżyc, w dzień Słońce, a przy większym zachmurzeniu chmura.
+// Bez danych o chmurach pokazujemy chmurę, a nie czyste niebo.
 export const weatherIcon = (night, cover) =>
-  icon(cover >= 80 ? "cloud" : cover >= 30 ? (night ? "cloudMoon" : "cloudSun") : night ? "moon" : "sun");
+  icon(cover == null || cover >= 80 ? "cloud" : cover >= 30 ? (night ? "cloudMoon" : "cloudSun") : night ? "moon" : "sun");
 
 // Pora dnia z phaseAt(): Dzień, Świt, Zmierzch albo Noc.
 export const phaseIcon = (phase) => icon(phase === "Noc" ? "moon" : phase === "Dzień" ? "sun" : "sunHorizon");

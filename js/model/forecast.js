@@ -1,18 +1,25 @@
 // Prognoza godzinowa i oś nocy dla miejsca. Łączy aktywność, ciemność i chmury w szansę, bez dotykania DOM.
-import { clamp, localMs, localHM } from "../util.js";
+import { clamp, num, localMs, localHM } from "../util.js";
 import { skyAt, darknessOf, magLat, DAY_MS } from "./sky.js";
 import { auroraAt, kpVisible, activityAt, clearSky } from "./aurora.js";
 
 // Wynik to widoczna aktywność × ciemność × część czystego nieba, dla 12 najbliższych godzin.
+// Bez aktualnego OVATION i Kp (activity: false) albo bez danych o chmurach w danej godzinie wynik jest null, a nie liczbą.
+// grid i space mają być już przefiltrowane przez freshData() z model/fresh.js.
 export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const offset = (w.utc_offset_seconds || 0) * 1000,
     nowLocal = now + offset;
   const idx = w.hourly.time.findIndex((t) => localMs(t) >= nowLocal - 1800000);
   const mlat = magLat(loc.lat, loc.lon);
-  const ovation = auroraAt(loc.lat, loc.lon, grid) ?? kpVisible(mlat, space.kp ?? 2);
+  const ovation = nowActivity(loc, grid, space);
   const layer = (k, i) => {
-    const v = Number(w.hourly[k]?.[i]);
-    return Number.isFinite(v) ? Math.round(v) : null;
+    const v = num(w.hourly[k]?.[i]);
+    return v == null ? null : Math.round(v);
+  };
+  // Zachmurzenie w procentach: całkowite z prognozy, a gdy go brak, wyliczone z warstw. null, gdy brak obu.
+  const cloudAt = (i, clear) => {
+    const total = num(w.hourly.cloud_cover?.[i]);
+    return total != null ? Math.round(total) : clear == null ? null : Math.round((1 - clear) * 100);
   };
   const rows = [];
   for (let i = Math.max(0, idx); i < Math.min(w.hourly.time.length, Math.max(0, idx) + 12); i++) {
@@ -21,13 +28,11 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
     const sky = skyAt(ms, loc.lat, loc.lon),
       dark = darknessOf(sky),
       night = sky.sunAlt < -6;
-    const act = activityAt(ovation, mlat, space, ms, Math.max(0, (ms - now) / 3600000));
+    const act = ovation == null ? null : activityAt(ovation, mlat, space, ms, Math.max(0, (ms - now) / 3600000));
     const clear = clearSky(w.hourly, i),
-      cover = Math.round((1 - clear) * 100),
-      total = Number(w.hourly.cloud_cover?.[i]);
-    // Gdy brak całkowitego zachmurzenia, pokazujemy zachmurzenie wyliczone z warstw.
-    const cloud = Number.isFinite(total) ? Math.round(total) : cover;
-    const score = Math.round(clamp(act * dark * clear, 0, 99));
+      cover = clear == null ? null : Math.round((1 - clear) * 100),
+      cloud = cloudAt(i, clear);
+    const score = act == null || clear == null ? null : Math.round(clamp(act * dark * clear, 0, 99));
     rows.push({
       t,
       ms,
@@ -48,35 +53,45 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   // Zachmurzenie na wykres: 13 godzin, czyli pełne 12 h, żeby podpisy co 3 h trafiały w oba końce.
   const clouds = [];
   for (let i = Math.max(0, idx); i < Math.min(w.hourly.time.length, Math.max(0, idx) + 13); i++) {
-    const total = Number(w.hourly.cloud_cover?.[i]);
-    clouds.push({ t: localMs(w.hourly.time[i]) - offset, v: Number.isFinite(total) ? Math.round(total) : Math.round((1 - clearSky(w.hourly, i)) * 100) });
+    const v = cloudAt(i, clearSky(w.hourly, i));
+    if (v != null) clouds.push({ t: localMs(w.hourly.time[i]) - offset, v });
   }
   const nowSky = skyAt(now, loc.lat, loc.lon);
+  const nowCloud = num(w.current?.cloud_cover);
   const first = rows[0] || {
-    score: 0,
-    cloud: w.current?.cloud_cover || 0,
-    cover: w.current?.cloud_cover || 0,
-    clear: 1 - (w.current?.cloud_cover || 0) / 100,
+    score: null,
+    cloud: nowCloud,
+    cover: nowCloud,
+    clear: nowCloud == null ? null : 1 - nowCloud / 100,
     dark: darknessOf(nowSky),
     night: nowSky.sunAlt < -6,
     sky: nowSky,
     act: ovation,
   };
-  const best = rows.reduce((a, b) => (b.score > a.score ? b : a), rows[0] || first);
-  const maxAct = Math.max(first.act, ...rows.map((r) => r.act));
-  return { rows, clouds, first, best, maxAct, nowSky, offset, tz: w.timezone_abbreviation || "" };
+  // Najlepsza godzina spośród tych, które mają wynik. Bez żadnego wyniku to pierwsza godzina z wynikiem null.
+  const scored = rows.filter((r) => r.score != null);
+  const best = scored.reduce((a, b) => (b.score > a.score ? b : a), scored[0] || first);
+  const maxAct = ovation == null ? null : Math.max(first.act, ...rows.map((r) => r.act));
+  return { rows, clouds, first, best, maxAct, activity: ovation != null, source: activitySource(grid, ovation), nowSky, offset, tz: w.timezone_abbreviation || "" };
 }
 
-// Aktywność bez prognozy pogody: tylko NOAA.
-export const activityOnly = (loc, grid, space) =>
-  auroraAt(loc.lat, loc.lon, grid) ?? kpVisible(magLat(loc.lat, loc.lon), space.kp ?? 2);
+// Skąd jest aktywność: z modelu OVATION, z indeksu Kp (gdy OVATION brak) albo null, gdy nie ma żadnego.
+export const activitySource = (grid, act) => (act == null ? null : grid.coords.length ? "ovation" : "kp");
+
+// Widoczna aktywność teraz: z modelu OVATION, a bez niego z bieżącego Kp. null, gdy nie ma aktualnego żadnego z nich.
+export function nowActivity(loc, grid, space) {
+  const ovation = auroraAt(loc.lat, loc.lon, grid);
+  if (ovation != null) return ovation;
+  return space.kp == null ? null : kpVisible(magLat(loc.lat, loc.lon), space.kp);
+}
 
 // Pierwsza wyraźna zmiana zachmurzenia w prognozie: przejaśnienie, gdy teraz jest pochmurno, albo napływ chmur, gdy jest pogodnie.
 export function cloudChange(rows) {
   if (!rows.length) return null;
   const at = (r) => localHM(localMs(r.t));
+  if (rows[0].cloud == null) return null;
   if (rows[0].cloud >= 50) {
-    const r = rows.slice(1).find((r) => r.cloud < 30);
+    const r = rows.slice(1).find((r) => r.cloud != null && r.cloud < 30);
     return r
       ? { short: `Przejaśnienia ok. ${at(r)}`, sentence: `Około ${at(r)} niebo powinno się przejaśnić.` }
       : { short: "Bez przejaśnień przez najbliższe 12 h", sentence: "W najbliższych godzinach nie widać przejaśnień." };
@@ -88,10 +103,10 @@ export function cloudChange(rows) {
 // Siła poświaty pigułek godzin w skali 0–1. Najlepsza godzina świeci tym mocniej, im wyższa jest jej szansa (od 0,5 przy 10% do 1 przy 70%),
 // a pozostałe proporcjonalnie słabiej, żeby w pasku było widać, jak zorza narasta i gaśnie. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny.
 export function hourGlow(rows) {
-  const top = Math.max(0, ...rows.map((r) => r.score));
+  const top = Math.max(0, ...rows.map((r) => r.score ?? 0));
   if (top < 10) return rows.map(() => 0);
   const peak = 0.5 + 0.5 * clamp((top - 10) / 60, 0, 1);
-  return rows.map((r) => (peak * r.score) / top);
+  return rows.map((r) => (peak * (r.score ?? 0)) / top);
 }
 
 // „yours” to godzina najlepszej szansy w czasie użytkownika, gdy miejsce leży w innej strefie.

@@ -74,7 +74,7 @@ Szkło w kartach i kafelkach: `backdrop-filter: blur(20px)`, zgodnie z rzeczywis
 
 Kolejność: tytuł 13 px (`--sub`), opis słowny i procent po 28 px, akapit o aktywności i warunkach, na dole zapowiedź godzin. Odstępy przeważnie 8 px, między wartością a akapitem 16 px. Po stuknięciu tytułu otwierany jest panel „Skąd ten wynik”.
 
-`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
+`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Bez wyniku (brak aktualnych danych NOAA albo prognozy chmur) zamiast opisu i procentu stoją „Brak danych” i kreska, zorza w tle jest ukryta, a pigułki godzin pokazują kreskę i nie świecą. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
 
 ## 6. Kafelki i wskaźniki
 
@@ -86,6 +86,9 @@ W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--sub-65`), �
 - Kp: miernik segmentowy (skala /9).
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
 - Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
+- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast oceny jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów, a „Ocena” ma kreskę.
+- Bz i wiatr z zapasowej sondy: przy ocenie nazwa sondy („Neutralnie · ACE”), w panelu „zapasowa sonda ACE” pod liczbą.
+- Kafelek „Zachmurzenie” bez prognozy: kreska, „Brak danych”, bez linii zmiany.
 
 ## 7. Pasek godzin
 
@@ -106,6 +109,8 @@ Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem
 ## 9. Panele szczegółów
 
 Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1E2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
+
+Stopka panelu (źródła) podaje, skąd są dane: sondę RTSW przy Bz i wietrze („sonda SOLAR1”, przy zapasowej „sonda ACE (zapasowa)”), numer satelity przy magnetometrze („GOES-19”), a w „Skąd ten wynik” źródło aktywności („z modelu OVATION”, „z indeksu Kp (brak aktualnego modelu OVATION)” albo brak danych).
 
 Metryka: 28/34 px, jednostka w tym samym rozmiarze, status 15 px, 4 px niżej. W panelu „Światło” zamiast liczby może być tytuł pory dnia. Między blokami nie ma jednego wspólnego marginesu; dane i wyjaśnienia mają zwykle własne paddingi po 16 px, źródła zostawiają około 48 px do dołu.
 

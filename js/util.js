@@ -8,6 +8,12 @@ export const esc = (v) =>
 
 export const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 
+// Liczba albo null. Number(null) daje 0, więc brak wartości w danych zamieniałby się w zero (np. 0% chmur).
+export const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+
+// Czas UTC z NOAA: część plików podaje go bez „Z” na końcu.
+export const utcMs = (s) => (s ? Date.parse(/Z$/.test(s) ? s : s + "Z") : NaN);
+
 export const fmtCoords = (lat, lon) =>
   `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? "N" : "S"}  •  ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
 

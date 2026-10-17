@@ -1,5 +1,5 @@
 // Widoczna aktywność zorzy i część czystego nieba. Bez DOM, więc da się to testować w Node.
-import { clamp } from "../util.js";
+import { clamp, num } from "../util.js";
 import { RAD } from "./sky.js";
 
 // Zorza świeci na wysokości 100–300 km, więc widać ją nad horyzontem nawet około 1000 km od owalu. Im dalej, tym niżej i słabiej.
@@ -61,12 +61,15 @@ export function activityAt(ovation, mlat, space, ms, hoursAhead) {
 }
 
 // Część nieba wolna od chmur. Niskie chmury zasłaniają całkowicie, średnie prawie, a wysokie i cienkie przepuszczają część światła.
+// null, gdy prognoza nie ma ani warstw, ani całkowitego zachmurzenia: brak danych to nie czyste niebo.
 export function clearSky(h, i) {
-  const L = h.cloud_cover_low?.[i],
-    M = h.cloud_cover_mid?.[i],
-    H = h.cloud_cover_high?.[i];
-  const total = Number(h.cloud_cover?.[i]) || 0;
-  if (![L, M, H].every(Number.isFinite)) return 1 - total / 100;
+  const L = num(h.cloud_cover_low?.[i]),
+    M = num(h.cloud_cover_mid?.[i]),
+    H = num(h.cloud_cover_high?.[i]),
+    total = num(h.cloud_cover?.[i]);
+  const byTotal = total == null ? null : 1 - total / 100;
+  if (L == null || M == null || H == null) return byTotal;
+  const byLayers = (1 - L / 100) * (1 - (0.85 * M) / 100) * (1 - (0.4 * H) / 100);
   // Warstwy często się pokrywają, więc zasłonięte niebo nie może przekroczyć całkowitego zachmurzenia.
-  return Math.max((1 - L / 100) * (1 - (0.85 * M) / 100) * (1 - (0.4 * H) / 100), 1 - total / 100);
+  return byTotal == null ? byLayers : Math.max(byLayers, byTotal);
 }
