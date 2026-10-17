@@ -1,47 +1,73 @@
 # Aurora Now
 
-Aurora Now to mobilna strona pomagająca sprawdzić, czy w wybranym miejscu można zobaczyć zorzę polarną. Łączy dane o aktywności zorzy, zachmurzeniu i porze dnia w prostą prognozę godzinową. Po uruchomieniu próbuje użyć bieżącej lokalizacji; gdy jest ona niedostępna, pokazuje Szczecin.
+Aurora Now to mobilna aplikacja internetowa pomagająca ocenić, **czy i kiedy warto spróbować obserwować zorzę polarną z wybranego miejsca**. Łączy informacje o aktywności zorzy, zachmurzeniu i oświetleniu nieba w orientacyjny wskaźnik godzinowy.
 
-Wersja na żywo: https://dgrochowicki.github.io/Aurora/
+**Wersja na żywo:** https://dgrochowicki.github.io/Aurora/
+
+Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie jest ona dostępna, pokazuje Szczecin.
 
 ## Co można zrobić
 
-- Sprawdzić szacowaną szansę zobaczenia zorzy teraz i w najbliższych 12 godzinach. Stuknięcie w kartę szansy pokazuje, z czego wynik się składa.
-- Wybrać godzinę z prognozy i zobaczyć jej zachmurzenie, porę dnia i Księżyc.
-- Zobaczyć kafelki z magnetometrem, Bz, Kp, prędkością wiatru słonecznego, zachmurzeniem i światłem w nocy. Po stuknięciu kafelek pokazuje szczegóły: wykresy magnetometru, Bz i wiatru z 2 godzin, prognozę Kp, warstwy chmur oraz osie Słońca i Księżyca z oknem najciemniejszego nieba.
-- Otworzyć mapę modelu zorzy NOAA OVATION na pełnym ekranie (przycisk z globusem).
-- Zmienić miejsce (przycisk ze strzałką albo stuknięcie w nazwę miejsca): wyszukać miejscowość, wrócić do swojej lokalizacji albo wybrać zapisane miejsce. Zapisane miejsca są tylko na tym urządzeniu.
+- Zobaczyć heurystyczny wynik 0–99%, obliczany dla bieżącej i kolejnych godzin prognozy, z rozbiciem na aktywność, ciemność i zachmurzenie.
+- Przejrzeć najbliższe 12 godzin, wybrać godzinę i sprawdzić zachmurzenie, porę dnia oraz wpływ Księżyca.
+- Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy.
+- Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
+- Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce.
 
-## Dane i interpretacja
+## Co oznacza „szansa” w aplikacji?
 
-Strona pobiera model zorzy OVATION oraz wskaźniki pogody kosmicznej z NOAA SWPC (Kp i jego prognoza, Bz, prędkość i gęstość wiatru słonecznego, pole magnetyczne z satelity GOES), a zachmurzenie w trzech warstwach z Open-Meteo. Wyszukiwanie miejsc korzysta z geokodowania Open-Meteo, a nazwę miejsca dla bieżącej lokalizacji ustala BigDataCloud. Położenie Słońca i Księżyca jest liczone w przeglądarce.
+**Pokazywany procent nie jest skalibrowanym, statystycznym prawdopodobieństwem zaobserwowania zorzy** ani oficjalną prognozą NOAA. Jest autorskim wskaźnikiem, powstałym z połączenia przybliżonej aktywności widocznej z lokalizacji, ciemności i części nieba bez chmur. Na przykład wskazanie 40% **nie oznacza**, że zorza będzie widoczna podczas 40 ze 100 porównywalnych nocy.
 
-Aplikacja uwzględnia zorzę widoczną nad horyzontem, do około 1000 km od owalu. Chmury są ważone według wysokości: niskie zasłaniają najbardziej, wysokie najmniej. Na najbliższą godzinę aktywność pochodzi z modelu OVATION, a na dalsze godziny z trzydniowej prognozy Kp. Ciemność zależy od zmierzchu oraz od jasności i wysokości Księżyca. Wynik procentowy jest **własnym, orientacyjnym oszacowaniem aplikacji**, a nie oficjalną prognozą prawdopodobieństwa NOAA. Warunki i widoczność mogą różnić się od wskazania.
+- Aktywność na najbliższy czas opiera się przede wszystkim na modelu NOAA OVATION; dalsze godziny wykorzystują własne przybliżenie oparte na prognozie Kp.
+- Zachmurzenie pochodzi z Open-Meteo, a położenie Słońca i Księżyca jest obliczane w przeglądarce.
+- Widoczność zależy także od warunków, których model nie obejmuje wprost: zanieczyszczenia światłem, przeszkód na horyzoncie, lokalnych chmur w kierunku zorzy i cech obserwatora lub aparatu.
 
-## Projekt
+**Ograniczenia obecnej wersji:** nazwa „Teraz” odnosi się do najbliższej godzinowej prognozy chmur; przy braku OVATION aplikacja może przejść na przybliżenie z Kp, a przy braku obu źródeł kod ma awaryjną wartość Kp = 2. Po chwilowych awariach mogą być ponownie używane poprzednie dane NOAA. Bieżący interfejs nie rozróżnia jeszcze wystarczająco jasno wszystkich takich sytuacji. Przy całkowitym braku prognozy pogody procent nie jest wyświetlany.
 
-Statyczna aplikacja internetowa w języku polskim, bez frameworka i bez kroku budowania. Skrypty to moduły ES, więc strona musi działać przez serwer, a nie z pliku. Lokalnie wystarczy `npm start` albo `python3 -m http.server 4173` i adres `http://localhost:4173`. Zapisane miejsca są przechowywane w `localStorage` przeglądarki, bez konta użytkownika.
+Dokładny opis **aktualnie zaimplementowanych** wzorów, progów i ryzyk jest w [MODEL.md](MODEL.md). Plan zmian jest w [UWAGI.md](UWAGI.md).
 
+## Źródła danych
+
+| Dostawca | Dane |
+|---|---|
+| NOAA SWPC | OVATION, bieżące i prognozowane Kp, Bz, wiatr słoneczny, magnetometr satelitarny GOES |
+| Open-Meteo | Całkowite zachmurzenie, warstwy chmur, geokodowanie miejsc |
+| BigDataCloud | Nazwa miejscowości dla lokalizacji urządzenia |
+| Obliczenia lokalne | Pozycje Słońca i Księżyca, ciemność, przybliżona szerokość geomagnetyczna |
+
+## Uruchomienie projektu
+
+Statyczna aplikacja w języku polskim, bez frameworka i kroku budowania. Korzysta z modułów ES, dlatego nie uruchamia się z `file://`.
+
+Wymagany Node.js 18+ do testów. Lokalnie:
+
+```bash
+npm start
+# Następnie http://localhost:4173
+
+npm test
 ```
-index.html
-css/
-  tokens.css       kolory, odstępy i czcionka; od nich zaczyna się zmiana stylu
-  base.css         układ strony, nagłówek, sekcje, pływające przyciski, komunikat
-  components.css   karty, godziny, kafelki, panele, wykresy, oś czasu, mapa, miejsca
-js/
-  main.js          start, wybór miejsca, przyciski mapy i miejsc, odświeżanie co 5 minut
-  util.js          formatowanie, pobieranie JSON, czas miejsca
-  labels.js        słowne opisy wartości i ich progi
-  data/            NOAA (noaa.js), pogoda i miejsca (places.js)
-  model/           Słońce i Księżyc (sky.js), aktywność i chmury (aurora.js), prognoza i oś nocy (forecast.js)
-  ui/              komponenty: kafelek, panel, wykres, oś czasu, godziny, ikony, fragmenty paneli, komunikat
-  views/           strona główna, panele szczegółów, mapa, ekran miejsc
-tests/             testy modelu w Node
+
+Alternatywnie serwer: `python3 -m http.server 4173`.
+
+## Struktura
+
+```text
+index.html          — główna struktura HTML
+css/                — tokeny, układ i komponenty
+js/main.js          — start, geolokalizacja, wybór miejsca i odświeżanie
+js/data/            — NOAA, Open-Meteo, geokodowanie, zapisywane miejsca
+js/model/           — widoczna aktywność, prognoza, astronomia
+js/labels.js        — opisy i progi prezentacji
+js/ui/              — kafelki, wykresy, panele, ikony
+js/views/           — ekran główny, szczegóły, mapa, miejsca
+tests/              — testy modelu i podziałki wykresów
 ```
 
-Katalog `model/` nie korzysta z DOM, więc da się go testować w Node: `npm test` (Node 18 lub nowszy).
+## Dokumentacja
 
-Pozostałe dokumenty:
-- `UWAGI.md` — otwarte zadania, ustalenia dotyczące modelu i plan dalszych prac;
-- `STYL.md` — ustalenia dotyczące wyglądu;
-- `CLAUDE.md` — opis projektu, zasad pracy i historii zmian dla agentów.
+- [MODEL.md](MODEL.md) — aktualny algorytm, źródła, fallbacki, ograniczenia i walidacja.
+- [UWAGI.md](UWAGI.md) — otwarte zadania, priorytety i decyzje wymagające autora.
+- [STYL.md](STYL.md) — obowiązujący system wizualny i nierozstrzygnięte kwestie UI.
+- [CLAUDE.md](CLAUDE.md) — instrukcje dla agentów, architektura i sposób pracy.
+- [CHANGELOG.md](CHANGELOG.md) — chronologiczna historia projektu.
