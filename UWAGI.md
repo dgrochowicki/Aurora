@@ -50,6 +50,10 @@ Nadal otwarte:
 - [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.
 - [ ] **UI.** Dokończyć uzgodnienia dotyczące ekranu miejsc, mapy, przycisków i szczegółowych paneli. Nieaktualne wartości stylu nie powinny wracać z dokumentacji; punkt odniesienia `STYL.md` i `css/tokens.css`.
 
+## Pomysły na później (autor, 18.10.2026)
+
+- **Zapisane miejsca na mapie**, jak w pogodzie Apple. W docelowej aplikacji darmowo tylko bieżąca lokalizacja, a dodawanie innych miejsc (i pokazywanie ich na mapie) jako funkcja płatna. Na razie nie planujemy.
+
 ## Do ustalenia z autorem
 
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?

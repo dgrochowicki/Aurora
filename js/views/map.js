@@ -6,13 +6,16 @@ import { createSheet } from "../ui/sheet.js";
 import { icon } from "../ui/icons.js";
 
 const note = $("#mapNote");
-let map, auroraLayer, locationMarker, mapLoc, field = null, getCurrent = () => null;
+let map, auroraLayer, locationMarker, field = null, justOpened = false, getCurrent = () => null;
 
 const sheet = createSheet({
   sheet: $("#mapSheet"),
   backdrop: $("#mapBackdrop"),
   closeButton: $("#closeMap"),
-  onOpen: () => showMap(getCurrent()),
+  onOpen: () => {
+    justOpened = true;
+    showMap(getCurrent());
+  },
 });
 
 // Kolory warstwy zorzy, te same co w legendzie (.map-legend i): płynnie od turkusu przy słabej do czerwieni przy silnej.
@@ -74,7 +77,24 @@ function drawTile(coords) {
 // current: funkcja zwracająca bieżące miejsce, żeby mapa pokazywała znacznik tam, gdzie prognoza.
 export function initMap({ current }) {
   getCurrent = current;
-  $("#closeMap").innerHTML = icon("x");
+  $("#closeMap").innerHTML = icon("xBold");
+  $("#locateMap").innerHTML = icon("gpsBold");
+  $("#locateMap").onclick = () => {
+    const loc = getCurrent();
+    if (map && loc) flyHome(loc);
+  };
+}
+
+// Przybliżenie, przy którym widać okolicę miejsca, a owal zorzy nad Skandynawią jeszcze u góry ekranu.
+const HOME_ZOOM = 4;
+const MAX_ZOOM = 12;
+
+// Powrót do miejsca: zwykłe przesunięcie z Leaflet (setView przycina środek do maxBounds, więc mapa nie wyjeżdża poza ramkę).
+// Bez animacji przybliżania: przy zmianie przybliżenia klatka po klatce Leaflet wyrzucał kafelki i mapa była pusta.
+function flyHome(loc) {
+  // Długość geograficzna celu najbliższa obecnemu środkowi, żeby przy zawijaniu świata nie jechać naokoło.
+  const lon = loc.lon + 360 * Math.round((map.getCenter().lng - loc.lon) / 360);
+  map.setView([loc.lat, lon], Math.max(map.getZoom(), HOME_ZOOM), { animate: !matchMedia("(prefers-reduced-motion: reduce)").matches });
 }
 
 export const openMap = (opener) => sheet.open(opener);
@@ -106,6 +126,7 @@ async function showMap(current) {
     // a w bok zawija się jak globus (worldCopyJump). Najmniejsze przybliżenie dobiera fitWorld(), żeby świat wypełniał ekran.
     map = L.map("auroraMap", {
       zoomControl: false,
+      maxZoom: MAX_ZOOM,
       worldCopyJump: true,
       maxBounds: [
         [-85.05, -100000],
@@ -115,21 +136,22 @@ async function showMap(current) {
       bounceAtZoomLimits: false,
     }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
     map.on("resize", fitWorld);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
+    // Przybliżenie do 12 (okolica miasta); wcześniej tylko do 8.
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: MAX_ZOOM, attribution: "© OpenStreetMap" }).addTo(map);
   }
+  // Po otwarciu panelu od razu miejsce w przybliżeniu HOME_ZOOM. Przy odświeżaniu danych mapa zostaje, gdzie była.
+  const opening = justOpened;
+  justOpened = false;
   setTimeout(() => {
     map.invalidateSize();
     fitWorld();
+    if (opening && current) map.setView([current.lat, current.lon], HOME_ZOOM, { animate: false });
   }, 50);
   if (current) {
     if (locationMarker) locationMarker.remove();
     locationMarker = L.circleMarker([current.lat, current.lon], { radius: 7, color: "#fff", weight: 2, fillColor: "#68f7bb", fillOpacity: 1 })
       .addTo(map)
       .bindPopup(esc(current.name));
-    if (mapLoc !== current) {
-      map.setView([current.lat, current.lon], map.getZoom());
-      mapLoc = current;
-    }
   }
   const grid = await getAuroraGrid();
   field = grid.coords.length ? ovationField(grid, { smooth: 1 }) : null;

@@ -2,6 +2,16 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — przyciski mapy i lot do lokalizacji
+
+- ✕ na mapie w tym samym wymiarze i z tą samą ikoną bold co w panelach szczegółów, na ciemnym szkle; pod nim nowy przycisk „Wróć do lokalizacji” (celownik Phosphor gps-fix bold).
+- Mapa otwiera się od razu na bieżącej lokalizacji w przybliżeniu 4. Animację przybliżania po otwarciu wypróbowaliśmy i usunęliśmy: `flyTo` z Leaflet oddalał mapę i wyjeżdżał poza ramkę, a własna animacja klatka po klatce zostawiała pustą mapę, zanim wczytały się kafelki. Decyzja autora: bez animacji.
+- Przycisk celownika płynnie przesuwa mapę do lokalizacji z dowolnego miejsca (zwykła animacja przesunięcia z Leaflet, w granicach mapy).
+- Przyciski mapy i panel legendy mniej przezroczyste: czarne 85% (prośba autora).
+- Legenda nie zaznacza się przy przeciąganiu palcem.
+- Mapę można przybliżyć do poziomu 12 (okolica miasta), wcześniej tylko do 8. Prośba autora.
+- Pomysł autora na później: zapisane miejsca na mapie jako funkcja płatna (`UWAGI.md`).
+
 ## 18.10.2026 — mapa bez końca świata na ekranie
 
 - Mapy nie da się już oddalić ani przesunąć tak, żeby było widać jej koniec i puste tło: najmniejsze przybliżenie dopasowuje się do wysokości ekranu (`fitWorld()` w `js/views/map.js`), a w pionie mapa kończy się na granicy odwzorowania (±85°, `maxBounds` z `maxBoundsViscosity: 1`). W bok dalej zawija się jak globus. Prośba autora, wzorem Hello Aurora.

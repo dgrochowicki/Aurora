@@ -916,10 +916,11 @@ html.sheet-open body {
 .leaflet-control-attribution {
   font-size: 9px !important;
 }
-.map-close {
+/* Okrągłe przyciski na mapie: ✕ i powrót do lokalizacji pod nim. Wymiar i ikona jak ✕ w panelu szczegółów (44 px, ikona bold 20 px),
+   ale tło ciemne szkło, bo jasne 4% z panelu znikałoby na mapie. Mniej przezroczyste niż pływające przyciski (85% zamiast 70%), bo mapa pod nimi jest jasna i ruchliwa. */
+.map-btn {
   position: absolute;
   z-index: 1001;
-  top: calc(16px + env(safe-area-inset-top));
   right: 16px;
   display: grid;
   place-items: center;
@@ -927,17 +928,30 @@ html.sheet-open body {
   height: 44px;
   border: 1px solid var(--card-border);
   border-radius: 50%;
-  background: var(--fab);
+  background: rgba(0, 0, 0, 0.85);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   color: var(--text);
   cursor: pointer;
   transition: var(--press);
 }
-.map-close:active {
+.map-btn:active {
   transform: scale(var(--press-scale));
 }
+.map-btn .icon {
+  width: 20px;
+  height: 20px;
+}
+.map-close {
+  top: calc(16px + env(safe-area-inset-top));
+}
+.map-locate {
+  top: calc(16px + 44px + 12px + env(safe-area-inset-top));
+}
 .map-panel {
+  /* Przeciągnięcie palcem przez legendę nie zaznacza tekstu. */
+  -webkit-user-select: none;
+  user-select: none;
   position: absolute;
   z-index: 1001;
   left: var(--gutter);
@@ -946,7 +960,7 @@ html.sheet-open body {
   padding: 14px 16px;
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
-  background: rgba(9, 18, 22, 0.88);
+  background: rgba(0, 0, 0, 0.85);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
