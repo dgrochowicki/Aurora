@@ -52,40 +52,46 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | `tests/model.test.js` | Testy obliczeń modelu |
 | `tests/chart.test.js` | Testy podziałki wykresów |
 
-**Zasady podziału kodu:** `js/model/` nie korzysta z DOM; `labels.js` jest miejscem wspólnych opisów i progów; nowy kafelek wymaga wpisu w `ACTIVITY_TILES` albo `CONDITION_TILES` w `home.js`, funkcji `DETAILS` w `details.js` i obsługi przez `setTile()`; panele używają `createSheet()` z `js/ui/sheet.js`.
+**Zasady podziału kodu:**
+- `js/model/` nie korzysta z DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
+- Tekst i progi opisów wartości są w `labels.js`, żeby kafelek i panel mówiły to samo.
+- Nowy kafelek to wpis w `ACTIVITY_TILES` albo `CONDITION_TILES` w `home.js`, funkcja w `DETAILS` w `details.js` i wywołanie `setTile()`.
+- Wszystkie panele (szczegóły, mapa, ekran miejsc) używają `createSheet()` z `js/ui/sheet.js` i klasy `.sheet`. Obsługuje on animację, Escape, powrót fokusu, nieaktywne tło i blokadę przewijania strony.
 
 ## Źródła danych i pułapki
 
 | Źródło | Adres | Ważne informacje |
 |---|---|---|
 | OVATION | `services.swpc.noaa.gov/json/ovation_aurora_latest.json` | Siatka `[lon 0–360, lat, value]`; model krótkoterminowy |
-| Kp | `/products/noaa-planetary-k-index.json` | Bieżący indeks; formaty w kodzie |
-| Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | Bloki 3 h, znaczniki UTC |
-| Bz | `/json/rtsw/rtsw_mag_1m.json` | Preferować `active: true`; kod ma także fallback do innych wierszy |
+| Kp | `/products/noaa-planetary-k-index.json` | Bieżący indeks; obsługujemy format tablic i obiektów |
+| Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | Bloki 3 h, czas UTC bez „Z” |
+| Bz | `/json/rtsw/rtsw_mag_1m.json` | Kilka sond naraz, oficjalne tylko `active: true`; wiersze od najnowszego; kod ma także fallback do innych wierszy |
 | Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active` |
-| GOES | `/json/goes/primary/magnetometers-6-hour.json` | Hp z orbity, nie regionalna stacja |
+| GOES | `/json/goes/primary/magnetometers-6-hour.json` | Składowa `Hp` z orbity, nie regionalna stacja; sortujemy sami |
 | Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |
 | Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | Geokodowanie i nazwa lokalizacji |
 
 Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru. Wynik procentowy może pochodzić z modelu awaryjnego. Pełna specyfikacja w `MODEL.md`.
 
+Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z liczb z ostatnich 2 godzin.
+
 ## Ustalenia pracy z autorem
 
 - Rozmowy, komentarze w kodzie, commity i opisy PR w języku polskim.
 - Autor pracuje z różnych urządzeń, dlatego stan pracy ma trafiać do GitHuba, nie wyłącznie do lokalnych plików.
-- **Duże zmiany:** osobna gałąź i podgląd. Merge do `main` tylko po jednoznacznej zgodzie autora („puść na mastera”). Drobne zmiany wyraźnie zlecone przez autora mogą trafiać bezpośrednio na `main` zgodnie z dotychczasową praktyką.
-- Podgląd gałęzi: `https://raw.githack.com/dgrochowicki/Aurora/<pełny-hash-commitu>/index.html` (hash, nie nazwa gałęzi, aby uniknąć mieszania wersji zasobów).
-- Po wdrożeniu kodu/UI na `main` weryfikować działanie strony Pages i wersje `?v=` w `index.html`. Zmiana samych dokumentów nie wymaga podbijania `?v=`.
-- Ustalona na dziś nawigacja: dwa pływające przyciski (mapa i miejsca), bez dolnego paska. Nazwa miejsca w nagłówku także otwiera ekran miejsc.
-- Magnetometr to dane GOES Hp, a nie naziemne IMAGE/FMI — do czasu decyzji autora nie zastępować źródła.
+- **Duże zmiany:** osobna gałąź, którą wypychamy bez pytania; autor ogląda ją na podglądzie. Merge do `main` tylko po jednoznacznej zgodzie autora („puść na mastera”): przez pull request albo, gdy nie ma `gh` (np. na Macu autora), przez lokalne `git merge --no-ff` i push. Drobne zmiany wyraźnie zlecone przez autora mogą trafiać bezpośrednio na `main`.
+- Podgląd gałęzi: `https://raw.githack.com/dgrochowicki/Aurora/<pełny-hash-commitu>/index.html`. Zawsze z hashem commitu, nie z nazwą gałęzi: link do gałęzi przez kilka minut po pushu miesza nowy `index.html` ze starymi skryptami i strona pokazuje same kreski.
+- Przy zmianach kodu lub CSS podbijamy `?v=` w `index.html` dla `js/main.js` i plików CSS. Po wypchnięciu `main` sprawdzamy, czy Pages serwuje nowe `?v=`. Zmiana samych dokumentów nie wymaga podbijania `?v=`.
+- Ustalona na dziś nawigacja: dwa pływające przyciski, bez dolnego paska: mapa (pełny ekran, zamykana ✕) i miejsca (pełny ekran, zamykany tylko wyborem miejsca albo Escape). Nazwa miejsca w nagłówku także otwiera ekran miejsc.
+- Magnetometr ma być w kafelkach jak w prototypie. To dane GOES Hp, a nie naziemne IMAGE/FMI (wymagają innego źródła) — do czasu decyzji autora nie zastępować źródła.
 - Aktualna kolejność prac jest w `UWAGI.md`; starszy porządek UI → wykresy → wyjaśnienia zachowano w historii, nie obowiązuje jako priorytet po audycie.
 
 ## Testowanie i podgląd
 
 - Przed zmianami uruchomić `npm test`. Testy jednostkowe nie zastępują prób na rzeczywistych danych NOAA/Open-Meteo.
 - Dla testów UI preferować dane deterministyczne, przechwycone żądania (`page.route`) i stałą datę (`page.clock.setFixedTime`), a następnie porównać zrzuty przed i po.
-- Na Macu autora można testować lokalny serwer w Playwright/Chromium (przyjęty widok referencyjny 402 × 874), ale zachowanie Mobile Safari potwierdza się na urządzeniu.
-- We wcześniejszym środowisku chmurowym sieć blokowała NOAA/Open-Meteo; **nie zakładać**, że każde środowisko ma identyczne ograniczenia. Jeśli połączenie nie działa, nie twierdzić, że przetestowano prawdziwe dane.
+- Na Macu autora sieć działa, więc testujemy na prawdziwych danych: `npm start` i Playwright z Chromium z `~/Library/Caches/ms-playwright/` (np. `chromium_headless_shell-1243`), widok referencyjny 402 × 874. Zachowań iOS (Safari, `:active`, zaznaczanie tekstu) nie da się tak sprawdzić; potwierdza je autor na telefonie.
+- We wcześniejszym środowisku chmurowym sieć blokowała NOAA/Open-Meteo (także przez WebFetch); stronę testowaliśmy tam w Playwright z przechwyconymi zapytaniami i danymi przykładowymi, z Chromium w `/opt/pw-browsers/chromium`. **Nie zakładać**, że każde środowisko ma identyczne ograniczenia. Jeśli połączenie nie działa, nie twierdzić, że przetestowano prawdziwe dane.
 - Projekt korzysta z lokalnych SVG ikon (Phosphor) w `js/ui/icons.js`, więc podstawowe ikony nie wymagają pobierania biblioteki z CDN; Leaflet jest ładowany osobno z unpkg.
 
 ## Historia zmian

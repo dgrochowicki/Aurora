@@ -67,6 +67,11 @@
 - [ ] Rozważyć wygładzanie linii zachmurzenia (monotonicznie, bez wyjścia poza 0–100%) oraz jasne oznaczanie, że warstwy dotyczą jednej godziny.
 - [ ] Sprawdzić wysokość linii dla tekstu 13 px i dużej liczby oraz nazwę czcionki referencyjnej z Figmy.
 
+## Rozstrzygnięte przez autora (17.10.2026)
+
+- **Zieleń na mapie zostaje.** Znacznik bieżącej lokalizacji użytkownika (`#68F7BB`) i tło legendy bez zmian.
+- **Poświata godzin zostaje od 10%.** Delikatne świecenie od 8% (jak w makiecie) wprowadzimy dopiero wtedy, gdy będziemy wiedzieć z obserwacji, że przy takim wyniku zorzę faktycznie widać. Zależy od walidacji wyniku (P1, „Zweryfikować progi”).
+
 ## Zasada porządku
 
 Aktualne wzory, parametry i ograniczenia zapisujemy w `MODEL.md`; ten plik służy wyłącznie do planowania. Zadanie przenosimy do historii w `CHANGELOG.md` po wdrożeniu i sprawdzeniu testów. Nie oznaczamy propozycji z audytu jako wykonanych.

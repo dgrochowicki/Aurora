@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — uzupełnienie dokumentacji (bez zmian w kodzie)
+
+- W `CLAUDE.md` przywrócono praktyczne ustalenia pominięte przy podziale: wypychanie gałęzi bez pytania, merge przez `git merge --no-ff` bez `gh`, podbijanie `?v=`, ścieżki Chromium dla Playwright, szczegóły formatów NOAA i zasady podziału kodu.
+- W `UWAGI.md` zapisano decyzje autora: zieleń na mapie zostaje, poświata godzin od 10% do czasu walidacji.
+- Usunięto scaloną gałąź `kolory-neutralne`.
+
 ## 17.10.2026 — aktualizacja dokumentacji (bez zmian w kodzie)
 
 - Rozdzielono dokumentację na README (opis dla użytkownika), CLAUDE (zasady dla agenta), MODEL (metodologia i ograniczenia), UWAGI (zadania), STYL (bieżący system wizualny) i CHANGELOG (historia).
