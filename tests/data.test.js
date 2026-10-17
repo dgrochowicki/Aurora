@@ -168,7 +168,7 @@ function mockFetch(routes) {
 }
 const RTSW_TIME = "2026-10-04T19:58:00";
 
-test("NOAA: Bz tylko z aktywnej sondy, wiek każdej wartości z jej pomiaru", async () => {
+test("NOAA: Bz z oficjalnej sondy, gdy jest, wiek każdej wartości z jej pomiaru", async () => {
   mockFetch({
     "planetary-k-index.json": [{ time_tag: "2026-10-04T15:00:00", Kp: 3.33 }],
     "k-index-forecast": [],
@@ -192,18 +192,35 @@ test("NOAA: Bz tylko z aktywnej sondy, wiek każdej wartości z jej pomiaru", as
   assert.equal(g.observed, Date.parse("2026-10-04T19:45:00Z"));
 });
 
-test("NOAA: same nieaktywne sondy to brak Bz", async () => {
+test("NOAA: bez oficjalnej sondy Bz z zapasowej, oznaczone jej nazwą i bez mieszania sond", async () => {
   mockFetch({
     "planetary-k-index.json": [],
     "k-index-forecast": [],
-    rtsw_mag_1m: [{ time_tag: RTSW_TIME, active: false, bz_gsm: -20 }],
+    rtsw_mag_1m: [
+      { time_tag: RTSW_TIME, active: false, source: "ACE", bz_gsm: -20 },
+      { time_tag: RTSW_TIME, active: false, source: "DSCOVR", bz_gsm: 5 },
+      { time_tag: "2026-10-04T19:50:00", active: false, source: "ACE", bz_gsm: -10 },
+    ],
     rtsw_wind_1m: [],
     magnetometers: [],
   });
   const s = await (await loadNoaa("inactive")).getSpaceWeather();
-  assert.equal(s.bz, null);
-  assert.equal(s.bzAvg, null);
-  assert.ok(Number.isNaN(s.times.bz));
+  assert.equal(s.bz, -20);
+  assert.equal(s.bzBackup, "ACE");
+  // Średnia tylko z wierszy tej samej sondy.
+  assert.equal(s.bzAvg, -15);
+  assert.equal(s.times.bz, Date.parse(RTSW_TIME + "Z"));
+});
+
+test("NOAA: oficjalna sonda ma pierwszeństwo, bez oznaczenia zapasu", async () => {
+  const { pickProbe } = await loadNoaa("pick");
+  const ok = (r) => Number.isFinite(r.bz_gsm);
+  const rows = [
+    { active: false, source: "ACE", bz_gsm: -20 },
+    { active: true, source: "DSCOVR", bz_gsm: 2 },
+  ];
+  assert.deepEqual(pickProbe(rows, ok), { rows: [rows[1]], backup: null });
+  assert.deepEqual(pickProbe([], ok), { rows: [], backup: null });
 });
 
 test("NOAA: po awarii zostają stare wartości razem z ich starym czasem, a nie z czasem pobrania", async (t) => {

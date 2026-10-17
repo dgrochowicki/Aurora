@@ -67,7 +67,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | OVATION | `services.swpc.noaa.gov/json/ovation_aurora_latest.json` | Siatka `[lon 0–360, lat, value]`; model krótkoterminowy |
 | Kp | `/products/noaa-planetary-k-index.json` | Bieżący indeks; obsługujemy format tablic i obiektów |
 | Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | Bloki 3 h, czas UTC bez „Z” |
-| Bz | `/json/rtsw/rtsw_mag_1m.json` | Kilka sond naraz, oficjalne tylko `active: true`; wiersze od najnowszego; kod ma także fallback do innych wierszy |
+| Bz | `/json/rtsw/rtsw_mag_1m.json` | Kilka sond naraz, oficjalna to `active: true`; wiersze od najnowszego; bez oficjalnej zapasowa sonda (`pickProbe()`), oznaczona w UI |
 | Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active` |
 | GOES | `/json/goes/primary/magnetometers-6-hour.json` | Składowa `Hp` z orbity, nie regionalna stacja; sortujemy sami |
 | Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |

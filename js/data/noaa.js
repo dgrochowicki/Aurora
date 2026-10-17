@@ -36,6 +36,17 @@ const lastHours = (rows, key) => {
     .reverse();
 };
 
+// Plik RTSW zawiera dane z kilku sond naraz (np. DSCOVR i ACE), a oficjalne są tylko wiersze z active: true.
+// Gdy wierszy oficjalnej sondy brak, bierzemy sondę z najnowszym poprawnym odczytem i zwracamy jej nazwę jako „backup”,
+// żeby strona mogła oznaczyć dane jako zapasowe. Wiersze są od najnowszego. Każda sonda osobno, bez mieszania.
+export function pickProbe(rows, ok) {
+  const active = rows.filter((r) => r && r.active === true && ok(r));
+  if (active.length) return { rows: active, backup: null };
+  const first = rows.find((r) => r && ok(r));
+  if (!first) return { rows: [], backup: null };
+  return { rows: rows.filter((r) => r && r.source === first.source && ok(r)), backup: first.source || "inna sonda" };
+}
+
 const settled = (r) => (r.status === "fulfilled" && Array.isArray(r.value) ? r.value : []);
 
 export async function getSpaceWeather() {
@@ -60,11 +71,11 @@ export async function getSpaceWeather() {
       .reverse()
       .find((r) => Number.isFinite(Number(r[1])));
 
-  // Plik RTSW zawiera dane z kilku sond naraz, a oficjalne są tylko wiersze z active: true. Innych nie używamy.
+  // Bz z jednej sondy: oficjalnej (active: true), a gdy jej brak, z zapasowej. Nazwa zapasowej trafia do bzBackup.
   const bzOk = (r) => r && r.bz_gsm != null && Number.isFinite(Number(r.bz_gsm));
-  const bzRow = magRows.find((r) => r.active === true && bzOk(r));
-  // Średni Bz z ostatnich 30 minut aktywnego satelity. Pojedynczy odczyt minutowy jest zbyt zaszumiony.
-  const activeMag = magRows.filter((r) => r && r.active === true && bzOk(r));
+  const { rows: activeMag, backup: bzBackup } = pickProbe(magRows, bzOk);
+  const bzRow = activeMag[0];
+  // Średni Bz z ostatnich 30 minut tej sondy. Pojedynczy odczyt minutowy jest zbyt zaszumiony.
   const newest = activeMag.length ? Date.parse(activeMag[0].time_tag + "Z") : NaN;
   const recent = activeMag.filter((r) => newest - Date.parse(r.time_tag + "Z") < 30 * 60000);
   const bzAvg = recent.length ? recent.reduce((a, r) => a + Number(r.bz_gsm), 0) / recent.length : null;
@@ -109,6 +120,7 @@ export async function getSpaceWeather() {
     kpForecast,
     kp: kpRow ? Number(kpRow.Kp ?? kpRow[1]) : null,
     bz: bzRow ? Number(bzRow.bz_gsm) : null,
+    bzBackup,
     // Czas ostatniego pomiaru każdej wartości. Kp opisuje blok 3-godzinny, więc liczymy go od końca bloku.
     times: {
       kp: kpRow ? utcMs(kpRow.time_tag ?? kpRow[0]) + 3 * 3600000 : NaN,
@@ -128,7 +140,7 @@ export async function getSpaceWeather() {
       s.times[key] = old.times[key];
     };
     keep("kp", ["kp"]);
-    keep("bz", ["bz", "bzAvg", "bzSeries"]);
+    keep("bz", ["bz", "bzAvg", "bzSeries", "bzBackup"]);
     keep("wind", ["wind", "density", "windSeries"]);
     keep("goes", ["goes", "goesRange", "goesSeries"]);
     if (!s.kpForecast.length) s.kpForecast = old.kpForecast;

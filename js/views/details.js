@@ -95,13 +95,17 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
-          status: favor(st, "bz", ref, bzLevel),
+          status: favor(st, "bz", ref, bzLevel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
         chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoStats([
+        infoStats(
+          [
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
+          ["Sonda", s.bz == null ? "—" : s.bzBackup ? `${s.bzBackup} (zapasowa)` : "Oficjalna NOAA"],
           ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
-        ]) +
+          ],
+          3,
+        ) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
   },

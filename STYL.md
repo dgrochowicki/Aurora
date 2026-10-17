@@ -87,6 +87,7 @@ W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--sub-65`), �
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
 - Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
 - Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast oceny jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów, a „Ocena” ma kreskę.
+- Bz z zapasowej sondy: przy ocenie nazwa sondy („Neutralnie · ACE”), w panelu „zapasowa sonda ACE” pod liczbą i kolumna „Sonda” w danych (3 kolumny).
 - Kafelek „Zachmurzenie” bez prognozy: kreska, „Brak danych”, bez linii zmiany.
 
 ## 7. Pasek godzin

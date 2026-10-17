@@ -88,7 +88,7 @@ W pierwszych trzech godzinach średnie Bz ≤ −5 nT podnosi używane Kp o 0,5,
 
 ## 5. Odczyty Bz, wiatru i GOES
 
-Bz pochodzi **wyłącznie z wierszy `active: true`** (oficjalna sonda NOAA). Gdy w pliku są tylko nieaktywne sondy, Bz jest brakiem danych. `bzAvg` to średnia aktywnych wpisów z ostatnich 30 minut według czasu najnowszego aktywnego wiersza.
+Bz pochodzi z oficjalnej sondy NOAA (wiersze `active: true`). Gdy jej wierszy brak, `pickProbe()` w `js/data/noaa.js` bierze sondę z najnowszym poprawnym odczytem (np. ACE) i zapisuje jej nazwę w `space.bzBackup` (decyzja autora z 17.10.2026: lepiej mieć drugie źródło niż brak danych). Wartość, średnia i wykres pochodzą zawsze z jednej sondy, bez mieszania. Zapasowa sonda jest oznaczona na kafelku („Neutralnie · ACE”) i w panelu. Limit świeżości 30 min obowiązuje tak samo. `bzAvg` to średnia wpisów wybranej sondy z ostatnich 30 minut według czasu jej najnowszego wiersza.
 
 Prędkość i gęstość wiatru pobierane są z aktywnych wpisów. `goes` to składowa Hp satelity GOES, a `goesRange` to rozstęp jej wartości w ostatniej godzinie. **Nie jest to pomiar lokalnej stacji naziemnej.**
 
