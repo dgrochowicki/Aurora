@@ -1,6 +1,6 @@
 # MODEL.md — algorytm Aurora Now
 
-**Stan implementacji: 17.10.2026, gałąź `dane-swiezosc` (świeżość danych NOAA, brak Kp = 2, braki zachmurzenia).** Ten dokument opisuje **aktualny kod**, a nie docelową metodę naukową. Niewdrożone propozycje są w [UWAGI.md](UWAGI.md). W razie rozbieżności z później zmienionym kodem należy zaktualizować dokument razem z implementacją.
+**Stan implementacji: 17.10.2026, `main` (świeżość danych NOAA, brak Kp = 2, braki zachmurzenia, zapasowe sondy RTSW).** Ten dokument opisuje **aktualny kod**, a nie docelową metodę naukową. Niewdrożone propozycje są w [UWAGI.md](UWAGI.md). W razie rozbieżności z później zmienionym kodem należy zaktualizować dokument razem z implementacją.
 
 ## 1. Cel i interpretacja wskaźnika
 

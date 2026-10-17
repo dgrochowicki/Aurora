@@ -6,7 +6,7 @@
 
 | Etap | Priorytet | Cel | Stan |
 |---|---|---|---|
-| 1 | P0 | Wiarygodność danych: braki, fallbacki, świeżość | Główna część na gałęzi `dane-swiezosc` |
+| 1 | P0 | Wiarygodność danych: braki, fallbacki, świeżość | Główna część wdrożona 17.10.2026, zostały drobne zadania |
 | 2 | P1 | Znaczenie wskaźnika i ograniczenia prognozy godzinowej | Decyzje + implementacja |
 | 3 | P1 | Geometria widoczności i warunki na horyzoncie | Analiza + testy |
 | 4 | P2 | Wykresy, dostępność, CI, UI | Do wykonania |
@@ -18,17 +18,10 @@
 
 **Decyzje autora (17.10.2026):** zapasowego źródła na awarię NOAA nie dodajemy. Przy braku albo zbyt starych danych o aktywności pokazujemy „Brak danych” zamiast wyniku, z wiekiem ostatniego pomiaru; chmury i światło nocy działają dalej. Limity wieku: OVATION 1 h, Kp 6 h (od końca bloku), Bz i wiatr 30 min.
 
-Zrobione na gałęzi `dane-swiezosc`, czeka na „puść na mastera” (potem przenieść do `CHANGELOG.md`):
-
-- [x] Czas pomiaru dla OVATION, Kp, Bz, wiatru i GOES oraz limity wieku (`js/model/fresh.js`); stare pomiary nie trafiają do modelu, a kafelki pokazują ich wiek.
-- [x] Bez aktualnego OVATION i Kp brak wyniku; usunięte zastępcze Kp = 2.
-- [x] `null` w zachmurzeniu to brak danych, nie 0% chmur.
-- [x] Bz i wiatr z oficjalnej sondy (`active: true`), a gdy jej brak, z zapasowej (np. ACE), wyraźnie oznaczonej na kafelku i w panelu.
-- [x] Testy braków, starych pomiarów, awarii NOAA i parsera (`tests/data.test.js`).
+Wdrożone 17.10.2026 (opis w `MODEL.md`, historia w `CHANGELOG.md`): limity wieku danych, brak wyniku bez aktualnych danych, `null` w chmurach, zapasowe sondy RTSW, źródła w stopkach paneli, testy w `tests/data.test.js`.
 
 Nadal otwarte:
 
-- [x] Źródło w stopce paneli: sonda RTSW (Bz, wiatr), satelita GOES, a w „Skąd ten wynik” model OVATION albo Kp.
 - [ ] Przejście z OVATION na Kp widać dziś tylko w stopce „Skąd ten wynik”. Rozważyć oznaczenie na stronie głównej.
 - [ ] Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku. Rozważyć pokazanie obok wieku najstarszego użytego pomiaru.
 - [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).

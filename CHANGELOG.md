@@ -2,7 +2,7 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 17.10.2026 — świeżość danych NOAA i braki danych (gałąź `dane-swiezosc`)
+## 17.10.2026 — świeżość danych NOAA i braki danych
 
 - Każdy pomiar NOAA ma czas pomiaru (OVATION z „Observation Time”, Kp od końca bloku). `freshData()` w `js/model/fresh.js` przepuszcza do modelu tylko świeże dane: OVATION do 1 h, Kp do 6 h, Bz, wiatr i GOES do 30 min.
 - Bez aktualnego OVATION i Kp strona pokazuje „Brak danych” zamiast wyniku, z wiekiem ostatniego pomiaru. Usunięte zastępcze Kp = 2.
