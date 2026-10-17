@@ -91,3 +91,6 @@ Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru. Wynik procentowy
 ## Historia zmian
 
 Pełny chronologiczny zapis przeniesiono do [CHANGELOG.md](CHANGELOG.md). Historyczne decyzje pozostają jako ślad projektu, ale nie zastępują bieżącego modelu ani tokenów CSS.
+
+## Audyt techniczny
+Audyt z 17.10.2026 znajduje się w audits/AURORA_AUDYT_2026-10-17.md. Jest historycznym punktem odniesienia, a nie aktualną listą błędów.
