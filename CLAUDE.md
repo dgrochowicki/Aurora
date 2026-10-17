@@ -68,7 +68,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | Kp | `/products/noaa-planetary-k-index.json` | Bieżący indeks; obsługujemy format tablic i obiektów |
 | Prognoza Kp | `/products/noaa-planetary-k-index-forecast.json` | Bloki 3 h, czas UTC bez „Z” |
 | Bz | `/json/rtsw/rtsw_mag_1m.json` | Kilka sond naraz, oficjalna to `active: true`; wiersze od najnowszego; bez oficjalnej zapasowa sonda (`pickProbe()`), oznaczona w UI |
-| Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active` |
+| Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active`; sonda wybierana jak dla Bz |
 | GOES | `/json/goes/primary/magnetometers-6-hour.json` | Składowa `Hp` z orbity, nie regionalna stacja; sortujemy sami |
 | Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |
 | Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | Geokodowanie i nazwa lokalizacji |

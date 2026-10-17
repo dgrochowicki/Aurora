@@ -80,9 +80,10 @@ export async function getSpaceWeather() {
   const recent = activeMag.filter((r) => newest - Date.parse(r.time_tag + "Z") < 30 * 60000);
   const bzAvg = recent.length ? recent.reduce((a, r) => a + Number(r.bz_gsm), 0) / recent.length : null;
 
-  // Prędkość i gęstość wiatru słonecznego z tego samego, aktywnego satelity.
-  const activeWind = settled(windResult).filter(
-    (r) => r && r.active === true && r.proton_speed != null && Number.isFinite(Number(r.proton_speed)),
+  // Prędkość i gęstość wiatru słonecznego z jednej sondy: oficjalnej, a gdy jej brak, z zapasowej (windBackup).
+  const { rows: activeWind, backup: windBackup } = pickProbe(
+    settled(windResult),
+    (r) => r.proton_speed != null && Number.isFinite(Number(r.proton_speed)),
   );
   const density = activeWind.find((r) => r.proton_density != null && Number.isFinite(Number(r.proton_density)))?.proton_density;
 
@@ -113,6 +114,7 @@ export async function getSpaceWeather() {
     bzSeries: lastHours(activeMag, "bz_gsm"),
     windSeries: lastHours(activeWind, "proton_speed"),
     wind: activeWind.length ? Number(activeWind[0].proton_speed) : null,
+    windBackup,
     density: density != null ? Number(density) : null,
     goes: goesLast ? goesLast.v : null,
     goesRange: goesHour.length > 1 ? Math.max(...goesHour) - Math.min(...goesHour) : null,
@@ -141,7 +143,7 @@ export async function getSpaceWeather() {
     };
     keep("kp", ["kp"]);
     keep("bz", ["bz", "bzAvg", "bzSeries", "bzBackup"]);
-    keep("wind", ["wind", "density", "windSeries"]);
+    keep("wind", ["wind", "density", "windSeries", "windBackup"]);
     keep("goes", ["goes", "goesRange", "goesSeries"]);
     if (!s.kpForecast.length) s.kpForecast = old.kpForecast;
   }

@@ -8,7 +8,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 - Bez aktualnego OVATION i Kp strona pokazuje „Brak danych” zamiast wyniku, z wiekiem ostatniego pomiaru. Usunięte zastępcze Kp = 2.
 - Kafelki i panele ze starym pomiarem pokazują „Pomiar sprzed…” zamiast oceny.
 - `null` w prognozie zachmurzenia to brak danych, a nie 0% chmur; taka godzina nie ma wyniku.
-- Bz z oficjalnej sondy RTSW, a gdy jej brak, z zapasowej (np. ACE) z jej nazwą na kafelku i w panelu.
+- Bz i wiatr z oficjalnej sondy RTSW, a gdy jej brak, z zapasowej (np. ACE) z jej nazwą na kafelku i w panelu.
 - Nowe testy w `tests/data.test.js` (braki, stare dane, awaria NOAA, parser).
 
 ## 17.10.2026 — uzupełnienie dokumentacji (bez zmian w kodzie)

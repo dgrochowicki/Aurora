@@ -212,6 +212,24 @@ test("NOAA: bez oficjalnej sondy Bz z zapasowej, oznaczone jej nazwą i bez mies
   assert.equal(s.times.bz, Date.parse(RTSW_TIME + "Z"));
 });
 
+test("NOAA: wiatr bez oficjalnej sondy z zapasowej, oznaczony jej nazwą", async () => {
+  mockFetch({
+    "planetary-k-index.json": [],
+    "k-index-forecast": [],
+    rtsw_mag_1m: [],
+    rtsw_wind_1m: [
+      { time_tag: RTSW_TIME, active: false, source: "ACE", proton_speed: 480, proton_density: 3 },
+      { time_tag: RTSW_TIME, active: false, source: "DSCOVR", proton_speed: null, proton_density: null },
+    ],
+    magnetometers: [],
+  });
+  const s = await (await loadNoaa("wind-backup")).getSpaceWeather();
+  assert.equal(s.wind, 480);
+  assert.equal(s.density, 3);
+  assert.equal(s.windBackup, "ACE");
+  assert.equal(s.times.wind, Date.parse(RTSW_TIME + "Z"));
+});
+
 test("NOAA: oficjalna sonda ma pierwszeństwo, bez oznaczenia zapasu", async () => {
   const { pickProbe } = await loadNoaa("pick");
   const ok = (r) => Number.isFinite(r.bz_gsm);

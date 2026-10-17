@@ -16,6 +16,8 @@ const ageText = (grid) => {
   return age == null ? "brak danych" : age < 1 ? "przed chwilą" : `${age} min temu`;
 };
 
+// Z której sondy RTSW jest pomiar: oficjalnej albo zapasowej (nazwa z pickProbe w data/noaa.js).
+const probeText = (v, backup) => (v == null ? "—" : backup ? `${backup} (zapasowa)` : "Oficjalna NOAA");
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
 // Stan pod liczbą jak w kafelku: znaczenie dla zorzy, a przy za starym pomiarze jego wiek.
 const favor = (st, src, v, level) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : favorLabel(level(v)));
@@ -101,7 +103,7 @@ export const DETAILS = {
         infoStats(
           [
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
-          ["Sonda", s.bz == null ? "—" : s.bzBackup ? `${s.bzBackup} (zapasowa)` : "Oficjalna NOAA"],
+          ["Sonda", probeText(s.bz, s.bzBackup)],
           ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
           ],
           3,
@@ -146,13 +148,17 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
-          status: favor(st, "wind", s.wind, windLevel),
+          status: favor(st, "wind", s.wind, windLevel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
         chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoStats([
-          ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
-          ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
-        ]) +
+        infoStats(
+          [
+            ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
+            ["Sonda", probeText(s.wind, s.windBackup)],
+            ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
+          ],
+          3,
+        ) +
         infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };
   },

@@ -23,7 +23,7 @@ Zrobione na gałęzi `dane-swiezosc`, czeka na „puść na mastera” (potem pr
 - [x] Czas pomiaru dla OVATION, Kp, Bz, wiatru i GOES oraz limity wieku (`js/model/fresh.js`); stare pomiary nie trafiają do modelu, a kafelki pokazują ich wiek.
 - [x] Bez aktualnego OVATION i Kp brak wyniku; usunięte zastępcze Kp = 2.
 - [x] `null` w zachmurzeniu to brak danych, nie 0% chmur.
-- [x] Bz z oficjalnej sondy (`active: true`), a gdy jej brak, z zapasowej (np. ACE), wyraźnie oznaczonej na kafelku i w panelu.
+- [x] Bz i wiatr z oficjalnej sondy (`active: true`), a gdy jej brak, z zapasowej (np. ACE), wyraźnie oznaczonej na kafelku i w panelu.
 - [x] Testy braków, starych pomiarów, awarii NOAA i parsera (`tests/data.test.js`).
 
 Nadal otwarte:
@@ -31,7 +31,6 @@ Nadal otwarte:
 - [ ] Jawnie oznaczać przejście z OVATION na model Kp (gdy OVATION jest stary, a Kp aktualne), np. w panelu „Skąd ten wynik”.
 - [ ] Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku. Rozważyć pokazanie obok wieku najstarszego użytego pomiaru.
 - [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).
-- [ ] Rozważyć zapasową sondę także dla wiatru słonecznego (dziś tylko `active: true`), tak jak dla Bz.
 - [ ] Limit wieku dla GOES przyjęto taki jak dla Bz i wiatru (30 min); do potwierdzenia przez autora.
 
 ## P1 — semantyka i trafność prognozy

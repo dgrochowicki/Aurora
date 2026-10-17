@@ -122,8 +122,9 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
       continue;
     }
     const viz = level == null ? "" : (!BARS_ONLY && spark[key]()) || meter(4, level + 1);
-    // Bz z zapasowej sondy ma jej nazwę przy ocenie, np. „Neutralnie · ACE”.
-    const probe = key === "bz" && space.bzBackup && level != null ? ` · ${space.bzBackup}` : "";
+    // Bz i wiatr z zapasowej sondy mają jej nazwę przy ocenie, np. „Neutralnie · ACE”.
+    const backup = { bz: space.bzBackup, wind: space.windBackup }[key];
+    const probe = backup && level != null ? ` · ${backup}` : "";
     setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : favorLabel(level) + probe });
   }
 }
