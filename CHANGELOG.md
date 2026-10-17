@@ -9,6 +9,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 - Przycisk celownika płynnie przesuwa mapę do lokalizacji z dowolnego miejsca (zwykła animacja przesunięcia z Leaflet, w granicach mapy).
 - Przyciski mapy i panel legendy mniej przezroczyste: czarne 85% (prośba autora).
 - Legenda nie zaznacza się przy przeciąganiu palcem.
+- Mapę można przybliżyć do poziomu 12 (okolica miasta), wcześniej tylko do 8. Prośba autora.
 - Pomysł autora na później: zapisane miejsca na mapie jako funkcja płatna (`UWAGI.md`).
 
 ## 18.10.2026 — mapa bez końca świata na ekranie

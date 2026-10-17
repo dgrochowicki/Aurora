@@ -87,6 +87,7 @@ export function initMap({ current }) {
 
 // Przybliżenie, przy którym widać okolicę miejsca, a owal zorzy nad Skandynawią jeszcze u góry ekranu.
 const HOME_ZOOM = 4;
+const MAX_ZOOM = 12;
 
 // Powrót do miejsca: zwykłe przesunięcie z Leaflet (setView przycina środek do maxBounds, więc mapa nie wyjeżdża poza ramkę).
 // Bez animacji przybliżania: przy zmianie przybliżenia klatka po klatce Leaflet wyrzucał kafelki i mapa była pusta.
@@ -125,6 +126,7 @@ async function showMap(current) {
     // a w bok zawija się jak globus (worldCopyJump). Najmniejsze przybliżenie dobiera fitWorld(), żeby świat wypełniał ekran.
     map = L.map("auroraMap", {
       zoomControl: false,
+      maxZoom: MAX_ZOOM,
       worldCopyJump: true,
       maxBounds: [
         [-85.05, -100000],
@@ -134,7 +136,8 @@ async function showMap(current) {
       bounceAtZoomLimits: false,
     }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
     map.on("resize", fitWorld);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
+    // Przybliżenie do 12 (okolica miasta); wcześniej tylko do 8.
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: MAX_ZOOM, attribution: "© OpenStreetMap" }).addTo(map);
   }
   // Po otwarciu panelu od razu miejsce w przybliżeniu HOME_ZOOM. Przy odświeżaniu danych mapa zostaje, gdzie była.
   const opening = justOpened;
