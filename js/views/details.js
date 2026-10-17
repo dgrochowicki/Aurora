@@ -3,20 +3,22 @@
 // Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
 import { fmtNum, localHM, browserOffset } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { ageLabel, activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
 // Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
 const placeOffset = (st) => st.offset ?? browserOffset();
+// Wiek modelu OVATION od czasu pomiarów, z których go policzono, a nie od czasu prognozy.
 const ageText = (grid) => {
-  const age = grid.time ? Math.round((Date.now() - Date.parse(grid.time)) / 60000) : null;
+  const age = Number.isFinite(grid.observed) ? Math.round((Date.now() - grid.observed) / 60000) : null;
   return age == null ? "brak danych" : age < 1 ? "przed chwilą" : `${age} min temu`;
 };
 
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
-const favor = (v, level) => (v == null ? "" : favorLabel(level(v)));
+// Stan pod liczbą jak w kafelku: znaczenie dla zorzy, a przy za starym pomiarze jego wiek.
+const favor = (st, src, v, level) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : favorLabel(level(v)));
 
 export const DETAILS = {
   score(st) {
@@ -24,25 +26,35 @@ export const DETAILS = {
     const factors = first
       ? factorBar(
           "Aktywność w zasięgu wzroku",
-          act / 100,
-          `${activityLabel(act)} · ${Math.round(act)}/100`,
+          act == null ? 0 : act / 100,
+          act == null ? "Brak aktualnych danych" : `${activityLabel(act)} · ${Math.round(act)}/100`,
           "Najsilniejsza zorza z modelu OVATION w promieniu 1000 km, osłabiona z odległością.",
         ) +
         factorBar("Ciemność", first.dark, `${Math.round(first.dark * 100)}%`, `${phaseAt(Date.now(), loc)} · ${moonLabel(first.sky)}`) +
-        factorBar("Czyste niebo", first.clear, `${Math.round(first.clear * 100)}%`, "Niskie chmury ważą najwięcej, wysokie najmniej.")
+        factorBar(
+          "Czyste niebo",
+          first.clear ?? 0,
+          first.clear == null ? "Brak danych" : `${Math.round(first.clear * 100)}%`,
+          "Niskie chmury ważą najwięcej, wysokie najmniej.",
+        )
       : "";
+    // Dlaczego nie ma liczby: brak pogody, brak aktualnych danych o zorzy albo brak prognozy chmur.
+    const why = !first
+      ? "Bez prognozy pogody nie znamy ciemności i zachmurzenia, więc nie liczymy szansy."
+      : first.score != null
+        ? ""
+        : act == null
+          ? "Brak aktualnych danych o zorzy z NOAA, więc nie liczymy szansy."
+          : "Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy.";
     return {
       title: "Skąd ten wynik",
       source: "NOAA SWPC · model OVATION i Kp · Open-Meteo · obliczenia w przeglądarce",
       html:
-        infoHero(first ? first.score : null, "%", {
-          tight: true,
-          status: first ? "" : "Bez prognozy pogody nie znamy ciemności i zachmurzenia, więc nie liczymy szansy.",
-        }) +
+        infoHero(first ? first.score : null, "%", { tight: true, status: why }) +
         infoCard("Trzy części szansy", factors) +
         infoStats([
           ["Szerokość geomagnetyczna", `${fmtNum(magLat(loc.lat, loc.lon))}°`],
-          ["Kp teraz", space.kp == null ? "—" : fmtNum(space.kp)],
+          ["Kp teraz", space.kp == null ? "—" : "kp" in st.stale ? `${fmtNum(space.kp)} · ${ageLabel(st.stale.kp, Date.now()).replace("Pomiar s", "s")}` : fmtNum(space.kp)],
           ["Model OVATION", ageText(grid)],
         ]) +
         infoText(
@@ -58,7 +70,7 @@ export const DETAILS = {
       source: "NOAA SWPC · magnetometr satelity GOES",
       html:
         infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
-          status: favor(s.goesRange, goesLevel),
+          status: favor(st, "goes", s.goesRange, goesLevel),
         }) +
         chart(s.goesSeries, {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
@@ -66,7 +78,7 @@ export const DETAILS = {
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
-          ["Ocena", s.goesRange == null ? "—" : goesLabel(s.goesRange)],
+          ["Ocena", s.goesRange == null || "goes" in st.stale ? "—" : goesLabel(s.goesRange)],
         ]) +
         infoText(
           "Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp.",
@@ -83,12 +95,12 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
-          status: favor(ref, bzLevel),
+          status: favor(st, "bz", ref, bzLevel),
         }) +
         chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
         infoStats([
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
-          ["Ocena", ref == null ? "—" : bzLabel(ref)],
+          ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
         ]) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
@@ -105,7 +117,7 @@ export const DETAILS = {
       source: "NOAA SWPC · indeks Kp i prognoza 3-dniowa",
       html:
         infoHero(s.kp == null ? null : fmtNum(s.kp), "/ 9", {
-          status: favor(s.kp, kpLevel),
+          status: favor(st, "kp", s.kp, kpLevel),
         }) +
         infoChart(
           barChart(
@@ -118,7 +130,7 @@ export const DETAILS = {
             },
           ),
         ) +
-        infoStats([["Ocena", s.kp == null ? "—" : kpLabel(s.kp)]]) +
+        infoStats([["Ocena", s.kp == null || "kp" in st.stale ? "—" : kpLabel(s.kp)]]) +
         infoText("Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu."),
     };
   },
@@ -130,12 +142,12 @@ export const DETAILS = {
       source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
       html:
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
-          status: favor(s.wind, windLevel),
+          status: favor(st, "wind", s.wind, windLevel),
         }) +
         chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
-          ["Ocena", s.wind == null ? "—" : windLabel(s.wind)],
+          ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
         ]) +
         infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };
@@ -155,7 +167,9 @@ export const DETAILS = {
       title: "Zachmurzenie",
       source: "Open-Meteo · prognoza godzinowa",
       html:
-        infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) }) +
+        (r.cloud == null
+          ? infoHero(null, "", { status: "Brak prognozy zachmurzenia na tę godzinę." })
+          : infoHero(Math.round(r.cloud), "%", { tight: true, status: cloudLabel(r.cloud) })) +
         chart(
           st.clouds,
           {

@@ -74,7 +74,7 @@ Szkło w kartach i kafelkach: `backdrop-filter: blur(20px)`, zgodnie z rzeczywis
 
 Kolejność: tytuł 13 px (`--sub`), opis słowny i procent po 28 px, akapit o aktywności i warunkach, na dole zapowiedź godzin. Odstępy przeważnie 8 px, między wartością a akapitem 16 px. Po stuknięciu tytułu otwierany jest panel „Skąd ten wynik”.
 
-`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
+`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Bez wyniku (brak aktualnych danych NOAA albo prognozy chmur) zamiast opisu i procentu stoją „Brak danych” i kreska, zorza w tle jest ukryta, a pigułki godzin pokazują kreskę i nie świecą. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
 
 ## 6. Kafelki i wskaźniki
 
@@ -86,6 +86,8 @@ W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--sub-65`), �
 - Kp: miernik segmentowy (skala /9).
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
 - Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
+- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast oceny jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów, a „Ocena” ma kreskę.
+- Kafelek „Zachmurzenie” bez prognozy: kreska, „Brak danych”, bez linii zmiany.
 
 ## 7. Pasek godzin
 

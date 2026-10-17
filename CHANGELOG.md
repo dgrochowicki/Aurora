@@ -2,6 +2,15 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — świeżość danych NOAA i braki danych (gałąź `dane-swiezosc`)
+
+- Każdy pomiar NOAA ma czas pomiaru (OVATION z „Observation Time”, Kp od końca bloku). `freshData()` w `js/model/fresh.js` przepuszcza do modelu tylko świeże dane: OVATION do 1 h, Kp do 6 h, Bz, wiatr i GOES do 30 min.
+- Bez aktualnego OVATION i Kp strona pokazuje „Brak danych” zamiast wyniku, z wiekiem ostatniego pomiaru. Usunięte zastępcze Kp = 2.
+- Kafelki i panele ze starym pomiarem pokazują „Pomiar sprzed…” zamiast oceny.
+- `null` w prognozie zachmurzenia to brak danych, a nie 0% chmur; taka godzina nie ma wyniku.
+- Bz tylko z aktywnej sondy RTSW.
+- Nowe testy w `tests/data.test.js` (braki, stare dane, awaria NOAA, parser).
+
 ## 17.10.2026 — uzupełnienie dokumentacji (bez zmian w kodzie)
 
 - W `CLAUDE.md` przywrócono praktyczne ustalenia pominięte przy podziale: wypychanie gałęzi bez pytania, merge przez `git merge --no-ff` bez `gh`, podbijanie `?v=`, ścieżki Chromium dla Playwright, szczegóły formatów NOAA i zasady podziału kodu.

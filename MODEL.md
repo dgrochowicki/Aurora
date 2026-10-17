@@ -1,6 +1,6 @@
 # MODEL.md — algorytm Aurora Now
 
-**Stan implementacji: 17.10.2026, `main` @ `4b8fae350762a5611131e0bd3e738d2c63671742`.** Ten dokument opisuje **aktualny kod**, a nie docelową metodę naukową. Niewdrożone propozycje są w [UWAGI.md](UWAGI.md). W razie rozbieżności z później zmienionym kodem należy zaktualizować dokument razem z implementacją.
+**Stan implementacji: 17.10.2026, gałąź `dane-swiezosc` (świeżość danych NOAA, brak Kp = 2, braki zachmurzenia).** Ten dokument opisuje **aktualny kod**, a nie docelową metodę naukową. Niewdrożone propozycje są w [UWAGI.md](UWAGI.md). W razie rozbieżności z później zmienionym kodem należy zaktualizować dokument razem z implementacją.
 
 ## 1. Cel i interpretacja wskaźnika
 
@@ -31,7 +31,21 @@ Wyświetlany procent **nie jest empirycznie skalibrowanym prawdopodobieństwem**
 
 Kodu źródeł szukać w `js/data/noaa.js` i `js/data/places.js`.
 
-`getAuroraGrid()` i `getSpaceWeather()` używają cache z TTL 5 minut. Aplikacja próbuje odświeżać dane co 5 minut, gdy karta jest widoczna, a po powrocie do widocznej karty może wymusić odświeżenie. **`fetchedAt` jest czasem pobrania, nie zawsze czasem obserwacji.** Jeśli NOAA przestaje odpowiadać, wcześniejsze wartości mogą być używane ponownie bez twardego limitu wieku. Nie wolno interpretować godziny aktualizacji interfejsu jako gwarancji świeżości pomiarów.
+`getAuroraGrid()` i `getSpaceWeather()` używają cache z TTL 5 minut. Aplikacja próbuje odświeżać dane co 5 minut, gdy karta jest widoczna, a po powrocie do widocznej karty może wymusić odświeżenie. **`fetchedAt` jest czasem pobrania, a nie czasem obserwacji.** Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku, nie wiek pomiarów.
+
+### Świeżość danych NOAA
+
+Każda wartość ma czas swojego pomiaru: siatka OVATION `grid.observed` (pole „Observation Time”, nie „Forecast Time”), a dane kosmiczne `space.times.{kp, bz, wind, goes}`. Kp opisuje blok 3-godzinny, więc jego czas to **koniec bloku** (`time_tag` + 3 h). Gdy NOAA chwilowo nie odpowiada, `getSpaceWeather()` zachowuje poprzednie wartości **razem z ich starym czasem pomiaru**, a `getAuroraGrid()` poprzednią siatkę.
+
+`freshData(grid, space, now)` w `js/model/fresh.js` przepuszcza do modelu tylko świeże pomiary. Limity (`MAX_AGE_MIN`), ustalone z autorem 17.10.2026:
+
+| Źródło | Największy wiek |
+|---|---:|
+| OVATION | 60 min |
+| Kp (od końca bloku) | 6 h |
+| Bz, wiatr słoneczny, GOES | 30 min |
+
+Za stara wartość (albo wartość bez znanego czasu) jest dla modelu brakiem: siatka OVATION dostaje puste `coords`, a `kp`, `bz`/`bzAvg`, `wind`/`density`, `goes`/`goesRange` stają się `null`. Serie do wykresów zostają, bo mają własne godziny. Zwracane `stale` podaje czas ostatniego pomiaru każdego takiego źródła. Kafelki i panele pokazują wtedy starą liczbę bez oceny i wskaźnika, z opisem „Pomiar sprzed N min/h” (`ageLabel()` w `js/labels.js`). Prognoza Kp (`kpForecast`) nie podlega limitowi, bo dotyczy przyszłych bloków.
 
 ## 3. Aktywność z modelu OVATION
 
@@ -70,11 +84,11 @@ activity = w * ovation + (1 - w) * kpVisible(mlat, kp);
 
 W pierwszych trzech godzinach średnie Bz ≤ −5 nT podnosi używane Kp o 0,5, a ≤ −10 nT o 1. Ta korekta jest heurystyczna.
 
-**Tryby zastępcze:** jeśli brakuje OVATION, `buildForecast()` stosuje `kpVisible(mlat, space.kp ?? 2)`. Kiedy jednocześnie brakuje Kp, użyta zostaje wartość **Kp = 2**. Gdy dla danej godziny `activityAt()` nie ma Kp, zwraca otrzymane OVATION także na dalszy horyzont. Interfejs nie oznacza dziś wszystkich tych degradacji danych.
+**Tryby zastępcze:** jeśli brakuje aktualnego OVATION, `nowActivity()` liczy aktywność z bieżącego Kp (`kpVisible(mlat, space.kp)`). **Gdy brakuje aktualnego OVATION i aktualnego Kp, aktywności nie ma (`null`)**: `buildForecast()` zwraca `activity: false`, wszystkie godziny mają `act` i `score` równe `null`, a strona pokazuje „Brak danych” i zdanie o braku aktualnych danych NOAA z wiekiem ostatniego pomiaru. Zastępczego Kp = 2 już nie ma (decyzja autora z 17.10.2026). Gdy dla danej godziny `activityAt()` nie ma Kp, zwraca otrzymane OVATION także na dalszy horyzont.
 
 ## 5. Odczyty Bz, wiatru i GOES
 
-Bieżący odczyt Bz preferuje sondę z `active: true`, lecz kod zawiera fallback do wpisu bez takiego statusu (oraz do formatu tablicowego). Nie można więc twierdzić, że **każda wyświetlona wartość** pochodzi wyłącznie z aktywnej sondy. `bzAvg` to średnia aktywnych wpisów z ostatnich 30 minut według czasu najnowszego wiersza.
+Bz pochodzi **wyłącznie z wierszy `active: true`** (oficjalna sonda NOAA). Gdy w pliku są tylko nieaktywne sondy, Bz jest brakiem danych. `bzAvg` to średnia aktywnych wpisów z ostatnich 30 minut według czasu najnowszego aktywnego wiersza.
 
 Prędkość i gęstość wiatru pobierane są z aktywnych wpisów. `goes` to składowa Hp satelity GOES, a `goesRange` to rozstęp jej wartości w ostatniej godzinie. **Nie jest to pomiar lokalnej stacji naziemnej.**
 
@@ -87,9 +101,9 @@ layerClear = (1 - L/100) * (1 - 0.85*M/100) * (1 - 0.4*H/100);
 clearSky = Math.max(layerClear, 1 - total/100);
 ```
 
-Gdy brak jednej z warstw, stosowane jest `1 - total/100`. Wagi 100%, 85% i 40% są ręcznie przyjętymi współczynnikami. Całkowite zachmurzenie nie jest sumą warstw.
+Gdy brak jednej z warstw, stosowane jest `1 - total/100`; gdy brak całkowitego zachmurzenia, same warstwy. Wagi 100%, 85% i 40% są ręcznie przyjętymi współczynnikami. Całkowite zachmurzenie nie jest sumą warstw.
 
-**Potwierdzony problem implementacyjny:** `Number(null) === 0`, a użycie `Number(h.cloud_cover?.[i]) || 0` oraz podobne konwersje w `forecast.js` mogą uznać brak wartości za 0% chmur. To zadanie P0 w [UWAGI.md](UWAGI.md).
+**Braki danych:** wartości czytamy przez `num()` z `js/util.js`, więc `null`, pusty tekst i nie-liczby są brakiem, a nie zerem. Gdy prognoza nie ma ani warstw, ani całkowitego zachmurzenia, `clearSky()` zwraca `null`, a godzina ma `cloud`, `cover`, `clear` i `score` równe `null` (w pigułce kreska, w kafelku „Brak danych”). Takie godziny nie trafiają na wykres zachmurzenia i nie mogą być najlepszą godziną.
 
 Aplikacja pobiera także `current.cloud_cover`, ale główny wynik opiera się na godzinowej prognozie. Pierwszy punkt jest wybierany z tolerancją około ±30 minut. Etykieta „Teraz” **nie oznacza pomiaru co do minuty**. Jeśli nie uda się pobrać całego obiektu pogody, główny wynik procentowy jest pomijany, choć dane kosmiczne mogą pozostać widoczne.
 
@@ -123,7 +137,7 @@ Model OVATION ma krótki horyzont i nie powinien być utożsamiany pod względem
 
 ## 9. „Pewność prognozy”
 
-`renderConfidence()` ustala „wysoką” pewność, gdy siatka OVATION ma mniej niż godzinę i istnieją Kp oraz prognoza Kp; „średnią” gdy dostępne są OVATION lub Kp; w innych przypadkach „niską”. To **heurystyka dostępności wybranych danych**, a nie empirycznie wyliczony przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
+`renderConfidence()` dostaje dane po `freshData()`. Ustala „wysoką” pewność, gdy jest świeża siatka OVATION (do godziny), świeże Kp i prognoza Kp; „średnią”, gdy jest świeże OVATION lub Kp; „niską” z dopiskiem „brak aktualnych danych o aktywności zorzy”, gdy nie ma żadnego. To **heurystyka dostępności wybranych danych**, a nie empirycznie wyliczony przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
 
 ## 10. Pozostałe ograniczenia i walidacja
 

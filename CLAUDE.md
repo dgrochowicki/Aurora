@@ -44,6 +44,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | `js/model/sky.js` | Słońce, Księżyc, ciemność, szerokość geomagnetyczna |
 | `js/model/aurora.js` | Aktywność OVATION/Kp, część czystego nieba |
 | `js/model/forecast.js` | Prognoza 12 h, oś nocy, godziny i poświata |
+| `js/model/fresh.js` | Świeżość danych NOAA: limity wieku i `freshData()` |
 | `js/ui/` | `tile`, `spark`, `sheet`, `chart`, `sky-chart`, `hours`, `parts`, `toast`, `icons` |
 | `js/views/home.js` | Strona główna i definicje kafelków |
 | `js/views/details.js` | Panele szczegółów `score`, `mag`, `bz`, `kp`, `wind`, `cloud`, `light` |
@@ -51,6 +52,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | `js/views/places.js` | Wyszukiwanie i wybór lokalizacji |
 | `tests/model.test.js` | Testy obliczeń modelu |
 | `tests/chart.test.js` | Testy podziałki wykresów |
+| `tests/data.test.js` | Testy braków i starych danych, parsera NOAA |
 
 **Zasady podziału kodu:**
 - `js/model/` nie korzysta z DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
@@ -71,7 +73,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |
 | Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | Geokodowanie i nazwa lokalizacji |
 
-Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru. Wynik procentowy może pochodzić z modelu awaryjnego. Pełna specyfikacja w `MODEL.md`.
+Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru, dlatego do modelu dane trafiają przez `freshData()` z limitami wieku. Bez OVATION wynik pochodzi z modelu Kp. Pełna specyfikacja w `MODEL.md`.
 
 Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z liczb z ostatnich 2 godzin.
 

@@ -6,7 +6,7 @@
 
 | Etap | Priorytet | Cel | Stan |
 |---|---|---|---|
-| 1 | P0 | Wiarygodność danych: braki, fallbacki, świeżość | Do wykonania |
+| 1 | P0 | Wiarygodność danych: braki, fallbacki, świeżość | Główna część na gałęzi `dane-swiezosc` |
 | 2 | P1 | Znaczenie wskaźnika i ograniczenia prognozy godzinowej | Decyzje + implementacja |
 | 3 | P1 | Geometria widoczności i warunki na horyzoncie | Analiza + testy |
 | 4 | P2 | Wykresy, dostępność, CI, UI | Do wykonania |
@@ -16,12 +16,22 @@
 
 ## P0 — wiarygodność i integralność danych
 
-- [ ] Oddzielić dla OVATION, Kp, prognozy Kp, Bz, wiatru, GOES i Open-Meteo: czas obserwacji/prognozy, czas pobrania, wiek oraz status źródła (aktualne / nieaktualne / brak).
-- [ ] Ustalić maksymalny dopuszczalny wiek danych i zachowanie po jego przekroczeniu; czas odświeżenia widoku nie może udawać czasu pomiaru.
-- [ ] Jawnie oznaczać brak OVATION i przejście na model Kp. Obecny fallback po braku również Kp podstawia wartość 2 — rozstrzygnąć, czy wynik ma być wówczas wyłączony czy opatrzony ostrzeżeniem.
-- [ ] Naprawić konwersję `null`/braków zachmurzenia na 0%; brak nie może oznaczać bezchmurnego nieba.
-- [ ] Zweryfikować wybór aktywnej sondy NOAA dla Bz; obecnie istnieje zapasowa ścieżka używająca wierszy bez `active: true`.
-- [ ] Dodać testy danych niekompletnych, błędów dostawców, starych pomiarów, formatów odpowiedzi i fallbacków.
+**Decyzje autora (17.10.2026):** zapasowego źródła na awarię NOAA nie dodajemy. Przy braku albo zbyt starych danych o aktywności pokazujemy „Brak danych” zamiast wyniku, z wiekiem ostatniego pomiaru; chmury i światło nocy działają dalej. Limity wieku: OVATION 1 h, Kp 6 h (od końca bloku), Bz i wiatr 30 min.
+
+Zrobione na gałęzi `dane-swiezosc`, czeka na „puść na mastera” (potem przenieść do `CHANGELOG.md`):
+
+- [x] Czas pomiaru dla OVATION, Kp, Bz, wiatru i GOES oraz limity wieku (`js/model/fresh.js`); stare pomiary nie trafiają do modelu, a kafelki pokazują ich wiek.
+- [x] Bez aktualnego OVATION i Kp brak wyniku; usunięte zastępcze Kp = 2.
+- [x] `null` w zachmurzeniu to brak danych, nie 0% chmur.
+- [x] Bz tylko z aktywnej sondy (`active: true`).
+- [x] Testy braków, starych pomiarów, awarii NOAA i parsera (`tests/data.test.js`).
+
+Nadal otwarte:
+
+- [ ] Jawnie oznaczać przejście z OVATION na model Kp (gdy OVATION jest stary, a Kp aktualne), np. w panelu „Skąd ten wynik”.
+- [ ] Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku. Rozważyć pokazanie obok wieku najstarszego użytego pomiaru.
+- [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).
+- [ ] Limit wieku dla GOES przyjęto taki jak dla Bz i wiatru (30 min); do potwierdzenia przez autora.
 
 ## P1 — semantyka i trafność prognozy
 
@@ -56,7 +66,6 @@
 ## Do ustalenia z autorem
 
 - [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji?
-- [ ] Czy przy braku źródeł pokazujemy brak wyniku, czy wynik awaryjny z ostrzeżeniem?
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
 - [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
