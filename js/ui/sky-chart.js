@@ -1,7 +1,7 @@
 // Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, jak łuk Słońca w pogodzie Apple, według makiety autora.
 // Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są tylko horyzont (linia ciągła) i −18°
 // (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Duże kropki to „teraz”, małe na horyzoncie to wschody i zachody.
-import { clamp, esc, localHM } from "../util.js";
+import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
 const STEP = 18;
@@ -9,8 +9,8 @@ const STEP = 18;
 const SUN = "#cc9200",
   MOON = "#c9d6e3";
 
-// n: wynik nightTimeline(), offset: strefa miejsca.
-export function skyChart(n, { offset, now = Date.now(), label }) {
+// n: wynik nightTimeline(), tz: strefa miejsca (IANA).
+export function skyChart(n, { tz, now = Date.now(), label }) {
   const alts = n.arcs.flatMap((a) => [a.sun, a.moon]);
   // Linie co 18° obejmujące oba łuki; zawsze co najmniej od +18° do −36°, żeby było widać horyzont i −18°.
   const hi = Math.max(STEP, Math.ceil(Math.max(...alts) / STEP) * STEP),
@@ -45,7 +45,7 @@ export function skyChart(n, { offset, now = Date.now(), label }) {
     dots = dot(now, a.moon, "is-moon") + dot(now, a.sun, "is-sun");
   }
   // Godziny co 6 h od początku osi, rozłożone równo jak na pozostałych wykresach.
-  const ticks = Array.from({ length: 5 }, (_, i) => `<span>${localHM(n.start + i * 6 * 3600000 + offset)}</span>`);
+  const ticks = Array.from({ length: 5 }, (_, i) => `<span>${hmIn(n.start + i * 6 * 3600000, tz)}</span>`);
   return `<div class="chart sky-chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${lines.join("")}${svg}${events.join("")}${dots}</div><div class="chart-x" aria-hidden="true">${ticks.join("")}</div></div>`;
 }
 

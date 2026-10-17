@@ -32,7 +32,6 @@ Nadal otwarte:
 - [ ] Zdecydować, czy zachować nazwę „% szansy” z bardzo wyraźnym zastrzeżeniem, czy przed walidacją prezentować „indeks warunków”. Dzisiaj wynik nie jest kalibrowanym prawdopodobieństwem.
 - [ ] Rozdzielić ocenę bliską (OVATION) od dalszych godzin (aproksymacja Kp). **Decyzja autora 17.10.2026: na razie nie pokazujemy tego w UI**, bo wymagałoby tłumaczenia; ewentualnie później jako pomoc.
 - [ ] **Dzień i noc w całości:** autor ma pomysł, jak lepiej pokazać wynik w dzień (dziś 0%); wrócimy do tego.
-- [ ] Testować granice czasu i DST; rozważyć znaczniki UTC/Unix i strefy IANA zamiast pojedynczego przesunięcia dla całej prognozy.
 - [ ] Zweryfikować progi „przez aparat” i „gołym okiem”, obecnie ustawione ręcznie.
 
 ## P1 — geometria i warunki dla lokalizacji

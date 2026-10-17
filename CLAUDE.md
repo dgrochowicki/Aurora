@@ -54,6 +54,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | `tests/model.test.js` | Testy obliczeń modelu |
 | `tests/chart.test.js` | Testy podziałki wykresów |
 | `tests/data.test.js` | Testy braków i starych danych, parsera NOAA |
+| `tests/time.test.js` | Testy stref czasu i zmiany czasu |
 
 **Zasady podziału kodu:**
 - `js/model/` nie korzysta z DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
@@ -71,7 +72,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | Bz | `/json/rtsw/rtsw_mag_1m.json` | Kilka sond naraz, oficjalna to `active: true`; wiersze od najnowszego; bez oficjalnej zapasowa sonda (`pickProbe()`), oznaczona w UI |
 | Wiatr | `/json/rtsw/rtsw_wind_1m.json` | `proton_speed`, `proton_density`, `active`; sonda wybierana jak dla Bz |
 | GOES | `/json/goes/primary/magnetometers-6-hour.json` | Składowa `Hp` z orbity, nie regionalna stacja; sortujemy sami |
-| Pogoda | `api.open-meteo.com/v1/forecast` | Czas lokalny i `utc_offset_seconds`; szczególna ostrożność przy DST |
+| Pogoda | `api.open-meteo.com/v1/forecast` | Czas Unix (`timeformat=unixtime`) i strefa IANA (`timezone`); godziny formatujemy w strefie miejsca (`hmIn()`), nie stałym przesunięciem |
 | Miejsca | `geocoding-api.open-meteo.com`, `api.bigdatacloud.net` | Geokodowanie i nazwa lokalizacji |
 
 Cache 5 minut nie gwarantuje świeżości oryginalnego pomiaru, dlatego do modelu dane trafiają przez `freshData()` z limitami wieku. Bez OVATION wynik pochodzi z modelu Kp. Pełna specyfikacja w `MODEL.md`.

@@ -148,8 +148,8 @@ test("godziny bez wyniku nie świecą i nie psują poświaty pozostałych", () =
 });
 
 test("zmiana zachmurzenia nie zgaduje przy brakach danych", () => {
-  assert.equal(cloudChange([{ cloud: null, t: "2026-10-04T20:00" }, { cloud: 10, t: "2026-10-04T21:00" }]), null);
-  const rows = [80, null, 20].map((cloud, i) => ({ cloud, t: `2026-10-04T2${i}:00` }));
+  assert.equal(cloudChange([{ cloud: null, hm: "20:00" }, { cloud: 10, hm: "21:00" }]), null);
+  const rows = [80, null, 20].map((cloud, i) => ({ cloud, hm: `2${i}:00` }));
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
 });
 

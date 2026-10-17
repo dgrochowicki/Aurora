@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — strefy czasu i zmiana czasu
+
+- Pogoda z Open-Meteo w czasie Unix (`timeformat=unixtime`), a wszystkie godziny formatowane w strefie miejsca (nazwa IANA, np. „Europe/Warsaw”) przez `Intl`: pigułki, „Najlepsza szansa około…”, data w nagłówku, oś i wschody w „Świetle tej nocy”, osie wykresów.
+- Wcześniej jedno stałe przesunięcie na całą prognozę dawało w noc zmiany czasu (25.10.2026) podpisy po 03:00 przesunięte o godzinę. Teraz zmiana czasu działa tam, gdzie jest, w jej lokalnym terminie, a miejsca bez zmiany czasu (Islandia, Japonia) jej nie mają. Uwaga autora: nie wszędzie jest zmiana czasu.
+- Nowe funkcje `hmIn()`, `offsetAt()`, `validTz()` w `js/util.js` i `placeTz()` w `js/model/forecast.js`; testy w `tests/time.test.js` (Polska, Islandia, Sydney, Indie).
+
 ## 17.10.2026 — „Teraz”, wynik w dzień, kompletność danych
 
 - „Teraz” to bieżące warunki jak w pogodzie Apple: zachmurzenie i warstwy z Open-Meteo `current` (co 15 min), Słońce i Księżyc dla tej chwili. Bez bieżących danych prognoza z godziny, w której jesteśmy (o 17:40 to 17:00, a nie 18:00). Dalej pełne godziny.

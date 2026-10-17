@@ -20,12 +20,44 @@ export const fmtCoords = (lat, lon) =>
 // Liczba w polskim zapisie: przecinek dziesiętny i prawdziwy znak minus.
 export const fmtNum = (v, d = 1) => v.toFixed(d).replace("-", "−").replace(".", ",");
 
-// Open-Meteo zwraca czas lokalny miejsca bez strefy. Czytamy go jako UTC, żeby wynik nie zależał od strefy przeglądarki.
+// Starszy format Open-Meteo: czas lokalny miejsca bez strefy. Czytamy go jako UTC, żeby wynik nie zależał od strefy przeglądarki.
 export const localMs = (t) => Date.parse(t + "Z");
-export const localHM = (ms) => new Date(ms).toISOString().slice(11, 16);
 
 // Przesunięcie strefy przeglądarki w milisekundach.
 export const browserOffset = () => -new Date().getTimezoneOffset() * 60000;
+
+// Czas w strefie miejsca. tz to nazwa strefy IANA (np. „Europe/Warsaw”), undefined to strefa przeglądarki.
+// Strefa sama wie, czy i kiedy zmienia się czas (letni, zimowy, inne daty na półkuli południowej, brak zmiany np. w Islandii).
+const formats = new Map();
+const formatter = (tz, opts) => {
+  const key = `${tz}|${JSON.stringify(opts)}`;
+  if (!formats.has(key)) formats.set(key, new Intl.DateTimeFormat("pl-PL", { ...opts, timeZone: tz }));
+  return formats.get(key);
+};
+
+// Godzina, np. „21:30”, w strefie tz.
+export const hmIn = (ms, tz) => formatter(tz, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ms);
+
+// Przesunięcie strefy tz względem UTC w danej chwili, w milisekundach (np. 7200000 latem w Polsce, 3600000 zimą).
+export function offsetAt(ms, tz) {
+  const p = Object.fromEntries(
+    formatter(tz, { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hourCycle: "h23" })
+      .formatToParts(ms)
+      .map((x) => [x.type, Number(x.value)]),
+  );
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(ms / 1000) * 1000;
+}
+
+// Poprawna strefa IANA albo undefined (strefa przeglądarki), żeby błędna nazwa z serwera nie wywróciła strony.
+export function validTz(tz) {
+  if (!tz) return undefined;
+  try {
+    formatter(tz, {});
+    return tz;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function fetchJSON(url, timeout = 10000) {
   const c = new AbortController();

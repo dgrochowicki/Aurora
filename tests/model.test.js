@@ -56,7 +56,7 @@ test("Słońce w Szczecinie: wysoko w południe latem, pod horyzontem o północ
 });
 
 test("oś nocy ma zachód i wschód Słońca we właściwej kolejności", () => {
-  const n = nightTimeline(SZCZECIN, Date.parse("2026-10-04T19:00:00Z"), 7200000);
+  const n = nightTimeline(SZCZECIN, Date.parse("2026-10-04T19:00:00Z"), "Europe/Warsaw");
   assert.equal(n.sunEv.length, 2);
   assert.equal(n.sunEv[0].rise, false);
   assert.equal(n.sunEv[1].rise, true);
@@ -64,7 +64,7 @@ test("oś nocy ma zachód i wschód Słońca we właściwej kolejności", () => 
 });
 
 test("łuki nocy mają wysokości co 5 minut, a Słońce w nocy schodzi poniżej −18°", () => {
-  const n = nightTimeline(SZCZECIN, Date.parse("2026-10-04T19:00:00Z"), 7200000);
+  const n = nightTimeline(SZCZECIN, Date.parse("2026-10-04T19:00:00Z"), "Europe/Warsaw");
   assert.equal(n.arcs.length, 24 * 12 + 1);
   assert.equal(n.arcs[0].t, n.start);
   assert.ok(n.arcs[0].sun > 0, "o 12:00 Słońce jest nad horyzontem");
@@ -93,7 +93,7 @@ test("szansa jest zerowa przy pełnym zachmurzeniu i wyższa przy czystym niebie
 });
 
 test("zmiana zachmurzenia: przejaśnienie po pochmurnym początku", () => {
-  const rows = [80, 80, 20].map((cloud, i) => ({ cloud, t: `2026-10-04T2${i}:00` }));
+  const rows = [80, 80, 20].map((cloud, i) => ({ cloud, hm: `2${i}:00` }));
   assert.equal(cloudChange(rows).short, "Przejaśnienia ok. 22:00");
 });
 
@@ -108,15 +108,15 @@ test("poświata godzin narasta i gaśnie razem z szansą, a przy słabej nocy pa
 });
 
 test("najlepsza szansa z godziną użytkownika dla miejsca w innej strefie", () => {
-  const best = { t: "2026-10-13T22:00", score: 34 };
+  const best = { hm: "22:00", score: 34 };
   assert.equal(outlookText(best, 40, null), "Najlepsza szansa około 22:00: 34%.");
   assert.equal(outlookText(best, 40, null, "04:00"), "Najlepsza szansa około 22:00 (u Ciebie 04:00): 34%.");
 });
 
 test("data w nagłówku liczona w strefie miejsca", () => {
   const ms = Date.parse("2026-09-30T23:30:00Z");
-  assert.equal(dayLabel(ms, 0), "Środa, 30 września");
-  assert.equal(dayLabel(ms, 2 * 3600000), "Czwartek, 1 października");
+  assert.equal(dayLabel(ms, "UTC"), "Środa, 30 września");
+  assert.equal(dayLabel(ms, "Europe/Warsaw"), "Czwartek, 1 października");
 });
 
 test("formatowanie liczb po polsku", () => {
@@ -149,7 +149,8 @@ test("„Teraz” o 17:40 to godzina 17:00, a nie 18:00, a kolejne pigułki to p
   const now = Date.parse("2026-10-04T15:40:00Z"); // 17:40 w czasie miejsca
   const fc = buildForecast(ABISKO, localWeather((h) => (h === 5 ? 0 : 100)), strongGrid, strongSpace, now);
   assert.equal(fc.rows[0].label, "Teraz");
-  assert.equal(fc.rows[0].t, "2026-10-04T17:00");
+  assert.equal(fc.rows[0].t, Date.parse("2026-10-04T15:00:00Z"));
+  assert.equal(fc.rows[0].hm, "17:40");
   assert.equal(fc.rows[0].cloud, 0);
   // Słońce i Księżyc liczone dla tej chwili, nie dla pełnej godziny.
   assert.equal(fc.rows[0].ms, now);

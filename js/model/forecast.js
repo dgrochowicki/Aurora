@@ -1,5 +1,5 @@
 // Prognoza godzinowa i oś nocy dla miejsca. Łączy aktywność, ciemność i chmury w szansę, bez dotykania DOM.
-import { clamp, num, localMs, localHM } from "../util.js";
+import { clamp, num, localMs, hmIn, offsetAt, validTz } from "../util.js";
 import { skyAt, darknessOf, magLat, DAY_MS } from "./sky.js";
 import { auroraAt, kpVisible, activityAt, clearSky } from "./aurora.js";
 
@@ -9,10 +9,10 @@ import { auroraAt, kpVisible, activityAt, clearSky } from "./aurora.js";
 // Bez aktualnego OVATION i Kp (activity: false) albo bez danych o chmurach w danej godzinie wynik jest null, a nie liczbą.
 // grid i space mają być już przefiltrowane przez freshData() z model/fresh.js.
 export function buildForecast(loc, w, grid, space, now = Date.now()) {
-  const offset = (w.utc_offset_seconds || 0) * 1000,
-    nowLocal = now + offset;
+  const tz = placeTz(w),
+    toMs = timeOf(w);
   // Pierwsza pełna godzina po teraz i godzina, w której jesteśmy (-1, gdy prognoza zaczyna się później).
-  let next = w.hourly.time.findIndex((t) => localMs(t) > nowLocal);
+  let next = w.hourly.time.findIndex((t) => toMs(t) > now);
   if (next < 0) next = w.hourly.time.length;
   const curHour = next - 1;
   const mlat = magLat(loc.lat, loc.lon);
@@ -31,22 +31,23 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
       cover = clear == null ? null : Math.round((1 - clear) * 100),
       cloud = cloudAt(h, i, clear);
     const score = act == null || clear == null ? null : Math.round(clamp(act * dark * clear, 0, 99));
-    return { t, ms, label, cloud, cover, clear, low: layer("cloud_cover_low"), mid: layer("cloud_cover_mid"), high: layer("cloud_cover_high"), dark, night, sky, act, score };
+    return { t, ms, label, hm: hmIn(ms, tz), cloud, cover, clear, low: layer("cloud_cover_low"), mid: layer("cloud_cover_mid"), high: layer("cloud_cover_high"), dark, night, sky, act, score };
   };
   const rows = [];
   const cur = currentClouds(w);
-  if (cur) rows.push(makeRow(cur, 0, w.current.time, now, "Teraz"));
-  else if (curHour >= 0) rows.push(makeRow(w.hourly, curHour, w.hourly.time[curHour], now, "Teraz"));
+  // t to chwila w ms (UTC), ms to chwila, dla której liczymy niebo: przy „Teraz” bieżąca, dalej pełne godziny.
+  if (cur) rows.push(makeRow(cur, 0, toMs(w.current.time), now, "Teraz"));
+  else if (curHour >= 0) rows.push(makeRow(w.hourly, curHour, toMs(w.hourly.time[curHour]), now, "Teraz"));
   for (let i = next; i < w.hourly.time.length && rows.length < 12; i++) {
-    const t = w.hourly.time[i];
-    rows.push(makeRow(w.hourly, i, t, localMs(t) - offset, localHM(localMs(t))));
+    const ms = toMs(w.hourly.time[i]);
+    rows.push(makeRow(w.hourly, i, ms, ms, hmIn(ms, tz)));
   }
   // Zachmurzenie na wykres: 13 godzin od godziny, w której jesteśmy, czyli pełne 12 h, żeby podpisy co 3 h trafiały w oba końce.
   const clouds = [];
   const from = Math.max(0, curHour);
   for (let i = from; i < Math.min(w.hourly.time.length, from + 13); i++) {
     const v = cloudAt(w.hourly, i, clearSky(w.hourly, i));
-    if (v != null) clouds.push({ t: localMs(w.hourly.time[i]) - offset, v });
+    if (v != null) clouds.push({ t: toMs(w.hourly.time[i]), v });
   }
   const nowSky = skyAt(now, loc.lat, loc.lon);
   const nowCloud = num(w.current?.cloud_cover);
@@ -64,8 +65,24 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const scored = rows.filter((r) => r.score != null);
   const best = scored.reduce((a, b) => (b.score > a.score ? b : a), scored[0] || first);
   const maxAct = ovation == null ? null : Math.max(first.act, ...rows.map((r) => r.act));
-  return { rows, clouds, first, best, maxAct, activity: ovation != null, source: activitySource(grid, ovation), nowSky, offset, tz: w.timezone_abbreviation || "" };
+  return { rows, clouds, first, best, maxAct, activity: ovation != null, source: activitySource(grid, ovation), nowSky, tz, tzName: w.timezone_abbreviation || "" };
 }
+
+// Strefa miejsca z Open-Meteo (timezone=auto daje nazwę IANA, np. „Europe/Warsaw”). Bez niej strefa ze stałego przesunięcia
+// w pełnych godzinach (Etc/GMT ma odwrócony znak), a w ostateczności strefa przeglądarki.
+export function placeTz(w) {
+  const tz = validTz(w.timezone);
+  if (tz) return tz;
+  const h = (w.utc_offset_seconds || 0) / 3600;
+  return Number.isInteger(h) ? (h === 0 ? "UTC" : validTz(`Etc/GMT${h > 0 ? "-" : "+"}${Math.abs(h)}`)) : undefined;
+}
+
+// Czas z Open-Meteo jako chwila w ms. Pobieramy go jako czas Unix (timeformat=unixtime), więc zmiana czasu go nie dotyczy.
+// Starszy format (tekst w czasie miejsca bez strefy) przeliczamy stałym utc_offset_seconds.
+const timeOf = (w) => {
+  const offset = (w.utc_offset_seconds || 0) * 1000;
+  return (t) => (typeof t === "number" ? t * 1000 : localMs(t) - offset);
+};
 
 // Zachmurzenie w procentach: całkowite z prognozy, a gdy go brak, wyliczone z warstw. null, gdy brak obu.
 function cloudAt(h, i, clear) {
@@ -95,7 +112,7 @@ export function nowActivity(loc, grid, space) {
 // Pierwsza wyraźna zmiana zachmurzenia w prognozie: przejaśnienie, gdy teraz jest pochmurno, albo napływ chmur, gdy jest pogodnie.
 export function cloudChange(rows) {
   if (!rows.length) return null;
-  const at = (r) => localHM(localMs(r.t));
+  const at = (r) => r.hm;
   if (rows[0].cloud == null) return null;
   if (rows[0].cloud >= 50) {
     const r = rows.slice(1).find((r) => r.cloud != null && r.cloud < 30);
@@ -123,28 +140,29 @@ export function outlookText(best, maxAct, change, yours = "") {
     maxAct < 8
       ? "Aktywność zorzy pozostanie zbyt niska, żeby ją zobaczyć."
       : best.score >= 10
-        ? `Najlepsza szansa około ${localHM(localMs(best.t))}${yours ? ` (u Ciebie ${yours})` : ""}: ${best.score}%.`
+        ? `Najlepsza szansa około ${best.hm}${yours ? ` (u Ciebie ${yours})` : ""}: ${best.score}%.`
         : "Szansa na zorzę pozostaje mała.",
   );
   return parts.join(" ");
 }
 
-// Dzisiejsza data w czasie miejsca, np. „Środa, 30 września”.
-export function dayLabel(ms, offset) {
-  const s = new Intl.DateTimeFormat("pl-PL", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(
-    new Date(ms + offset),
-  );
+// Dzisiejsza data w strefie miejsca tz, np. „Środa, 30 września”.
+export function dayLabel(ms, tz) {
+  const s = new Intl.DateTimeFormat("pl-PL", { weekday: "long", day: "numeric", month: "long", timeZone: tz }).format(ms);
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // Oś doby od 12:00 do 12:00 czasu miejsca, co 5 minut: Słońce, Księżyc i okna pełnej ciemności.
-// Przed południem to noc, która właśnie mija, po południu nadchodząca.
-export function nightTimeline(loc, now, offset) {
+// Przed południem to noc, która właśnie mija, po południu nadchodząca. tz: strefa miejsca.
+// Oś ma zawsze 24 h od południa; w dniu zmiany czasu kończy się więc o 11:00 albo 13:00 czasu miejsca.
+export function nightTimeline(loc, now, tz) {
   const STEP = 5 * 60000,
-    nowLocal = now + offset,
+    off = offsetAt(now, tz),
+    nowLocal = now + off,
     day = Math.floor(nowLocal / DAY_MS) * DAY_MS,
     h = (nowLocal - day) / 3600000;
-  const start = day + (h < 12 ? -12 : 12) * 3600000 - offset,
+  const noonLocal = day + (h < 12 ? -12 : 12) * 3600000;
+  const start = noonLocal - offsetAt(noonLocal - off, tz),
     end = start + 24 * 3600000;
   const samples = [];
   for (let t = start; t <= end; t += STEP) {
@@ -183,7 +201,7 @@ export function nightTimeline(loc, now, offset) {
   const dark = segs("dark").filter((g) => g.v),
     cur = dark.find((g) => g.from <= now && now < g.to),
     next = dark.find((g) => g.from > now),
-    hm = (ms) => localHM(ms + offset);
+    hm = (ms) => hmIn(ms, tz);
   const nextText = cur
     ? `Najciemniej teraz, do ${hm(cur.to)}`
     : next
