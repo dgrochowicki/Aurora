@@ -105,7 +105,7 @@ Gdy brak jednej z warstw, stosowane jest `1 - total/100`; gdy brak całkowitego 
 
 **Braki danych:** wartości czytamy przez `num()` z `js/util.js`, więc `null`, pusty tekst i nie-liczby są brakiem, a nie zerem. Gdy prognoza nie ma ani warstw, ani całkowitego zachmurzenia, `clearSky()` zwraca `null`, a godzina ma `cloud`, `cover`, `clear` i `score` równe `null` (w pigułce kreska, w kafelku „Brak danych”). Takie godziny nie trafiają na wykres zachmurzenia i nie mogą być najlepszą godziną.
 
-Aplikacja pobiera także `current.cloud_cover`, ale główny wynik opiera się na godzinowej prognozie. Pierwszy punkt jest wybierany z tolerancją około ±30 minut. Etykieta „Teraz” **nie oznacza pomiaru co do minuty**. Jeśli nie uda się pobrać całego obiektu pogody, główny wynik procentowy jest pomijany, choć dane kosmiczne mogą pozostać widoczne.
+**„Teraz”** (pierwsza pigułka) to bieżące warunki, jak w pogodzie Apple: zachmurzenie i warstwy z Open-Meteo `current` (wartości co 15 minut, to nadal model, nie pomiar), a Słońce, Księżyc i aktywność liczone dla tej chwili. Gdy bieżących danych o chmurach brak, „Teraz” bierze prognozę z pełnej godziny, w której jesteśmy (o 17:40 to 17:00). Kolejne pigułki to pełne godziny po teraz (18:00, 19:00…), razem 12. Wykres zachmurzenia zaczyna się od godziny, w której jesteśmy. Jeśli nie uda się pobrać całego obiektu pogody, główny wynik procentowy jest pomijany, choć dane kosmiczne mogą pozostać widoczne.
 
 ## 7. Ciemność, Słońce, Księżyc
 
@@ -113,7 +113,7 @@ Aplikacja pobiera także `current.cloud_cover`, ale główny wynik opiera się n
 
 | Wysokość Słońca | Czynnik |
 |---|---:|
-| ≥ 0° | 0,05 |
+| ≥ 0° | 0 |
 | 0° do −6° | 0,15 |
 | −6° do −12° | liniowo 0,15 → 0,70 |
 | −12° do −18° | liniowo 0,70 → 1,00 |
@@ -125,19 +125,19 @@ Przy Księżycu poniżej horyzontu czynnik księżycowy wynosi 1. Nad horyzontem
 moonFactor = 1 - 0.5 * moonIllum * Math.min(1, moonAlt / 30);
 ```
 
-Wysoko położony Księżyc w pełni może zredukować wynik o połowę. **W dzień czynnik Słońca nie wynosi zero** (0,05), więc silna aktywność może wytworzyć dodatni wynik, mimo że obserwacja zorzy w świetle dnia praktycznie nie jest możliwa.
+Wysoko położony Księżyc w pełni może zredukować wynik o połowę. **Ze Słońcem nad horyzontem czynnik ciemności i cały wynik to 0** (decyzja autora z 17.10.2026); aktywność nadal jest pokazywana osobno. Zmierzch cywilny (0° do −6°) zostaje przy 0,15.
 
 `nightTimeline()` oblicza pozycje Słońca i Księżyca co 5 minut na lokalnej osi 12:00–12:00. Ten wykres dotyczy oświetlenia, a nie samej siły zorzy.
 
 ## 8. Czas i prognoza godzinowa
 
-`buildForecast()` zwraca do 12 godzin prognozy i 13 punktów zachmurzenia dla wykresu pełnych 12 godzin. Najlepsza godzina to maksymalny `score`. Lokalny czas Open-Meteo jest traktowany jako czas bez strefy, przeliczany przy pomocy `utc_offset_seconds`. Szczególnie należy przetestować przejście czasu letniego/zimowego i lokalizacje z inną strefą niż urządzenie.
+`buildForecast()` zwraca „Teraz” i do 11 kolejnych pełnych godzin oraz 13 punktów zachmurzenia dla wykresu pełnych 12 godzin. Najlepsza godzina to maksymalny `score`. Lokalny czas Open-Meteo jest traktowany jako czas bez strefy, przeliczany przy pomocy `utc_offset_seconds`. Szczególnie należy przetestować przejście czasu letniego/zimowego i lokalizacje z inną strefą niż urządzenie.
 
 Model OVATION ma krótki horyzont i nie powinien być utożsamiany pod względem trafności z godzinami 3–12 wyznaczanymi z autorskiej aproksymacji Kp.
 
-## 9. „Pewność prognozy”
+## 9. „Kompletność danych”
 
-`renderConfidence()` dostaje dane po `freshData()`. Ustala „wysoką” pewność, gdy jest świeża siatka OVATION (do godziny), świeże Kp i prognoza Kp; „średnią”, gdy jest świeże OVATION lub Kp; „niską” z dopiskiem „brak aktualnych danych o aktywności zorzy”, gdy nie ma żadnego. To **heurystyka dostępności wybranych danych**, a nie empirycznie wyliczony przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
+Linia pod kafelkami (dawniej „Pewność prognozy”, zmiana nazwy 17.10.2026). `renderConfidence()` dostaje dane po `freshData()`: „pełna”, gdy jest świeża siatka OVATION (do godziny), świeże Kp i prognoza Kp; „częściowa”, gdy jest świeże OVATION lub Kp; „brak aktualnych danych o aktywności zorzy”, gdy nie ma żadnego. To **dostępność źródeł**, a nie trafność prognozy ani przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
 
 ## 10. Pozostałe ograniczenia i walidacja
 

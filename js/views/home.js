@@ -248,11 +248,12 @@ function selectHour(i) {
 function renderConfidence(space, grid) {
   const hasGrid = grid.coords.length > 0;
   if (!hasGrid && space.kp == null) {
-    els.confidence.textContent = "Pewność prognozy: niska • brak aktualnych danych o aktywności zorzy";
+    els.confidence.textContent = "Kompletność danych: brak aktualnych danych o aktywności zorzy";
     return;
   }
-  const confidence = hasGrid && space.kp != null && space.kpForecast?.length ? "wysoka" : "średnia";
-  els.confidence.textContent = `Pewność prognozy: ${confidence} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
+  // To nie jest trafność prognozy, tylko to, ile źródeł o aktywności mamy: model OVATION, Kp i prognozę Kp.
+  const level = hasGrid && space.kp != null && space.kpForecast?.length ? "pełna" : "częściowa";
+  els.confidence.textContent = `Kompletność danych: ${level} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
 }
 
 // Akapit pod wynikiem: co z zorzą (z kierunkiem patrzenia, gdy jest szansa) i jakie są warunki obserwacji teraz.

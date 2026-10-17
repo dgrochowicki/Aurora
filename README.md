@@ -24,7 +24,9 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 
 **Braki i stare dane:** gdy nie ma aktualnych danych NOAA o aktywności zorzy (model OVATION młodszy niż godzina albo Kp młodsze niż 6 h), aplikacja zamiast procentu pokazuje „Brak danych” i wiek ostatniego pomiaru; zachmurzenie i światło nocy działają dalej. Gdy oficjalna sonda NOAA nie podaje Bz lub wiatru, aplikacja bierze dane z zapasowej (np. ACE) i to oznacza; nazwa sondy i źródło aktywności są w stopce każdego panelu. Pomiary Bz, wiatru słonecznego i magnetometru starsze niż 30 minut są pokazywane z dopiskiem „Pomiar sprzed…”, bez oceny. Godzina bez prognozy zachmurzenia nie ma wyniku. Przy całkowitym braku prognozy pogody procent nie jest wyświetlany.
 
-**Ograniczenia obecnej wersji:** nazwa „Teraz” odnosi się do najbliższej godzinowej prognozy chmur. Przy braku aktualnego OVATION aplikacja przechodzi na przybliżenie z Kp i jeszcze tego wyraźnie nie oznacza.
+„Teraz” to bieżące warunki (zachmurzenie z Open-Meteo co 15 minut, położenie Słońca i Księżyca w tej chwili), a kolejne godziny to prognoza na pełne godziny. Za dnia, gdy Słońce jest nad horyzontem, szansa wynosi 0%.
+
+**Ograniczenia obecnej wersji:** przy braku aktualnego OVATION aplikacja przechodzi na przybliżenie z Kp i jeszcze tego wyraźnie nie oznacza.
 
 Dokładny opis **aktualnie zaimplementowanych** wzorów, progów i ryzyk jest w [MODEL.md](MODEL.md). Plan zmian jest w [UWAGI.md](UWAGI.md).
 

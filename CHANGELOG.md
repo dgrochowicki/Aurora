@@ -2,6 +2,13 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 17.10.2026 — „Teraz”, wynik w dzień, kompletność danych
+
+- „Teraz” to bieżące warunki jak w pogodzie Apple: zachmurzenie i warstwy z Open-Meteo `current` (co 15 min), Słońce i Księżyc dla tej chwili. Bez bieżących danych prognoza z godziny, w której jesteśmy (o 17:40 to 17:00, a nie 18:00). Dalej pełne godziny.
+- Ze Słońcem nad horyzontem szansa wynosi 0% (`darknessOf()`, decyzja autora).
+- „Pewność prognozy” zmieniona na „Kompletność danych: pełna / częściowa / brak”, bo mówi o dostępności źródeł, a nie o trafności.
+- Testy w `tests/model.test.js`.
+
 ## 17.10.2026 — świeżość danych NOAA i braki danych
 
 - Każdy pomiar NOAA ma czas pomiaru (OVATION z „Observation Time”, Kp od końca bloku). `freshData()` w `js/model/fresh.js` przepuszcza do modelu tylko świeże dane: OVATION do 1 h, Kp do 6 h, Bz, wiatr i GOES do 30 min.

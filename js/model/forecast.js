@@ -3,57 +3,49 @@ import { clamp, num, localMs, localHM } from "../util.js";
 import { skyAt, darknessOf, magLat, DAY_MS } from "./sky.js";
 import { auroraAt, kpVisible, activityAt, clearSky } from "./aurora.js";
 
-// Wynik to widoczna aktywność × ciemność × część czystego nieba, dla 12 najbliższych godzin.
+// Wynik to widoczna aktywność × ciemność × część czystego nieba, dla 12 pigułek: „Teraz” i 11 kolejnych pełnych godzin.
+// „Teraz” jak w pogodzie Apple: bieżące warunki (Open-Meteo „current”, co 15 minut) i położenie Słońca w tej chwili,
+// a gdy bieżących danych brak, prognoza z pełnej godziny, w której jesteśmy (np. 17:00 o 17:40).
 // Bez aktualnego OVATION i Kp (activity: false) albo bez danych o chmurach w danej godzinie wynik jest null, a nie liczbą.
 // grid i space mają być już przefiltrowane przez freshData() z model/fresh.js.
 export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const offset = (w.utc_offset_seconds || 0) * 1000,
     nowLocal = now + offset;
-  const idx = w.hourly.time.findIndex((t) => localMs(t) >= nowLocal - 1800000);
+  // Pierwsza pełna godzina po teraz i godzina, w której jesteśmy (-1, gdy prognoza zaczyna się później).
+  let next = w.hourly.time.findIndex((t) => localMs(t) > nowLocal);
+  if (next < 0) next = w.hourly.time.length;
+  const curHour = next - 1;
   const mlat = magLat(loc.lat, loc.lon);
   const ovation = nowActivity(loc, grid, space);
-  const layer = (k, i) => {
-    const v = num(w.hourly[k]?.[i]);
-    return v == null ? null : Math.round(v);
-  };
-  // Zachmurzenie w procentach: całkowite z prognozy, a gdy go brak, wyliczone z warstw. null, gdy brak obu.
-  const cloudAt = (i, clear) => {
-    const total = num(w.hourly.cloud_cover?.[i]);
-    return total != null ? Math.round(total) : clear == null ? null : Math.round((1 - clear) * 100);
-  };
-  const rows = [];
-  for (let i = Math.max(0, idx); i < Math.min(w.hourly.time.length, Math.max(0, idx) + 12); i++) {
-    const t = w.hourly.time[i],
-      ms = localMs(t) - offset;
+  // Jeden wiersz z danych w układzie Open-Meteo: h to obiekt z tablicami (hourly albo bieżące w tablicach jednoelementowych).
+  const makeRow = (h, i, t, ms, label) => {
+    const layer = (k) => {
+      const v = num(h[k]?.[i]);
+      return v == null ? null : Math.round(v);
+    };
     const sky = skyAt(ms, loc.lat, loc.lon),
       dark = darknessOf(sky),
       night = sky.sunAlt < -6;
     const act = ovation == null ? null : activityAt(ovation, mlat, space, ms, Math.max(0, (ms - now) / 3600000));
-    const clear = clearSky(w.hourly, i),
+    const clear = clearSky(h, i),
       cover = clear == null ? null : Math.round((1 - clear) * 100),
-      cloud = cloudAt(i, clear);
+      cloud = cloudAt(h, i, clear);
     const score = act == null || clear == null ? null : Math.round(clamp(act * dark * clear, 0, 99));
-    rows.push({
-      t,
-      ms,
-      label: rows.length === 0 && idx >= 0 ? "Teraz" : localHM(localMs(t)),
-      cloud,
-      cover,
-      clear,
-      low: layer("cloud_cover_low", i),
-      mid: layer("cloud_cover_mid", i),
-      high: layer("cloud_cover_high", i),
-      dark,
-      night,
-      sky,
-      act,
-      score,
-    });
+    return { t, ms, label, cloud, cover, clear, low: layer("cloud_cover_low"), mid: layer("cloud_cover_mid"), high: layer("cloud_cover_high"), dark, night, sky, act, score };
+  };
+  const rows = [];
+  const cur = currentClouds(w);
+  if (cur) rows.push(makeRow(cur, 0, w.current.time, now, "Teraz"));
+  else if (curHour >= 0) rows.push(makeRow(w.hourly, curHour, w.hourly.time[curHour], now, "Teraz"));
+  for (let i = next; i < w.hourly.time.length && rows.length < 12; i++) {
+    const t = w.hourly.time[i];
+    rows.push(makeRow(w.hourly, i, t, localMs(t) - offset, localHM(localMs(t))));
   }
-  // Zachmurzenie na wykres: 13 godzin, czyli pełne 12 h, żeby podpisy co 3 h trafiały w oba końce.
+  // Zachmurzenie na wykres: 13 godzin od godziny, w której jesteśmy, czyli pełne 12 h, żeby podpisy co 3 h trafiały w oba końce.
   const clouds = [];
-  for (let i = Math.max(0, idx); i < Math.min(w.hourly.time.length, Math.max(0, idx) + 13); i++) {
-    const v = cloudAt(i, clearSky(w.hourly, i));
+  const from = Math.max(0, curHour);
+  for (let i = from; i < Math.min(w.hourly.time.length, from + 13); i++) {
+    const v = cloudAt(w.hourly, i, clearSky(w.hourly, i));
     if (v != null) clouds.push({ t: localMs(w.hourly.time[i]) - offset, v });
   }
   const nowSky = skyAt(now, loc.lat, loc.lon);
@@ -73,6 +65,21 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const best = scored.reduce((a, b) => (b.score > a.score ? b : a), scored[0] || first);
   const maxAct = ovation == null ? null : Math.max(first.act, ...rows.map((r) => r.act));
   return { rows, clouds, first, best, maxAct, activity: ovation != null, source: activitySource(grid, ovation), nowSky, offset, tz: w.timezone_abbreviation || "" };
+}
+
+// Zachmurzenie w procentach: całkowite z prognozy, a gdy go brak, wyliczone z warstw. null, gdy brak obu.
+function cloudAt(h, i, clear) {
+  const total = num(h.cloud_cover?.[i]);
+  return total != null ? Math.round(total) : clear == null ? null : Math.round((1 - clear) * 100);
+}
+
+// Bieżące zachmurzenie z Open-Meteo w układzie hourly (tablice jednoelementowe), albo null, gdy go brak.
+const CLOUD_KEYS = ["cloud_cover", "cloud_cover_low", "cloud_cover_mid", "cloud_cover_high"];
+function currentClouds(w) {
+  const c = w.current;
+  if (!c?.time) return null;
+  const h = Object.fromEntries(CLOUD_KEYS.map((k) => [k, [c[k]]]));
+  return clearSky(h, 0) == null ? null : h;
 }
 
 // Skąd jest aktywność: z modelu OVATION, z indeksu Kp (gdy OVATION brak) albo null, gdy nie ma żadnego.

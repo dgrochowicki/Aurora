@@ -50,10 +50,11 @@ export function moonLitRight(ms, lat, lon) {
 }
 
 // Ciemność 0–1: zmierzch żeglarski przy -12°, astronomiczny przy -18°. Jasny Księżyc wysoko na niebie obniża wynik nawet o połowę.
+// Ze Słońcem nad horyzontem zorzy nie widać, więc ciemność i cała szansa to 0 (decyzja autora z 17.10.2026).
 export function darknessOf(sky) {
   const a = sky.sunAlt;
   const sunF =
-    a >= 0 ? 0.05 : a >= -6 ? 0.15 : a >= -12 ? 0.15 + ((-6 - a) / 6) * 0.55 : a >= -18 ? 0.7 + ((-12 - a) / 6) * 0.3 : 1;
+    a >= 0 ? 0 : a >= -6 ? 0.15 : a >= -12 ? 0.15 + ((-6 - a) / 6) * 0.55 : a >= -18 ? 0.7 + ((-12 - a) / 6) * 0.3 : 1;
   const moonF = sky.moonAlt <= 0 ? 1 : 1 - 0.5 * sky.moonIllum * Math.min(1, sky.moonAlt / 30);
   return sunF * moonF;
 }
