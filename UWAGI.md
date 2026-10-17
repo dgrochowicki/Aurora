@@ -53,12 +53,19 @@
 - [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.
 - [ ] **UI.** Dokończyć uzgodnienia dotyczące ekranu miejsc, mapy, przycisków i szczegółowych paneli. Nieaktualne wartości stylu nie powinny wracać z dokumentacji; punkt odniesienia `STYL.md` i `css/tokens.css`.
 
-## Do decyzji autora
+## Do ustalenia z autorem
 
 - [ ] Czy wynik ma pozostać procentem, czy zmienić jego nazwę do czasu walidacji?
 - [ ] Czy przy braku źródeł pokazujemy brak wyniku, czy wynik awaryjny z ostrzeżeniem?
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
+- [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
+- [ ] Potwierdzić opisy i kolory czterech poziomów „sprzyja zorzy”.
+- [ ] Dopracować oddzielenie pływających przycisków od treści pod spodem (cień, tło, ramka).
+- [ ] Dokończyć projekt ekranu miejsc i mapy oraz szczegóły paneli, bez przywracania starej palety.
+- [ ] Potwierdzić progi nazw zachmurzenia: Brak <10, Małe <30, Umiarkowane <60, Duże <80, Bardzo duże ≥80.
+- [ ] Rozważyć wygładzanie linii zachmurzenia (monotonicznie, bez wyjścia poza 0–100%) oraz jasne oznaczanie, że warstwy dotyczą jednej godziny.
+- [ ] Sprawdzić wysokość linii dla tekstu 13 px i dużej liczby oraz nazwę czcionki referencyjnej z Figmy.
 
 ## Zasada porządku
 
