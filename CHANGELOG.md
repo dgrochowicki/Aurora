@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — mapa bez końca świata na ekranie
+
+- Mapy nie da się już oddalić ani przesunąć tak, żeby było widać jej koniec i puste tło: najmniejsze przybliżenie dopasowuje się do wysokości ekranu (`fitWorld()` w `js/views/map.js`), a w pionie mapa kończy się na granicy odwzorowania (±85°, `maxBounds` z `maxBoundsViscosity: 1`). W bok dalej zawija się jak globus. Prośba autora, wzorem Hello Aurora.
+
 ## 17.10.2026 — „Jasność nieba” zamiast „Światło w nocy”
 
 - Kafelek „Światło w nocy” i panel „Światło tej nocy” nazywają się teraz „Jasność nieba”. Stara nazwa nie pasowała w dzień, a panel pokazuje całą dobę 12:00–12:00. Decyzja autora.

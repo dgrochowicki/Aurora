@@ -84,6 +84,17 @@ export function refreshMap(current) {
   if (sheet.isOpen) showMap(current);
 }
 
+// Najmniejsze przybliżenie, przy którym wysokość świata (256 px · 2^z) nie jest mniejsza niż wysokość mapy na ekranie.
+function fitWorld() {
+  const h = map.getSize().y;
+  if (!h) return;
+  // Pełne przybliżenia, żeby kafelki podkładu były ostre.
+  const min = Math.ceil(Math.log2(h / 256));
+  map.setMinZoom(min);
+  if (map.getZoom() < min) map.setZoom(min);
+  map.panInsideBounds(map.options.maxBounds, { animate: false });
+}
+
 async function showMap(current) {
   if (!window.L) {
     note.textContent = "Mapa nie mogła się załadować. Sprawdź połączenie.";
@@ -91,10 +102,25 @@ async function showMap(current) {
   }
   const L = window.L;
   if (!map) {
-    map = L.map("auroraMap", { zoomControl: false, worldCopyJump: true }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
+    // Bez szarego tła za końcem mapy: w pionie mapa kończy się na granicy odwzorowania (±85°) i nie da się jej przesunąć dalej,
+    // a w bok zawija się jak globus (worldCopyJump). Najmniejsze przybliżenie dobiera fitWorld(), żeby świat wypełniał ekran.
+    map = L.map("auroraMap", {
+      zoomControl: false,
+      worldCopyJump: true,
+      maxBounds: [
+        [-85.05, -100000],
+        [85.05, 100000],
+      ],
+      maxBoundsViscosity: 1,
+      bounceAtZoomLimits: false,
+    }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
+    map.on("resize", fitWorld);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
   }
-  setTimeout(() => map.invalidateSize(), 50);
+  setTimeout(() => {
+    map.invalidateSize();
+    fitWorld();
+  }, 50);
   if (current) {
     if (locationMarker) locationMarker.remove();
     locationMarker = L.circleMarker([current.lat, current.lon], { radius: 7, color: "#fff", weight: 2, fillColor: "#68f7bb", fillOpacity: 1 })
