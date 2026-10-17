@@ -72,8 +72,11 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const scored = rows.filter((r) => r.score != null);
   const best = scored.reduce((a, b) => (b.score > a.score ? b : a), scored[0] || first);
   const maxAct = ovation == null ? null : Math.max(first.act, ...rows.map((r) => r.act));
-  return { rows, clouds, first, best, maxAct, activity: ovation != null, nowSky, offset, tz: w.timezone_abbreviation || "" };
+  return { rows, clouds, first, best, maxAct, activity: ovation != null, source: activitySource(grid, ovation), nowSky, offset, tz: w.timezone_abbreviation || "" };
 }
+
+// Skąd jest aktywność: z modelu OVATION, z indeksu Kp (gdy OVATION brak) albo null, gdy nie ma żadnego.
+export const activitySource = (grid, act) => (act == null ? null : grid.coords.length ? "ovation" : "kp");
 
 // Widoczna aktywność teraz: z modelu OVATION, a bez niego z bieżącego Kp. null, gdy nie ma aktualnego żadnego z nich.
 export function nowActivity(loc, grid, space) {

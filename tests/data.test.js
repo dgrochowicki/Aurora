@@ -44,6 +44,7 @@ test("brak zachmurzenia całkowitego i warstw to brak danych, a nie czyste niebo
 test("cloud_cover: null bez warstw daje godzinę bez wyniku, nie 0% chmur", () => {
   const fc = buildForecast(SZCZECIN, weather(null, false), grid(NOW), space(), NOW);
   assert.equal(fc.activity, true);
+  assert.equal(fc.source, "ovation");
   assert.equal(fc.first.cloud, null);
   assert.equal(fc.first.clear, null);
   assert.equal(fc.first.score, null);
@@ -62,6 +63,7 @@ test("brak chmur tylko w części godzin: reszta ma wynik, a najlepsza godzina j
 test("bez OVATION i bez Kp nie ma wyniku ani zastępczego Kp = 2", () => {
   const fc = buildForecast(SZCZECIN, weather(0), { coords: [], time: null, observed: NaN }, space({ kp: null }), NOW);
   assert.equal(fc.activity, false);
+  assert.equal(fc.source, null);
   assert.ok(fc.rows.length > 0);
   assert.ok(fc.rows.every((r) => r.score == null && r.act == null));
   assert.equal(fc.maxAct, null);
@@ -74,6 +76,7 @@ test("bez OVATION i bez Kp nie ma wyniku ani zastępczego Kp = 2", () => {
 test("bez OVATION, ale z aktualnym Kp wynik liczymy z Kp", () => {
   const fc = buildForecast(SZCZECIN, weather(0), { coords: [], time: null, observed: NaN }, space({ kp: 7 }), NOW);
   assert.equal(fc.activity, true);
+  assert.equal(fc.source, "kp");
   assert.ok(fc.first.score > 0);
 });
 
@@ -174,20 +177,23 @@ test("NOAA: Bz z oficjalnej sondy, gdy jest, wiek każdej wartości z jej pomiar
     "k-index-forecast": [],
     rtsw_mag_1m: [
       { time_tag: RTSW_TIME, active: false, bz_gsm: -20 },
-      { time_tag: "2026-10-04T19:50:00", active: true, bz_gsm: -4 },
+      { time_tag: "2026-10-04T19:50:00", active: true, source: "DSCOVR", bz_gsm: -4 },
     ],
     rtsw_wind_1m: [{ time_tag: RTSW_TIME, active: true, proton_speed: 450, proton_density: 2 }],
-    magnetometers: [{ time_tag: "2026-10-04T19:59:00Z", Hp: 100 }],
+    magnetometers: [{ time_tag: "2026-10-04T19:59:00Z", Hp: 100, satellite: 19 }],
     ovation_aurora_latest: { "Observation Time": "2026-10-04T19:45:00Z", "Forecast Time": "2026-10-04T20:30:00Z", coordinates: [[14, 58, 60]] },
   });
   const noaa = await loadNoaa("active");
   const s = await noaa.getSpaceWeather();
   assert.equal(s.bz, -4);
+  assert.equal(s.bzProbe, "DSCOVR");
+  assert.equal(s.bzBackup, null);
   assert.equal(s.times.bz, Date.parse("2026-10-04T19:50:00Z"));
   // Kp z bloku 15:00–18:00 liczymy od końca bloku.
   assert.equal(s.times.kp, Date.parse("2026-10-04T18:00:00Z"));
   assert.equal(s.times.wind, Date.parse(RTSW_TIME + "Z"));
   assert.equal(s.times.goes, Date.parse("2026-10-04T19:59:00Z"));
+  assert.equal(s.goesSat, 19);
   const g = await noaa.getAuroraGrid();
   assert.equal(g.observed, Date.parse("2026-10-04T19:45:00Z"));
 });
@@ -207,6 +213,7 @@ test("NOAA: bez oficjalnej sondy Bz z zapasowej, oznaczone jej nazwą i bez mies
   const s = await (await loadNoaa("inactive")).getSpaceWeather();
   assert.equal(s.bz, -20);
   assert.equal(s.bzBackup, "ACE");
+  assert.equal(s.bzProbe, "ACE");
   // Średnia tylko z wierszy tej samej sondy.
   assert.equal(s.bzAvg, -15);
   assert.equal(s.times.bz, Date.parse(RTSW_TIME + "Z"));
@@ -237,8 +244,8 @@ test("NOAA: oficjalna sonda ma pierwszeństwo, bez oznaczenia zapasu", async () 
     { active: false, source: "ACE", bz_gsm: -20 },
     { active: true, source: "DSCOVR", bz_gsm: 2 },
   ];
-  assert.deepEqual(pickProbe(rows, ok), { rows: [rows[1]], backup: null });
-  assert.deepEqual(pickProbe([], ok), { rows: [], backup: null });
+  assert.deepEqual(pickProbe(rows, ok), { rows: [rows[1]], backup: null, probe: "DSCOVR" });
+  assert.deepEqual(pickProbe([], ok), { rows: [], backup: null, probe: null });
 });
 
 test("NOAA: po awarii zostają stare wartości razem z ich starym czasem, a nie z czasem pobrania", async (t) => {

@@ -28,7 +28,8 @@ Zrobione na gałęzi `dane-swiezosc`, czeka na „puść na mastera” (potem pr
 
 Nadal otwarte:
 
-- [ ] Jawnie oznaczać przejście z OVATION na model Kp (gdy OVATION jest stary, a Kp aktualne), np. w panelu „Skąd ten wynik”.
+- [x] Źródło w stopce paneli: sonda RTSW (Bz, wiatr), satelita GOES, a w „Skąd ten wynik” model OVATION albo Kp.
+- [ ] Przejście z OVATION na Kp widać dziś tylko w stopce „Skąd ten wynik”. Rozważyć oznaczenie na stronie głównej.
 - [ ] Godzina „Aktualizacja” w nagłówku to czas przeliczenia widoku. Rozważyć pokazanie obok wieku najstarszego użytego pomiaru.
 - [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).
 - [ ] Limit wieku dla GOES przyjęto taki jak dla Bz i wiatru (30 min); do potwierdzenia przez autora.

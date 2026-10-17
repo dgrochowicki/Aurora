@@ -16,8 +16,14 @@ const ageText = (grid) => {
   return age == null ? "brak danych" : age < 1 ? "przed chwilą" : `${age} min temu`;
 };
 
-// Z której sondy RTSW jest pomiar: oficjalnej albo zapasowej (nazwa z pickProbe w data/noaa.js).
-const probeText = (v, backup) => (v == null ? "—" : backup ? `${backup} (zapasowa)` : "Oficjalna NOAA");
+// Stopka panelu z pomiarem RTSW: nazwa użytej sondy (z pickProbe w data/noaa.js), przy zapasowej z dopiskiem.
+const rtswSource = (probe, backup) =>
+  `NOAA SWPC · ${probe ? `sonda ${probe}${backup ? " (zapasowa)" : ""} · ` : ""}pomiary wiatru słonecznego w czasie rzeczywistym`;
+// Stopka „Skąd ten wynik”: z czego policzono aktywność.
+const ACTIVITY_SOURCE = {
+  ovation: "NOAA SWPC · aktywność z modelu OVATION",
+  kp: "NOAA SWPC · aktywność z indeksu Kp (brak aktualnego modelu OVATION)",
+};
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
 // Stan pod liczbą jak w kafelku: znaczenie dla zorzy, a przy za starym pomiarze jego wiek.
 const favor = (st, src, v, level) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : favorLabel(level(v)));
@@ -50,7 +56,7 @@ export const DETAILS = {
           : "Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy.";
     return {
       title: "Skąd ten wynik",
-      source: "NOAA SWPC · model OVATION i Kp · Open-Meteo · obliczenia w przeglądarce",
+      source: `${ACTIVITY_SOURCE[st.source] || "Brak aktualnych danych NOAA o aktywności"} · Open-Meteo · obliczenia w przeglądarce`,
       html:
         infoHero(first ? first.score : null, "%", { tight: true, status: why }) +
         infoCard("Trzy części szansy", factors) +
@@ -69,7 +75,7 @@ export const DETAILS = {
     const s = st.space;
     return {
       title: "Magnetometr",
-      source: "NOAA SWPC · magnetometr satelity GOES",
+      source: `NOAA SWPC · magnetometr satelity GOES${s.goesSat ? `-${s.goesSat}` : ""}`,
       html:
         infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
           status: favor(st, "goes", s.goesRange, goesLevel),
@@ -94,20 +100,16 @@ export const DETAILS = {
       ref = s.bzAvg ?? s.bz;
     return {
       title: "Pole wiatru słonecznego · Bz",
-      source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
+      source: rtswSource(s.bzProbe, s.bzBackup),
       html:
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
           status: favor(st, "bz", ref, bzLevel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
         chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoStats(
-          [
+        infoStats([
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
-          ["Sonda", probeText(s.bz, s.bzBackup)],
           ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
-          ],
-          3,
-        ) +
+        ]) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
   },
@@ -145,20 +147,16 @@ export const DETAILS = {
     const s = st.space;
     return {
       title: "Wiatr słoneczny",
-      source: "NOAA SWPC · pomiary wiatru słonecznego w czasie rzeczywistym",
+      source: rtswSource(s.windProbe, s.windBackup),
       html:
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
           status: favor(st, "wind", s.wind, windLevel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
         chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
-        infoStats(
-          [
-            ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
-            ["Sonda", probeText(s.wind, s.windBackup)],
-            ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
-          ],
-          3,
-        ) +
+        infoStats([
+          ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
+          ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
+        ]) +
         infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };
   },

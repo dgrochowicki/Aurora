@@ -38,13 +38,15 @@ const lastHours = (rows, key) => {
 
 // Plik RTSW zawiera dane z kilku sond naraz (np. DSCOVR i ACE), a oficjalne są tylko wiersze z active: true.
 // Gdy wierszy oficjalnej sondy brak, bierzemy sondę z najnowszym poprawnym odczytem i zwracamy jej nazwę jako „backup”,
-// żeby strona mogła oznaczyć dane jako zapasowe. Wiersze są od najnowszego. Każda sonda osobno, bez mieszania.
+// żeby strona mogła oznaczyć dane jako zapasowe. „probe” to nazwa użytej sondy, także oficjalnej (do stopki panelu).
+// Wiersze są od najnowszego. Każda sonda osobno, bez mieszania.
 export function pickProbe(rows, ok) {
   const active = rows.filter((r) => r && r.active === true && ok(r));
-  if (active.length) return { rows: active, backup: null };
+  if (active.length) return { rows: active, backup: null, probe: active[0].source || null };
   const first = rows.find((r) => r && ok(r));
-  if (!first) return { rows: [], backup: null };
-  return { rows: rows.filter((r) => r && r.source === first.source && ok(r)), backup: first.source || "inna sonda" };
+  if (!first) return { rows: [], backup: null, probe: null };
+  const name = first.source || "inna sonda";
+  return { rows: rows.filter((r) => r && r.source === first.source && ok(r)), backup: name, probe: name };
 }
 
 const settled = (r) => (r.status === "fulfilled" && Array.isArray(r.value) ? r.value : []);
@@ -73,7 +75,7 @@ export async function getSpaceWeather() {
 
   // Bz z jednej sondy: oficjalnej (active: true), a gdy jej brak, z zapasowej. Nazwa zapasowej trafia do bzBackup.
   const bzOk = (r) => r && r.bz_gsm != null && Number.isFinite(Number(r.bz_gsm));
-  const { rows: activeMag, backup: bzBackup } = pickProbe(magRows, bzOk);
+  const { rows: activeMag, backup: bzBackup, probe: bzProbe } = pickProbe(magRows, bzOk);
   const bzRow = activeMag[0];
   // Średni Bz z ostatnich 30 minut tej sondy. Pojedynczy odczyt minutowy jest zbyt zaszumiony.
   const newest = activeMag.length ? Date.parse(activeMag[0].time_tag + "Z") : NaN;
@@ -81,7 +83,7 @@ export async function getSpaceWeather() {
   const bzAvg = recent.length ? recent.reduce((a, r) => a + Number(r.bz_gsm), 0) / recent.length : null;
 
   // Prędkość i gęstość wiatru słonecznego z jednej sondy: oficjalnej, a gdy jej brak, z zapasowej (windBackup).
-  const { rows: activeWind, backup: windBackup } = pickProbe(
+  const { rows: activeWind, backup: windBackup, probe: windProbe } = pickProbe(
     settled(windResult),
     (r) => r.proton_speed != null && Number.isFinite(Number(r.proton_speed)),
   );
@@ -92,6 +94,7 @@ export async function getSpaceWeather() {
     .map((r) => ({
       t: Date.parse(/Z$/.test(r?.time_tag) ? r.time_tag : r?.time_tag + "Z"),
       v: r?.Hp == null ? NaN : Number(r.Hp),
+      sat: r?.satellite ?? null,
     }))
     .filter((r) => Number.isFinite(r.t) && Number.isFinite(r.v))
     .sort((a, b) => a.t - b.t);
@@ -115,6 +118,7 @@ export async function getSpaceWeather() {
     windSeries: lastHours(activeWind, "proton_speed"),
     wind: activeWind.length ? Number(activeWind[0].proton_speed) : null,
     windBackup,
+    windProbe,
     density: density != null ? Number(density) : null,
     goes: goesLast ? goesLast.v : null,
     goesRange: goesHour.length > 1 ? Math.max(...goesHour) - Math.min(...goesHour) : null,
@@ -123,6 +127,9 @@ export async function getSpaceWeather() {
     kp: kpRow ? Number(kpRow.Kp ?? kpRow[1]) : null,
     bz: bzRow ? Number(bzRow.bz_gsm) : null,
     bzBackup,
+    bzProbe,
+    // Numer satelity GOES, z którego jest ostatni odczyt, np. 19.
+    goesSat: goesLast ? goesLast.sat : null,
     // Czas ostatniego pomiaru każdej wartości. Kp opisuje blok 3-godzinny, więc liczymy go od końca bloku.
     times: {
       kp: kpRow ? utcMs(kpRow.time_tag ?? kpRow[0]) + 3 * 3600000 : NaN,
@@ -142,9 +149,9 @@ export async function getSpaceWeather() {
       s.times[key] = old.times[key];
     };
     keep("kp", ["kp"]);
-    keep("bz", ["bz", "bzAvg", "bzSeries", "bzBackup"]);
-    keep("wind", ["wind", "density", "windSeries", "windBackup"]);
-    keep("goes", ["goes", "goesRange", "goesSeries"]);
+    keep("bz", ["bz", "bzAvg", "bzSeries", "bzBackup", "bzProbe"]);
+    keep("wind", ["wind", "density", "windSeries", "windBackup", "windProbe"]);
+    keep("goes", ["goes", "goesRange", "goesSeries", "goesSat"]);
     if (!s.kpForecast.length) s.kpForecast = old.kpForecast;
   }
   return spaceWeather;

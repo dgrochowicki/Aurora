@@ -2,7 +2,7 @@
 import { $, fmtNum, browserOffset } from "../util.js";
 import { phaseAt, moonLitRight } from "../model/sky.js";
 import { moonPhaseIcon } from "../ui/sky-chart.js";
-import { buildForecast, nowActivity, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
+import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
@@ -139,7 +139,7 @@ export function renderForecast(loc, w, grid, space) {
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
     night = nightTimeline(loc, now, offset);
-  state = { loc, grid, space, stale: live.stale, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
+  state = { loc, grid, space, stale: live.stale, source: fc.source, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
   showScore(first.score);
   els.activityLevel.textContent = fc.activity ? activityLabel(first.act) : "";
@@ -208,7 +208,7 @@ export function renderSpaceOnly(loc, grid, space) {
   const now = Date.now();
   const live = freshData(grid, space, now);
   const act = nowActivity(loc, live.grid, live.space);
-  state = { loc, grid, space, stale: live.stale, rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
+  state = { loc, grid, space, stale: live.stale, source: activitySource(live.grid, act), rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
   // Bez prognozy pogody nie znamy strefy miejsca, więc datę podajemy według przeglądarki.
   showUpdated(now, browserOffset());
   renderSpaceTiles(space, live.stale, now);
