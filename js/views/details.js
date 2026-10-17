@@ -1,15 +1,14 @@
 // Treść paneli szczegółów po stuknięciu w kafelek. Każda funkcja dostaje stan strony głównej i zwraca {title, source, html}.
 // Układ wspólny dla wszystkich paneli: metryka ze stanem, wykres, dane, na końcu wyjaśnienie (klocki z ui/parts.js).
 // Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
-import { fmtNum, localHM, browserOffset } from "../util.js";
+import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
 import { ageLabel, activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
-// Godziny pokazujemy w czasie wybranego miejsca. Bez prognozy pogody nie znamy jego strefy, więc używamy strefy przeglądarki.
-const placeOffset = (st) => st.offset ?? browserOffset();
+// Godziny pokazujemy w strefie wybranego miejsca. Bez prognozy pogody nie znamy jej, więc st.tz jest pusty i Intl bierze strefę przeglądarki.
 // Wiek modelu OVATION od czasu pomiarów, z których go policzono, a nie od czasu prognozy.
 const ageText = (grid) => {
   const age = Number.isFinite(grid.observed) ? Math.round((Date.now() - grid.observed) / 60000) : null;
@@ -82,7 +81,7 @@ export const DETAILS = {
         }) +
         chart(s.goesSeries, {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
-          offset: placeOffset(st),
+          tz: st.tz,
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -105,7 +104,7 @@ export const DETAILS = {
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
           status: favor(st, "bz", ref, bzLevel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
-        chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", tz: st.tz }) +
         infoStats([
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
           ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
@@ -117,7 +116,7 @@ export const DETAILS = {
   kp(st) {
     const s = st.space,
       now = Date.now(),
-      off = placeOffset(st);
+      tz = st.tz;
     // Doba prognozy: 8 bloków 3-godzinnych od bieżącego.
     const blocks = (s.kpForecast || []).filter((r) => r.t + 3 * 3600000 > now).slice(0, 8);
     return {
@@ -132,8 +131,8 @@ export const DETAILS = {
             // Cała skala 0–9, a słupek tym jaśniejszy, im wyższe Kp, czyli większa szansa na zorzę.
             blocks.map((r) => ({ t: r.t, v: r.kp, a: 0.2 + 0.8 * Math.min(1, r.kp / 9) })),
             {
-              label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${localHM(r.t + off)} ${fmtNum(r.kp)}`).join(", ")}`,
-              offset: off,
+              label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${hmIn(r.t, tz)} ${fmtNum(r.kp)}`).join(", ")}`,
+              tz,
               ticks: [9, 6, 3, 0],
             },
           ),
@@ -152,7 +151,7 @@ export const DETAILS = {
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
           status: favor(st, "wind", s.wind, windLevel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
-        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", offset: placeOffset(st) }) +
+        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", tz: st.tz }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
           ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
@@ -181,8 +180,8 @@ export const DETAILS = {
         chart(
           st.clouds,
           {
-            label: `Zachmurzenie w najbliższych godzinach: ${st.clouds.map((p) => `${localHM(p.t + st.offset)} ${p.v}%`).join(", ")}`,
-            offset: st.offset,
+            label: `Zachmurzenie w najbliższych godzinach: ${st.clouds.map((p) => `${hmIn(p.t, st.tz)} ${p.v}%`).join(", ")}`,
+            tz: st.tz,
             ticks: [100, 80, 60, 40, 20, 0],
             row: ROW_DENSE,
             unit: "%",
@@ -214,8 +213,7 @@ export const DETAILS = {
         source: "Obliczenia w przeglądarce",
         html: infoHero(null) + infoText("Bez prognozy pogody nie znamy strefy czasowej miejsca, więc nie pokazujemy godzin."),
       };
-    const off = st.offset,
-      hm = (ms) => localHM(ms + off),
+    const hm = (ms) => hmIn(ms, st.tz),
       near = (a, b) => Math.abs(a - b) < 15 * 60000;
     // Pora dnia jako tytuł, pod nią kiedy jest pełna ciemność i dlaczego wtedy: zachodzi Księżyc albo zaczyna się noc astronomiczna.
     const now = Date.now();
@@ -248,7 +246,7 @@ export const DETAILS = {
       source: "Położenie Słońca i Księżyca liczone w przeglądarce",
       html:
         infoHero(phaseAt(now, st.loc), "", { text: true, status: `${dark} ${moonNow}` }) +
-        infoChart(skyChart(n, { offset: off, now, label: `Wysokość Słońca i Księżyca od ${hm(n.start)} do ${hm(n.end)}. Najciemniej: ${windows}.` })) +
+        infoChart(skyChart(n, { tz: st.tz, now, label: `Wysokość Słońca i Księżyca od ${hm(n.start)} do ${hm(n.end)}. Najciemniej: ${windows}.` })) +
         infoText(
           "Łuki pokazują wysokość Słońca i Księżyca nad horyzontem. Najciemniej jest wtedy, gdy Słońce zejdzie poniżej −18° (noc astronomiczna), a Księżyc jest pod horyzontem albo bardzo słaby.",
         ) +

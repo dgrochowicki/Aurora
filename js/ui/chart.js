@@ -1,7 +1,7 @@
 // Wykresy w panelu szczegółów: liniowe (pomiary z 2 godzin, zachmurzenie) i słupkowy (prognoza Kp). Linia sięga krawędzi panelu, podpisy osi mają wcięcie 24 px.
 // Podziałka: co najmniej 3 przerywane linie co 53 px (32 px od linii do liczby nad następną: liczba 16 + 4 przerwy + 1 linia),
 // liczby osi Y po prawej, 4 px nad linią. Przy 3 liniach wykres z osią godzin ma 153 px, jak w makiecie.
-import { esc, fmtNum, localHM } from "../util.js";
+import { esc, fmtNum, hmIn } from "../util.js";
 
 const ROW = 53;
 // Gęstsza podziałka (np. zachmurzenie co 20%): 16 px zamiast 32 od linii do liczby nad następną, przy 6 liniach wykres ma 232 px.
@@ -52,11 +52,11 @@ function gridHTML(ticks, y, unit = "") {
 }
 
 // series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
-// offset: strefa, w której podpisujemy godziny. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
+// tz: strefa miejsca (IANA), w której podpisujemy godziny; bez niej strefa przeglądarki. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
 // tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony).
 // unit: dopisek przy liczbach osi Y poza zerem. row: odstęp linii podziałki w px (domyślnie 53).
 // every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego początek, środek i koniec.
-export function lineChart(series, { zero = false, label, offset = 0, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin." }) {
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin." }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -78,7 +78,7 @@ export function lineChart(series, { zero = false, label, offset = 0, ticks: fixe
     : "";
   const negative = zero ? `<path class="chart-line negative" clip-path="url(#chartBelowZero)" d="${line}"/>` : "";
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}<path class="chart-line" d="${line}"/>${negative}</svg>`;
-  const hm = (t) => localHM(t + offset);
+  const hm = (t) => hmIn(t, tz);
   // Środkowy podpis to czas środkowego punktu danych, żeby przy prognozie godzinowej była pełna godzina.
   const mid = series[Math.floor((series.length - 1) / 2)].t;
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni), rozłożone równo jak początek, środek i koniec.
@@ -90,7 +90,7 @@ export function lineChart(series, { zero = false, label, offset = 0, ticks: fixe
 // Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, a}] od najwcześniejszego.
 // a (0–1): jasność zielonego słupka, nad słupkiem jest jego wartość, pod nim godzina początku bloku.
 // ticks: stała podziałka, np. cała skala Kp 0–9.
-export function barChart(items, { label, offset = 0, ticks: fixed = null }) {
+export function barChart(items, { label, tz, ticks: fixed = null }) {
   if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
   const ticks = fixed || niceTicks(0, Math.max(...items.map((p) => p.v))),
     { H, y } = scale(ticks);
@@ -100,6 +100,6 @@ export function barChart(items, { label, offset = 0, ticks: fixed = null }) {
         `<b><i style="height:${(H - y(p.v)).toFixed(1)}px;--a:${p.a.toFixed(2)}"><span>${fmtNum(p.v)}</span></i></b>`,
     )
     .join("");
-  const times = items.map((p) => `<span>${localHM(p.t + offset)}</span>`).join("");
+  const times = items.map((p) => `<span>${hmIn(p.t, tz)}</span>`).join("");
   return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div><div class="chart-x is-bars" aria-hidden="true">${times}</div></div>`;
 }

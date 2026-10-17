@@ -1,5 +1,5 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
-import { $, fmtNum, browserOffset } from "../util.js";
+import { $, fmtNum, browserOffset, offsetAt } from "../util.js";
 import { phaseAt, moonLitRight } from "../model/sky.js";
 import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
@@ -135,11 +135,11 @@ export function renderForecast(loc, w, grid, space) {
   const live = freshData(grid, space, now);
   const fc = buildForecast(loc, w, live.grid, live.space, now);
   if (loc.test && fc.activity) applyTest(fc, loc.test);
-  const { rows, clouds, first, best, maxAct, nowSky, offset, tz } = fc;
+  const { rows, clouds, first, best, maxAct, nowSky, tz, tzName } = fc;
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
-    night = nightTimeline(loc, now, offset);
-  state = { loc, grid, space, stale: live.stale, source: fc.source, rows, clouds, first, act: first.act, offset, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
+    night = nightTimeline(loc, now, tz);
+  state = { loc, grid, space, stale: live.stale, source: fc.source, rows, clouds, first, act: first.act, tz, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
   showScore(first.score);
   els.activityLevel.textContent = fc.activity ? activityLabel(first.act) : "";
@@ -157,13 +157,14 @@ export function renderForecast(loc, w, grid, space) {
   });
   setTile(els.conditionTiles, "light", { value: phase, icon: phaseIcon(phase), status: moonTileLabel(nowSky), statusIcon: moonUp ? moonPhaseIcon(nowSky.moonIllum, moonLitRight(now, loc.lat, loc.lon)) : "", next: night.nextText });
 
-  const diffH = (browserOffset() - offset) / 3600000;
-  showUpdated(now, offset);
+  // Różnica między czasem użytkownika a czasem miejsca w tej chwili; po zmianie czasu w jednym z nich sama się poprawia.
+  const diffH = (browserOffset() - offsetAt(now, tz)) / 3600000;
+  showUpdated(now, tz);
   els.tzNote.hidden = diffH === 0;
   els.tzNote.textContent =
     diffH === 0
       ? ""
-      : `Godziny według czasu miejsca (${tz}). U Ciebie jest o ${Math.abs(diffH).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} h ${diffH > 0 ? "później" : "wcześniej"}.`;
+      : `Godziny według czasu miejsca (${tzName}). U Ciebie jest o ${Math.abs(diffH).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} h ${diffH > 0 ? "później" : "wcześniej"}.`;
 
   renderHours(els.hourly, rows, hourGlow(rows));
   selectHour(state.sel);
@@ -208,9 +209,9 @@ export function renderSpaceOnly(loc, grid, space) {
   const now = Date.now();
   const live = freshData(grid, space, now);
   const act = nowActivity(loc, live.grid, live.space);
-  state = { loc, grid, space, stale: live.stale, source: activitySource(live.grid, act), rows: [], clouds: [], first: null, act, offset: null, change: null, night: null, sel: 0 };
+  state = { loc, grid, space, stale: live.stale, source: activitySource(live.grid, act), rows: [], clouds: [], first: null, act, tz: undefined, change: null, night: null, sel: 0 };
   // Bez prognozy pogody nie znamy strefy miejsca, więc datę podajemy według przeglądarki.
-  showUpdated(now, browserOffset());
+  showUpdated(now, undefined);
   renderSpaceTiles(space, live.stale, now);
   setTile(els.conditionTiles, "cloud", { status: "Brak prognozy pogody" });
   setTile(els.conditionTiles, "light", { status: "Brak danych" });
@@ -227,9 +228,9 @@ export function renderSpaceOnly(loc, grid, space) {
       : `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
 }
 
-// Data w czasie miejsca i godzina pobrania danych w czasie użytkownika.
-function showUpdated(now, offset) {
-  els.today.textContent = dayLabel(now, offset);
+// Data w strefie miejsca (tz; bez niej strefa przeglądarki) i godzina pobrania danych w czasie użytkownika.
+function showUpdated(now, tz) {
+  els.today.textContent = dayLabel(now, tz);
   els.updated.textContent = `Aktualizacja ${new Date(now).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
