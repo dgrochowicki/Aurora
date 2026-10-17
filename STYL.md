@@ -131,14 +131,4 @@ Dwa pływające przyciski 72 × 48 px, radius 24 px, 24 px od krawędzi i dołu;
 
 Ekran miejsc: pełny ekran, wyszukiwarka, aktualne miejsce oznaczone „Teraz”, „Moja lokalizacja” i zapisane miejscowości. Nie ma osobnego widocznego ✕; zamyka wybór miejsca albo Escape. Stuknięcie nazwy lokalizacji w nagłówku również otwiera ekran miejsc. Mapa bazuje na Leaflet i kafelkach OpenStreetMap ze stylizacją ciemną.
 
-## 11. Do ustalenia z autorem
-
-- [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
-- [ ] Potwierdzić opisy i kolory czterech poziomów „sprzyja zorzy”.
-- [ ] Dopracować oddzielenie pływających przycisków od treści pod spodem (cień, tło, ramka).
-- [ ] Dokończyć projekt ekranu miejsc i mapy oraz szczegóły paneli, bez przywracania starej palety.
-- [ ] Potwierdzić progi nazw zachmurzenia: Brak <10, Małe <30, Umiarkowane <60, Duże <80, Bardzo duże ≥80.
-- [ ] Rozważyć wygładzanie linii zachmurzenia (monotonicznie, bez wyjścia poza 0–100%) oraz jasne oznaczanie, że warstwy dotyczą jednej godziny.
-- [ ] Sprawdzić wysokość linii dla tekstu 13 px i dużej liczby oraz nazwę czcionki referencyjnej z Figmy.
-
 **Uwaga:** propozycje poprawy modelu widoczności i interpretacji procentów nie są kwestią stylu; znajdują się w [UWAGI.md](UWAGI.md), a aktualną implementację opisuje [MODEL.md](MODEL.md).
