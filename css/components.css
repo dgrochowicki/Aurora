@@ -917,7 +917,7 @@ html.sheet-open body {
   font-size: 9px !important;
 }
 /* Okrągłe przyciski na mapie: ✕ i powrót do lokalizacji pod nim. Wymiar i ikona jak ✕ w panelu szczegółów (44 px, ikona bold 20 px),
-   ale tło ciemne szkło jak pływające przyciski, bo jasne 4% z panelu znikałoby na mapie. */
+   ale tło ciemne szkło, bo jasne 4% z panelu znikałoby na mapie. Mniej przezroczyste niż pływające przyciski (85% zamiast 70%), bo mapa pod nimi jest jasna i ruchliwa. */
 .map-btn {
   position: absolute;
   z-index: 1001;
@@ -928,7 +928,7 @@ html.sheet-open body {
   height: 44px;
   border: 1px solid var(--card-border);
   border-radius: 50%;
-  background: var(--fab);
+  background: rgba(0, 0, 0, 0.85);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   color: var(--text);
@@ -960,7 +960,7 @@ html.sheet-open body {
   padding: 14px 16px;
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
-  background: rgba(9, 18, 22, 0.88);
+  background: rgba(0, 0, 0, 0.85);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }

@@ -85,14 +85,49 @@ export function initMap({ current }) {
   };
 }
 
-// Przybliżenie, przy którym widać okolicę miejsca i owal zorzy nad nim (przy 4 owal nad Skandynawią wypada już poza ekran).
-const HOME_ZOOM = 3;
+// Przybliżenie, przy którym widać okolicę miejsca, a owal zorzy nad Skandynawią jeszcze u góry ekranu.
+const HOME_ZOOM = 4;
+const FLY_MS = 1200;
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+let flight = 0,
+  flying = false;
 
-// Lot do miejsca: płynne przybliżenie, a przy ograniczonym ruchu od razu.
+// Płynny przejazd do miejsca bez oddalania po drodze (flyTo z Leaflet leci łukiem: najpierw oddala, i nie pilnuje granic mapy).
+// Co klatkę setView z ułamkowym przybliżeniem; setView przycina środek do maxBounds, więc mapa nie wyjeżdża poza ramkę.
+// Przybliżenie nigdy nie maleje, a dotknięcie mapy przerywa animację.
 function flyHome(loc) {
-  if (reducedMotion()) map.setView([loc.lat, loc.lon], HOME_ZOOM, { animate: false });
-  else map.flyTo([loc.lat, loc.lon], HOME_ZOOM, { duration: 1.2 });
+  const zoom = Math.max(map.getZoom(), HOME_ZOOM);
+  // Długość geograficzna celu najbliższa obecnemu środkowi, żeby przy zawijaniu świata nie jechać naokoło.
+  const c0 = map.getCenter(),
+    lon = loc.lon + 360 * Math.round((c0.lng - loc.lon) / 360),
+    target = L.latLng(loc.lat, lon);
+  if (reducedMotion()) return map.setView(target, zoom, { animate: false });
+  const z0 = map.getZoom(),
+    p0 = map.project(c0, zoom),
+    p1 = map.project(target, zoom),
+    id = ++flight,
+    start = performance.now();
+  flying = true;
+  map.options.zoomSnap = 0;
+  const step = (now) => {
+    if (id !== flight) return;
+    const t = Math.min(1, (now - start) / FLY_MS),
+      e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+    map.setView(map.unproject(p0.add(p1.subtract(p0).multiplyBy(e)), zoom), z0 + (zoom - z0) * e, { animate: false });
+    if (t < 1) requestAnimationFrame(step);
+    else stopFlight();
+  };
+  requestAnimationFrame(step);
+}
+
+// Koniec albo przerwanie animacji: z powrotem pełne przybliżenia, żeby kafelki podkładu były ostre.
+function stopFlight() {
+  flight++;
+  flying = false;
+  if (map.options.zoomSnap === 0) {
+    map.options.zoomSnap = 1;
+    map.setZoom(Math.round(map.getZoom()), { animate: false });
+  }
 }
 
 export const openMap = (opener) => sheet.open(opener);
@@ -133,6 +168,8 @@ async function showMap(current) {
       bounceAtZoomLimits: false,
     }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
     map.on("resize", fitWorld);
+    // Dotknięcie, przeciągnięcie albo kółko myszy przerywa przejazd do miejsca.
+    ["pointerdown", "wheel"].forEach((ev) => map.getContainer().addEventListener(ev, () => flying && stopFlight(), { passive: true }));
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
   }
   // Po otwarciu panelu: świat w całości, a potem płynne przybliżenie do miejsca. Przy odświeżaniu danych mapa zostaje, gdzie była.
@@ -143,7 +180,7 @@ async function showMap(current) {
     fitWorld();
     if (opening && current) {
       map.setView([current.lat, current.lon], map.getMinZoom(), { animate: false });
-      setTimeout(() => flyHome(current), 250);
+      setTimeout(() => flyHome(current), 300);
     }
   }, 50);
   if (current) {
