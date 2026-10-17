@@ -916,10 +916,11 @@ html.sheet-open body {
 .leaflet-control-attribution {
   font-size: 9px !important;
 }
-.map-close {
+/* Okrągłe przyciski na mapie: ✕ i powrót do lokalizacji pod nim. Wymiar i ikona jak ✕ w panelu szczegółów (44 px, ikona bold 20 px),
+   ale tło ciemne szkło jak pływające przyciski, bo jasne 4% z panelu znikałoby na mapie. */
+.map-btn {
   position: absolute;
   z-index: 1001;
-  top: calc(16px + env(safe-area-inset-top));
   right: 16px;
   display: grid;
   place-items: center;
@@ -934,10 +935,23 @@ html.sheet-open body {
   cursor: pointer;
   transition: var(--press);
 }
-.map-close:active {
+.map-btn:active {
   transform: scale(var(--press-scale));
 }
+.map-btn .icon {
+  width: 20px;
+  height: 20px;
+}
+.map-close {
+  top: calc(16px + env(safe-area-inset-top));
+}
+.map-locate {
+  top: calc(16px + 44px + 12px + env(safe-area-inset-top));
+}
 .map-panel {
+  /* Przeciągnięcie palcem przez legendę nie zaznacza tekstu. */
+  -webkit-user-select: none;
+  user-select: none;
   position: absolute;
   z-index: 1001;
   left: var(--gutter);

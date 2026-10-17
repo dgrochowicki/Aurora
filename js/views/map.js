@@ -6,13 +6,16 @@ import { createSheet } from "../ui/sheet.js";
 import { icon } from "../ui/icons.js";
 
 const note = $("#mapNote");
-let map, auroraLayer, locationMarker, mapLoc, field = null, getCurrent = () => null;
+let map, auroraLayer, locationMarker, field = null, justOpened = false, getCurrent = () => null;
 
 const sheet = createSheet({
   sheet: $("#mapSheet"),
   backdrop: $("#mapBackdrop"),
   closeButton: $("#closeMap"),
-  onOpen: () => showMap(getCurrent()),
+  onOpen: () => {
+    justOpened = true;
+    showMap(getCurrent());
+  },
 });
 
 // Kolory warstwy zorzy, te same co w legendzie (.map-legend i): płynnie od turkusu przy słabej do czerwieni przy silnej.
@@ -74,7 +77,22 @@ function drawTile(coords) {
 // current: funkcja zwracająca bieżące miejsce, żeby mapa pokazywała znacznik tam, gdzie prognoza.
 export function initMap({ current }) {
   getCurrent = current;
-  $("#closeMap").innerHTML = icon("x");
+  $("#closeMap").innerHTML = icon("xBold");
+  $("#locateMap").innerHTML = icon("gpsBold");
+  $("#locateMap").onclick = () => {
+    const loc = getCurrent();
+    if (map && loc) flyHome(loc);
+  };
+}
+
+// Przybliżenie, przy którym widać okolicę miejsca i owal zorzy nad nim (przy 4 owal nad Skandynawią wypada już poza ekran).
+const HOME_ZOOM = 3;
+const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Lot do miejsca: płynne przybliżenie, a przy ograniczonym ruchu od razu.
+function flyHome(loc) {
+  if (reducedMotion()) map.setView([loc.lat, loc.lon], HOME_ZOOM, { animate: false });
+  else map.flyTo([loc.lat, loc.lon], HOME_ZOOM, { duration: 1.2 });
 }
 
 export const openMap = (opener) => sheet.open(opener);
@@ -117,19 +135,22 @@ async function showMap(current) {
     map.on("resize", fitWorld);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 8, attribution: "© OpenStreetMap" }).addTo(map);
   }
+  // Po otwarciu panelu: świat w całości, a potem płynne przybliżenie do miejsca. Przy odświeżaniu danych mapa zostaje, gdzie była.
+  const opening = justOpened;
+  justOpened = false;
   setTimeout(() => {
     map.invalidateSize();
     fitWorld();
+    if (opening && current) {
+      map.setView([current.lat, current.lon], map.getMinZoom(), { animate: false });
+      setTimeout(() => flyHome(current), 250);
+    }
   }, 50);
   if (current) {
     if (locationMarker) locationMarker.remove();
     locationMarker = L.circleMarker([current.lat, current.lon], { radius: 7, color: "#fff", weight: 2, fillColor: "#68f7bb", fillOpacity: 1 })
       .addTo(map)
       .bindPopup(esc(current.name));
-    if (mapLoc !== current) {
-      map.setView([current.lat, current.lon], map.getZoom());
-      mapLoc = current;
-    }
   }
   const grid = await getAuroraGrid();
   field = grid.coords.length ? ovationField(grid, { smooth: 1 }) : null;
