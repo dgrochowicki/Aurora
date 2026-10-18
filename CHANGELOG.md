@@ -2,6 +2,13 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — ekran miejsc z kartami według makiety autora
+
+- Zapisane miejsca jako osobne karty jak w pogodzie Apple: nazwa, podpis („Moja lokalizacja” albo kraj) i linia warunków z godziną miejscową, ikoną pogody, zachmurzeniem i szansą teraz („Mała · 12%”); plakietka „Teraz” przy bieżącym miejscu. Wyniki wyszukiwania zostają listą.
+- Wciśnięcie podświetla i zmniejsza całą kartę, a nie tylko obszar przycisku obok plakietki i ✕ (uwaga autora).
+- Nowe wymiary według makiety: tytuł 21 px, pole wyszukiwania 54 px z lupą Phosphor, odstępy 32 px, szary tekst `--muted` (biały 60%).
+- Warunki dla wszystkich kart jednym zapytaniem do Open-Meteo (`getWeatherMany()` w `js/data/places.js`, `placeSummary()` w `js/model/forecast.js`), z chmurami na linii wzroku, więc karta zgadza się ze stroną główną; pamięć na 5 minut.
+
 ## 18.10.2026 — chmury w kierunku zorzy i uśrednianie wzdłuż łuku
 
 - Wynik liczy chmury na linii wzroku w stronę zorzy: trzy dodatkowe punkty pogody tam, gdzie linia wzroku mija wysokość niskich, średnich i wysokich chmur (np. 13, 39 i 78 km na północny zachód od Szczecina), pobierane w tym samym zapytaniu do Open-Meteo. Pod zorzą i bez kierunku zostaje niebo nad głową. Kafelek i pigułki dalej pokazują chmury nad głową; zdanie o warunkach podaje oba, gdy się różnią, a panel „Skąd ten wynik” pokazuje chmury na linii wzroku z odległościami. `rayPoints()`, `elevationDeg()`, `destination()`, `clearAlong()` w `js/model/aurora.js`, `getWeather(loc, ray)` w `js/data/places.js`.

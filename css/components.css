@@ -489,16 +489,16 @@
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) 0;
   background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px, var(--bg) 100%) var(--bg-top);
 }
+/* Ekran miejsc według makiety autora (18.10.2026): tytuł 21 px, 32 px do pola wyszukiwania i 32 px do kart. */
 .places-head {
   flex: none;
-  padding-bottom: 16px;
+  padding-bottom: 32px;
 }
 .places-head h2 {
-  font-size: 1.75rem;
+  font-size: 1.3125rem;
   font-weight: 600;
-  line-height: 1.15;
-  margin: 0 0 20px;
-  padding-inline: var(--text-inset);
+  line-height: 27px;
+  margin: 0 0 32px;
 }
 .sheet-handle,
 .sheet-header {
@@ -599,20 +599,23 @@ html.sheet-open body {
 .search-field {
   flex: none;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
+  height: 54px;
   background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
   padding: 0 16px;
-  color: var(--sub-65);
+  color: var(--text);
 }
-.search-field:focus-within {
-  border-color: rgba(104, 247, 187, 0.5);
+.search-icon .icon {
+  width: 20px;
+  height: 20px;
 }
+/* Wpisany tekst 16 px, bo przy mniejszym Safari na iPhonie przybliża stronę po stuknięciu w pole; podpowiedź 14 px jak w makiecie. */
 .search-field input {
   width: 100%;
-  padding: 15px 0;
+  padding: 0;
   border: 0;
   outline: 0;
   background: transparent;
@@ -620,7 +623,8 @@ html.sheet-open body {
   font-size: 1rem;
 }
 .search-field input::placeholder {
-  color: #78908d;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 .search-hint {
   font-size: 0.8125rem;
@@ -1035,11 +1039,12 @@ html.sheet-open body {
   height: 18px;
   color: var(--green);
 }
+/* Podpis w wynikach wyszukiwania: ten sam szary 12 px co na kartach miejsc. */
 .place-main small {
   display: block;
-  margin-top: 2px;
-  font-size: 0.8125rem;
-  color: var(--sub-65);
+  font-size: 0.75rem;
+  line-height: 16px;
+  color: var(--muted);
 }
 .place-badge {
   flex: none;
@@ -1065,6 +1070,80 @@ html.sheet-open body {
 .delete-place .icon {
   width: 18px;
   height: 18px;
+}
+/* Karty miejsc: nazwa 15 px, podpis i linia warunków 12 px szare, plakietka „Teraz” 13 px. Wymiary z makiety autora. */
+.place-cards {
+  display: grid;
+  gap: var(--gap);
+}
+.place-card {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--press);
+}
+/* Wciśnięcie dotyczy całej karty (jak kafelki na stronie głównej), a nie samego obszaru przycisku obok plakietki i ✕.
+   ✕ ma własne wciśnięcie i nie rusza karty. */
+.place-card:has(.place-main:active) {
+  transform: scale(var(--press-scale));
+  background: rgba(255, 255, 255, 0.12);
+}
+.place-card .place-main:active {
+  background: none;
+}
+.place-card .delete-place:active {
+  color: var(--text);
+}
+.place-card .place-main {
+  display: block;
+  padding: 16px;
+}
+.place-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 20px;
+}
+.place-name .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--green);
+}
+.place-sub,
+.place-meta {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  line-height: 16px;
+  color: var(--muted);
+}
+.place-meta {
+  gap: 12px;
+  margin-top: 12px;
+}
+.place-cloud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.place-cloud .icon {
+  width: 12px;
+  height: 12px;
+}
+.place-card .place-badge {
+  margin-right: 28px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.8125rem;
+  line-height: 16px;
+  color: var(--glow);
+}
+.place-card .delete-place {
+  color: var(--muted);
 }
 .search-results:not(:empty) {
   margin-top: 4px;

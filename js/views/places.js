@@ -1,9 +1,16 @@
 // Ekran wyboru miejsca na pełnym ekranie: wyszukiwarka, oglądane teraz miejsce, moja lokalizacja i zapisane miejsca.
 // Nie ma przycisku zamknięcia. Ekran zamyka wybór miejsca, także tego oglądanego teraz, albo Escape.
+// Miejsca to karty jak w pogodzie Apple: nazwa, podpis i linia warunków (godzina miejscowa, chmury, szansa teraz).
+// Wyniki wyszukiwania zostają prostą listą.
 import { $, esc, fmtCoords } from "../util.js";
-import { searchPlaces, loadSaved, storeSaved, TEST_PLACES } from "../data/places.js";
+import { searchPlaces, loadSaved, storeSaved, getWeatherMany, TEST_PLACES } from "../data/places.js";
+import { getAuroraGrid, getSpaceWeather } from "../data/noaa.js";
+import { freshData } from "../model/fresh.js";
+import { lookDirection, rayPoints } from "../model/aurora.js";
+import { placeSummary } from "../model/forecast.js";
+import { chanceLabel } from "../labels.js";
 import { createSheet } from "../ui/sheet.js";
-import { icon } from "../ui/icons.js";
+import { icon, weatherIcon } from "../ui/icons.js";
 import { toast } from "../ui/toast.js";
 
 const els = { places: $("#places"), input: $("#searchInput"), results: $("#searchResults"), hint: $("#searchHint") };
@@ -37,6 +44,7 @@ const sheet = createSheet({
 // current: funkcja zwracająca bieżące miejsce. onChoose: wybór miejsca z listy lub wyszukiwarki. onLocate: „Moja lokalizacja”.
 export function initPlaces({ current, onChoose, onLocate }) {
   getCurrent = current;
+  $("#placesSheet .search-icon").innerHTML = icon("search");
   choose = onChoose;
   locate = onLocate;
   els.input.oninput = (e) => {
@@ -53,6 +61,47 @@ export function initPlaces({ current, onChoose, onLocate }) {
 
 export const openPlaces = (opener) => sheet.open(opener);
 
+// Warunki na kartach: pamięć na 5 minut, jak dane NOAA. Klucz to współrzędne miejsca.
+const SUMMARY_TTL = 5 * 60 * 1000;
+const summaries = new Map();
+const keyOf = (p) => `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`;
+let summarySeq = 0;
+
+// Linia warunków karty: „15:20 ☁ 52% Mała · 12%”. Bez danych kreska, w trakcie pobierania „Sprawdzam…”.
+function metaHTML(p) {
+  const s = summaries.get(keyOf(p));
+  if (!s) return "Sprawdzam…";
+  if (!s.data) return "—";
+  const { hm, night, cloud, score } = s.data;
+  const sc = p.test ?? score;
+  return [
+    `<span>${hm}</span>`,
+    cloud == null ? "" : `<span class="place-cloud">${weatherIcon(night, cloud)}${cloud}%</span>`,
+    `<span>${sc == null ? "Brak danych" : `${chanceLabel(sc)} · ${sc}%`}</span>`,
+  ].join("");
+}
+
+// Pobiera warunki dla miejsc bez świeżych danych, jednym zapytaniem, i odświeża linie kart.
+async function loadSummaries(list) {
+  const now = Date.now(),
+    need = list.filter((p) => !(summaries.get(keyOf(p))?.at > now - SUMMARY_TTL));
+  if (!need.length) return;
+  const seq = ++summarySeq;
+  try {
+    const [grid, space] = await Promise.all([getAuroraGrid(), getSpaceWeather()]);
+    const live = freshData(grid, space, now);
+    const ws = await getWeatherMany(need.map((loc) => ({ loc, ray: rayPoints(loc, lookDirection(loc, live.grid)) })));
+    need.forEach((p, i) => summaries.set(keyOf(p), { at: now, data: placeSummary(p, ws[i], live.grid, live.space, now) }));
+  } catch {
+    need.forEach((p) => summaries.set(keyOf(p), { at: 0, data: null }));
+  }
+  if (seq !== summarySeq || !sheet.isOpen) return;
+  els.places.querySelectorAll("[data-meta]").forEach((m) => {
+    const p = cardPlaces.get(m.dataset.meta);
+    if (p) m.innerHTML = metaHTML(p);
+  });
+}
+
 // Podczas wyszukiwania lista miejsc ustępuje wynikom.
 function showSearch(on) {
   els.places.hidden = on;
@@ -60,35 +109,44 @@ function showSearch(on) {
   if (!on) els.results.innerHTML = "";
 }
 
-const row = ({ key, name, sub, badge = "", del = "" }) =>
-  `<div class="place-row"><button type="button" class="place-main" data-key="${key}"><b>${name}</b><small>${sub}</small></button>${badge}${del}</div>`;
+// Karta miejsca. place: miejsce z warunkami w linii pod podpisem (bez niego karta bez tej linii, np. „Moja lokalizacja”).
+const cardPlaces = new Map();
+function card({ key, name, sub, place = null, badge = "", del = "" }) {
+  if (place) cardPlaces.set(key, place);
+  const meta = place ? `<span class="place-meta" data-meta="${key}">${metaHTML(place)}</span>` : "";
+  return `<div class="place-card card"><button type="button" class="place-main" data-key="${key}"><span class="place-name">${name}</span><span class="place-sub">${sub}</span>${meta}</button>${badge}${del}</div>`;
+}
 
 export function renderPlaces() {
   const current = getCurrent();
   const others = saved.filter((p) => !same(p, current));
-  const rows = [];
+  const cards = [];
+  cardPlaces.clear();
   if (current)
-    rows.push(
-      row({
+    cards.push(
+      card({
         key: "current",
         name: esc(current.name),
-        sub: esc(current.country || fmtCoords(current.lat, current.lon)),
+        sub: current.isGeo ? "Moja lokalizacja" : esc(current.country || fmtCoords(current.lat, current.lon)),
+        place: current,
         badge: '<span class="place-badge">Teraz</span>',
       }),
     );
-  if (!current?.isGeo) rows.push(row({ key: "geo", name: `${icon("navArrow")}Moja lokalizacja`, sub: "Użyj lokalizacji telefonu" }));
-  TEST_PLACES.forEach((p, i) => p !== current && rows.push(row({ key: `test:${i}`, name: p.name, sub: p.country })));
+  if (!current?.isGeo) cards.push(card({ key: "geo", name: `${icon("navArrow")}Moja lokalizacja`, sub: "Użyj lokalizacji telefonu" }));
+  TEST_PLACES.forEach((p, i) => p !== current && cards.push(card({ key: `test:${i}`, name: p.name, sub: p.country, place: p })));
   others.forEach((p) =>
-    rows.push(
-      row({
+    cards.push(
+      card({
         key: `saved:${saved.indexOf(p)}`,
         name: esc(p.name),
         sub: esc(p.country || fmtCoords(p.lat, p.lon)),
+        place: p,
         del: `<button type="button" class="delete-place" data-delete="${saved.indexOf(p)}" aria-label="Usuń ${esc(p.name)}">${icon("x")}</button>`,
       }),
     ),
   );
-  els.places.innerHTML = `<div class="place-list">${rows.join("")}</div>${others.length ? "" : '<p class="search-hint">Wyszukaj miejsce powyżej, żeby dodać je do listy.</p>'}`;
+  els.places.innerHTML = `<div class="place-cards">${cards.join("")}</div>${others.length ? "" : '<p class="search-hint">Wyszukaj miejsce powyżej, żeby dodać je do listy.</p>'}`;
+  if (sheet.isOpen) loadSummaries([...cardPlaces.values()]);
   els.places.querySelectorAll("[data-key]").forEach(
     (b) =>
       (b.onclick = () => {

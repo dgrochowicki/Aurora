@@ -102,6 +102,12 @@ const timeOf = (w) => {
   return (t) => (typeof t === "number" ? t * 1000 : localMs(t) - offset);
 };
 
+// Skrót warunków dla karty miejsca: godzina miejscowa, pora (noc), zachmurzenie nad głową i szansa teraz.
+export function placeSummary(loc, w, grid, space, now = Date.now()) {
+  const fc = buildForecast(loc, w, grid, space, now);
+  return { hm: hmIn(now, fc.tz), night: fc.first.night, cloud: fc.first.cloud, score: fc.first.score };
+}
+
 // Zachmurzenie w procentach: całkowite z prognozy, a gdy go brak, wyliczone z warstw. null, gdy brak obu.
 function cloudAt(h, i, clear) {
   const total = num(h.cloud_cover?.[i]);

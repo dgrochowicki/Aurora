@@ -24,6 +24,8 @@
   --track: rgba(255, 255, 255, 0.1);
   --fab: rgba(0, 0, 0, 0.7);
   /* Tło panelu: biały 4% na --bg, jak pigułki godzin. */
+  /* Neutralny szary tekst drugorzędny na kartach miejsc (makieta autora 18.10.2026): biały 60%. */
+  --muted: rgba(255, 255, 255, 0.6);
   --sheet: #1e2226;
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
