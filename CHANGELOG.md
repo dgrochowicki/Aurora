@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — chmury w kierunku zorzy i uśrednianie wzdłuż łuku
+
+- Wynik liczy chmury na linii wzroku w stronę zorzy: trzy dodatkowe punkty pogody tam, gdzie linia wzroku mija wysokość niskich, średnich i wysokich chmur (np. 13, 39 i 78 km na północny zachód od Szczecina), pobierane w tym samym zapytaniu do Open-Meteo. Pod zorzą i bez kierunku zostaje niebo nad głową. Kafelek i pigułki dalej pokazują chmury nad głową; zdanie o warunkach podaje oba, gdy się różnią, a panel „Skąd ten wynik” pokazuje chmury na linii wzroku z odległościami. `rayPoints()`, `elevationDeg()`, `destination()`, `clearAlong()` w `js/model/aurora.js`, `getWeather(loc, ray)` w `js/data/places.js`.
+- Aktywność OVATION to średnia z 5 sąsiednich komórek wzdłuż równoleżnika (`arcAveraged()`), więc pojedynczy skok modelu nie zawyża wyniku; szeroki łuk bez zmian.
+- Obie zmiany modelu na decyzję autora („Robimy”), z testami.
+
 ## 18.10.2026 — kierunek patrzenia i testy na prawdziwych danych
 
 - Zamiast stałego „Patrz na północ” kierunek z modelu OVATION: azymut do najsilniejszej widocznej zorzy w 8 stronach świata (np. „Skieruj go na północny zachód”), „Patrz w górę”, gdy zorza jest prawie nad głową, a bez OVATION w stronę bieguna geomagnetycznego. Ten sam kierunek w radzie o horyzoncie w panelu zachmurzenia. `auroraBest()`, `bearing()`, `lookDirection()` w `js/model/aurora.js`, `directionLabel()` i `directionPlace()` w `js/labels.js`, z testami.

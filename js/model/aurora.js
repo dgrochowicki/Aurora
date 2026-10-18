@@ -53,15 +53,37 @@ export function ovationField(grid, { smooth = 0 } = {}) {
 // Najwyższa widoczna aktywność z modelu OVATION w promieniu 1000 km. null, gdy modelu brak.
 export const auroraAt = (lat, lon, grid) => auroraBest(lat, lon, grid)?.v ?? null;
 
+// Wartości OVATION uśrednione wzdłuż długości geograficznej: każda komórka to średnia z ARC_CELLS sąsiadów na tym samym równoleżniku.
+// Łuk zorzy biegnie ze wschodu na zachód, więc szeroki łuk zostaje bez zmian, a pojedyncza mocna komórka (szum modelu) spada do 1/ARC_CELLS.
+// Decyzja autora z 18.10.2026: zamiast jednej najmocniejszej komórki. Wynik w pamięci podręcznej per siatka.
+export const ARC_CELLS = 5;
+const arcCache = new WeakMap();
+export function arcAveraged(grid) {
+  if (arcCache.has(grid)) return arcCache.get(grid);
+  const W = 360,
+    v = new Map();
+  for (const p of grid.coords) v.set(Math.round(p[1]) * W + (((Math.round(p[0]) % W) + W) % W), Number(p[2]) || 0);
+  const half = (ARC_CELLS - 1) / 2,
+    out = grid.coords.map((p) => {
+      const lat = Math.round(p[1]),
+        lon = (((Math.round(p[0]) % W) + W) % W);
+      let sum = 0;
+      for (let d = -half; d <= half; d++) sum += v.get(lat * W + ((lon + d + W) % W)) || 0;
+      return [p[0], p[1], sum / ARC_CELLS];
+    });
+  arcCache.set(grid, out);
+  return out;
+}
+
 // To samo co auroraAt, razem z położeniem komórki siatki, która daje tę aktywność (do kierunku patrzenia).
-// { v, lat, lon } albo null, gdy modelu brak. Przy zerowej aktywności lat i lon są null.
+// { v, lat, lon } albo null, gdy modelu brak. Przy zerowej aktywności lat i lon są null. Wartości z arcAveraged().
 export function auroraBest(lat, lon, grid) {
   if (!grid.coords.length) return null;
   const targetLon = lon < 0 ? lon + 360 : lon,
     cosLat = Math.cos(lat * RAD);
   let best = { v: 0, lat: null, lon: null };
-  for (const p of grid.coords) {
-    const v = Number(p[2]) || 0;
+  for (const p of arcAveraged(grid)) {
+    const v = p[2];
     if (v <= best.v) continue;
     const dLat = (p[1] - lat) * 111.2;
     if (Math.abs(dLat) > HORIZON_KM) continue;
@@ -146,4 +168,55 @@ export function clearSky(h, i) {
   const byLayers = (1 - L / 100) * (1 - (0.85 * M) / 100) * (1 - (0.4 * H) / 100);
   // Warstwy często się pokrywają, więc zasłonięte niebo nie może przekroczyć całkowitego zachmurzenia.
   return byTotal == null ? byLayers : Math.max(byLayers, byTotal);
+}
+
+// --- Chmury w kierunku zorzy (decyzja autora z 18.10.2026) ---
+// Zorzę widać nisko nad horyzontem, więc liczy się nie niebo nad głową, ale linia wzroku w jej stronę. Ta linia przecina
+// niskie chmury blisko, średnie dalej, a wysokie najdalej. Dla każdej warstwy bierzemy pogodę z punktu, w którym linia wzroku
+// mija jej wysokość. Pod zorzą (bliżej niż OVERHEAD_KM) zostaje niebo nad głową.
+export const OVERHEAD_KM = 150;
+export const AURORA_KM = 110; // dolny brzeg zorzy, gdzie świeci najjaśniej
+export const LAYER_KM = { low: 1.5, mid: 4.5, high: 9 }; // typowe wysokości warstw chmur w Open-Meteo
+const EARTH_KM = 6371;
+// Odległość zorzy, gdy kierunek jest z modelu Kp i nie znamy odległości: owal zwykle tuż nad horyzontem.
+const KP_AURORA_KM = 800;
+
+// Wysokość kątowa nad horyzontem punktu na wysokości h km, D km dalej po powierzchni Ziemi (z krzywizną). Co najmniej 1°.
+export function elevationDeg(D, h = AURORA_KM) {
+  const th = D / EARTH_KM,
+    e = Math.atan2(Math.cos(th) - EARTH_KM / (EARTH_KM + h), Math.sin(th)) / RAD;
+  return Math.max(1, e);
+}
+
+// Punkt km dalej w kierunku az (stopnie) po wielkim kole.
+export function destination(lat, lon, az, km) {
+  const d = km / EARTH_KM,
+    f1 = lat * RAD,
+    b = az * RAD;
+  const f2 = Math.asin(Math.sin(f1) * Math.cos(d) + Math.cos(f1) * Math.sin(d) * Math.cos(b));
+  const l2 = lon * RAD + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(f1), Math.cos(d) - Math.sin(f1) * Math.sin(f2));
+  return { lat: f2 / RAD, lon: ((((l2 / RAD + 540) % 360) + 360) % 360) - 180 };
+}
+
+// Trzy punkty pogody na linii wzroku: { low, mid, high } z { lat, lon, km }. null, gdy kierunku brak albo zorza jest nad głową.
+// Odległość do warstwy: h / tan(wysokość kątowa zorzy), w granicach 2–150 km.
+export function rayPoints(loc, dir) {
+  if (!dir || (dir.km != null && dir.km < OVERHEAD_KM)) return null;
+  const e = elevationDeg(dir.km ?? KP_AURORA_KM) * RAD;
+  return Object.fromEntries(
+    Object.entries(LAYER_KM).map(([layer, h]) => {
+      const km = clamp(h / Math.tan(e), 2, 150);
+      return [layer, { ...destination(loc.lat, loc.lon, dir.az, km), km: Math.round(km) }];
+    }),
+  );
+}
+
+// Część czystego nieba na linii wzroku: każda warstwa z jej punktu (low, mid, high to wartości 0–100 albo null).
+// Brak warstwy w punkcie: wartość z nieba nad głową (home). Bez żadnej warstwy null.
+export function clearAlong(ray, home) {
+  const L = ray.low ?? home.low,
+    M = ray.mid ?? home.mid,
+    H = ray.high ?? home.high;
+  if (L == null || M == null || H == null) return null;
+  return (1 - L / 100) * (1 - (0.85 * M) / 100) * (1 - (0.4 * H) / 100);
 }
