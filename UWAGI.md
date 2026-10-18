@@ -52,6 +52,13 @@ Nadal otwarte:
 
 ## Pomysły na później (autor, 18.10.2026)
 
+- **Bardziej realistyczna zorza w tle** (rozmowa 18.10.2026). Obecne plamy CSS autorowi wystarczają; zmieniamy tylko, gdy próba wyraźnie wygląda lepiej i kosztuje prawie tyle co dziś. Ustalenia:
+  - React Bits „Aurora” / „Soft Aurora” to shadery WebGL2 (licencja MIT + Commons Clause: wolno użyć w aplikacji, nie wolno sprzedawać samego komponentu). Soft Aurora liczy 3 warstwy szumu na piksel w 60 kl./s, więc stale obciąża GPU i baterię; odrzucone.
+  - Gdyby shader: własny, w 1/6–1/8 rozdzielczości, 20–30 kl./s, z pauzą (karta w tle, otwarty panel, przewinięte), bez animacji przy ograniczonym ruchu, CSS jako zapas; przed decyzją pomiar energii w Web Inspectorze Safari na iPhonie.
+  - Preferowany wariant: autor rysuje 2–3 rozmyte pasma w Figmie (przezroczysty WebP), animujemy je w CSS tylko przez transform i opacity (prawie bez kosztu).
+  - Pasek adresu Safari nie może być przezroczysty; zorza musi gasnąć do koloru tła przy górnej krawędzi, żeby cięcie było niewidoczne.
+  - Już dziś największy koszt tła to `backdrop-filter: blur` kafelków nad ruchomą zorzą; warto zmierzyć przy okazji.
+
 - **Zapisane miejsca na mapie**, jak w pogodzie Apple. W docelowej aplikacji darmowo tylko bieżąca lokalizacja, a dodawanie innych miejsc (i pokazywanie ich na mapie) jako funkcja płatna. Na razie nie planujemy.
 
 ## Do ustalenia z autorem
