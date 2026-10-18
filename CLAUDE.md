@@ -55,6 +55,8 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | `tests/chart.test.js` | Testy podziałki wykresów |
 | `tests/data.test.js` | Testy braków i starych danych, parsera NOAA |
 | `tests/time.test.js` | Testy stref czasu i zmiany czasu |
+| `tests/real.test.js` | Testy na zapisanych prawdziwych odpowiedziach NOAA i Open-Meteo (`tests/fixtures/`) |
+| `tests/fixtures/update.mjs` | Pobiera i przycina świeże próbki: `npm run fixtures` (ręcznie, testy nie używają sieci) |
 
 **Zasady podziału kodu:**
 - `js/model/` nie korzysta z DOM, więc da się go testować w Node. Nowe obliczenia trafiają tutaj, razem z testem.
@@ -92,6 +94,7 @@ Wykresy nie są pobierane jako obrazki. Aplikacja rysuje SVG (`ui/chart.js`) z l
 
 ## Testowanie i podgląd
 
+- Po zmianie parsera albo gdy NOAA/Open-Meteo zmienią format: `npm run fixtures`, potem `npm test` i commit nowych próbek.
 - Przed zmianami uruchomić `npm test`. Testy jednostkowe nie zastępują prób na rzeczywistych danych NOAA/Open-Meteo.
 - Dla testów UI preferować dane deterministyczne, przechwycone żądania (`page.route`) i stałą datę (`page.clock.setFixedTime`), a następnie porównać zrzuty przed i po.
 - Na Macu autora sieć działa, więc testujemy na prawdziwych danych: `npm start` i Playwright z Chromium z `~/Library/Caches/ms-playwright/` (np. `chromium_headless_shell-1243`), widok referencyjny 402 × 874. Zachowań iOS (Safari, `:active`, zaznaczanie tekstu) nie da się tak sprawdzić; potwierdza je autor na telefonie.
