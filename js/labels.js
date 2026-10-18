@@ -55,6 +55,24 @@ export function conditionsText(r) {
   return `Warunki obserwacji są ${quality}, ${cloud}${brightMoon ? ", jasny Księżyc" : ""}.`;
 }
 
+// Kierunek patrzenia z lookDirection(): „na północny zachód” itd. (8 stron świata), a gdy zorza jest prawie nad głową
+// (komórka modelu bliżej niż OVERHEAD_KM), „w górę”. Bez kierunku zwykła strona półkuli.
+export const OVERHEAD_KM = 150;
+const SIDES = ["na północ", "na północny wschód", "na wschód", "na południowy wschód", "na południe", "na południowy zachód", "na zachód", "na północny zachód"];
+export function directionLabel(dir, lat) {
+  if (!dir) return lat >= 0 ? "na północ" : "na południe";
+  if (dir.km != null && dir.km < OVERHEAD_KM) return "w górę";
+  return SIDES[Math.round(dir.az / 45) % 8];
+}
+
+// To samo w miejscowniku, do zdań typu „horyzont na północnym zachodzie”. Pod zorzą null (nie ma jednego horyzontu).
+const PLACES = ["na północy", "na północnym wschodzie", "na wschodzie", "na południowym wschodzie", "na południu", "na południowym zachodzie", "na zachodzie", "na północnym zachodzie"];
+export function directionPlace(dir, lat) {
+  if (!dir) return lat >= 0 ? "na północy" : "na południu";
+  if (dir.km != null && dir.km < OVERHEAD_KM) return null;
+  return PLACES[Math.round(dir.az / 45) % 8];
+}
+
 // Czym da się zobaczyć zorzę przy danej szansie. Poniżej progu aparatu nic nie dopisujemy.
 export const viewLabel = (score) => (score >= 48 ? "widoczna gołym okiem" : score >= 14 ? "widoczna przez aparat" : null);
 

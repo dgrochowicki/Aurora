@@ -51,22 +51,52 @@ export function ovationField(grid, { smooth = 0 } = {}) {
 }
 
 // Najwyższa widoczna aktywność z modelu OVATION w promieniu 1000 km. null, gdy modelu brak.
-export function auroraAt(lat, lon, grid) {
+export const auroraAt = (lat, lon, grid) => auroraBest(lat, lon, grid)?.v ?? null;
+
+// To samo co auroraAt, razem z położeniem komórki siatki, która daje tę aktywność (do kierunku patrzenia).
+// { v, lat, lon } albo null, gdy modelu brak. Przy zerowej aktywności lat i lon są null.
+export function auroraBest(lat, lon, grid) {
   if (!grid.coords.length) return null;
   const targetLon = lon < 0 ? lon + 360 : lon,
     cosLat = Math.cos(lat * RAD);
-  let best = 0;
+  let best = { v: 0, lat: null, lon: null };
   for (const p of grid.coords) {
     const v = Number(p[2]) || 0;
-    if (v <= best) continue;
+    if (v <= best.v) continue;
     const dLat = (p[1] - lat) * 111.2;
     if (Math.abs(dLat) > HORIZON_KM) continue;
     const dLonDeg = Math.min(Math.abs(p[0] - targetLon), 360 - Math.abs(p[0] - targetLon));
     const dLon = dLonDeg * 111.2 * Math.max(cosLat, Math.cos(p[1] * RAD));
     const w = visWeight(Math.hypot(dLat, dLon));
-    if (v * w > best) best = v * w;
+    if (v * w > best.v) best = { v: v * w, lat: p[1], lon: p[0] > 180 ? p[0] - 360 : p[0] };
   }
   return best;
+}
+
+// Kierunek (azymut 0–360°, 0 = północ) i odległość po powierzchni Ziemi z punktu 1 do punktu 2.
+export function bearing(lat1, lon1, lat2, lon2) {
+  const f1 = lat1 * RAD,
+    f2 = lat2 * RAD,
+    dl = (lon2 - lon1) * RAD;
+  const y = Math.sin(dl) * Math.cos(f2),
+    x = Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl);
+  const az = ((Math.atan2(y, x) / RAD) % 360 + 360) % 360;
+  const km = 6371 * Math.acos(Math.min(1, Math.sin(f1) * Math.sin(f2) + Math.cos(f1) * Math.cos(f2) * Math.cos(dl)));
+  return { az, km };
+}
+
+// Bieguny geomagnetyczne z tego samego dipola co magLat() w sky.js.
+const MAG_POLE_N = { lat: 80.8, lon: -72.6 },
+  MAG_POLE_S = { lat: -80.8, lon: 107.4 };
+
+// Gdzie patrzeć: na najsilniejszą widoczną zorzę z modelu OVATION, a bez niego (model Kp) w stronę bieguna geomagnetycznego,
+// bo owal leży wokół niego. { az, km } z bearing(); km = null przy modelu Kp. null, gdy nie ma żadnej aktywności do pokazania.
+export function lookDirection(loc, grid) {
+  const best = auroraBest(loc.lat, loc.lon, grid);
+  if (best?.lat != null) return bearing(loc.lat, loc.lon, best.lat, best.lon);
+  if (best) return null;
+  const pole = loc.lat >= 0 ? MAG_POLE_N : MAG_POLE_S;
+  return { az: bearing(loc.lat, loc.lon, pole.lat, pole.lon).az, km: null };
 }
 
 // Aktywność z Kp w skali modelu OVATION. Owal zorzy przesuwa się o około 2° na każdy punkt Kp i rośnie razem z Kp.

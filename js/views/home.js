@@ -4,7 +4,8 @@ import { phaseAt, moonLitRight } from "../model/sky.js";
 import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
-import { ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { lookDirection } from "../model/aurora.js";
+import { directionLabel, ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -138,7 +139,8 @@ export function renderForecast(loc, w, grid, space) {
   const keepT = state?.loc === loc ? state.rows[state.sel]?.t : null,
     change = cloudChange(rows),
     night = nightTimeline(loc, now, tz);
-  state = { loc, grid, space, stale: live.stale, source: fc.source, rows, clouds, first, act: first.act, tz, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
+  const dir = lookDirection(loc, live.grid);
+  state = { loc, grid, space, stale: live.stale, source: fc.source, dir, rows, clouds, first, act: first.act, tz, change, night, sel: Math.max(0, rows.findIndex((r) => r.t === keepT)) };
 
   showScore(first.score);
   els.activityLevel.textContent = fc.activity ? activityLabel(first.act) : "";
@@ -176,7 +178,7 @@ export function renderForecast(loc, w, grid, space) {
   if (!fc.activity) els.summary.textContent = `${noActivityText(live.stale, now)} ${conditionsText(first)}`;
   else if (first.score == null)
     els.summary.textContent = `Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy. Aktywność zorzy jest ${activityLabel(first.act).toLowerCase()}.`;
-  else renderVerdict(first, best, maxAct, loc.lat >= 0 ? "na północ" : "na południe");
+  else renderVerdict(first, best, maxAct, directionLabel(dir, loc.lat));
 }
 
 // Wynik i jego opis słowny. null to kreska i „Brak danych”, bez zorzy w tle.
@@ -257,7 +259,7 @@ function renderConfidence(space, grid) {
 }
 
 // Akapit pod wynikiem: co z zorzą (z kierunkiem patrzenia, gdy jest szansa) i jakie są warunki obserwacji teraz.
-// „where” to kierunek: na północ albo na południe.
+// „where” to kierunek z directionLabel(): np. „na północny zachód” albo „w górę”.
 function renderVerdict(first, best, activity, where) {
   let reason;
   if (activity < 8 && best.score < 10) reason = "Aktywność zorzy jest zbyt niska dla Twojej lokalizacji.";

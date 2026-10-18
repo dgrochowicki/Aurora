@@ -203,3 +203,42 @@ test("wygładzone pole OVATION zachowuje poziom i rozmywa pojedynczy szczyt", as
   assert.equal(f(65, 10), 40);
   assert.equal(f(65, 11), 40);
 });
+
+test("kierunek patrzenia: na najsilniejszą widoczną zorzę, w górę pod nią, a bez modelu w stronę bieguna geomagnetycznego", async () => {
+  const { lookDirection, bearing } = await import("../js/model/aurora.js");
+  const { directionLabel } = await import("../js/labels.js");
+  // Zorza nad południową Norwegią (58°N, 8°E, ok. 650 km) widziana ze Szczecina: północny zachód.
+  const nw = lookDirection(SZCZECIN, { coords: [[8, 58, 40]] });
+  assert.ok(nw.az > 300 && nw.az < 340, `azymut ${nw.az}`);
+  assert.equal(directionLabel(nw, SZCZECIN.lat), "na północny zachód");
+  // Zorza nad Gotlandią i Łotwą (58°N, 22°E, ok. 700 km): północny wschód.
+  assert.equal(directionLabel(lookDirection(SZCZECIN, { coords: [[22, 58, 40]] }), SZCZECIN.lat), "na północny wschód");
+  // Słabsza, ale bliższa zorza na północy wygrywa z mocniejszą, dalszą na północnym zachodzie (osłabienie z odległością).
+  assert.equal(directionLabel(lookDirection(SZCZECIN, { coords: [[14, 56, 40], [8, 58, 60]] }), SZCZECIN.lat), "na północ");
+  // Zorza dalej niż 1000 km jest za horyzontem: nie ma kierunku.
+  assert.equal(lookDirection(SZCZECIN, { coords: [[5, 62, 40]] }), null);
+  // Długość geograficzna zapisana w siatce jako 0–360.
+  assert.equal(directionLabel(lookDirection({ lat: 64, lon: -21 }, { coords: [[339, 66, 50]] }), 64), "na północ");
+  // Pod zorzą: w górę.
+  assert.equal(directionLabel(lookDirection({ lat: 68.35, lon: 18.83 }, { coords: [[19, 68, 60]] }), 68.35), "w górę");
+  // Bez modelu OVATION: w stronę bieguna geomagnetycznego (z Polski lekko na zachód od północy).
+  const kp = lookDirection(SZCZECIN, { coords: [] });
+  assert.equal(kp.km, null);
+  assert.ok(kp.az > 320 || kp.az < 10, `azymut ${kp.az}`);
+  assert.equal(directionLabel(lookDirection({ lat: -45, lon: 170 }, { coords: [] }), -45), "na południe");
+  // Model jest, ale nic nie świeci: zwykła strona półkuli.
+  assert.equal(lookDirection(SZCZECIN, { coords: [[14, 62, 0]] }), null);
+  assert.equal(directionLabel(null, SZCZECIN.lat), "na północ");
+  assert.equal(directionLabel(null, -40), "na południe");
+  // bearing: na wschód po równiku, 1° to ok. 111 km.
+  const e = bearing(0, 0, 0, 1);
+  assert.ok(Math.abs(e.az - 90) < 1e-6 && Math.abs(e.km - 111.2) < 0.5);
+});
+
+test("kierunek w miejscowniku do rady o horyzoncie", async () => {
+  const { directionPlace } = await import("../js/labels.js");
+  assert.equal(directionPlace({ az: 315, km: 600 }, 53), "na północnym zachodzie");
+  assert.equal(directionPlace({ az: 2, km: null }, 53), "na północy");
+  assert.equal(directionPlace({ az: 10, km: 50 }, 68), null);
+  assert.equal(directionPlace(null, -40), "na południu");
+});

@@ -3,7 +3,7 @@
 // Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { ageLabel, activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -22,6 +22,11 @@ const rtswSource = (probe, backup) =>
 const ACTIVITY_SOURCE = {
   ovation: "NOAA SWPC · aktywność z modelu OVATION",
   kp: "NOAA SWPC · aktywność z indeksu Kp (brak aktualnego modelu OVATION)",
+};
+// Rada o horyzoncie w kierunku zorzy (z lookDirection w stronie głównej); pod zorzą rada o całym niebie.
+const horizonTip = (st) => {
+  const place = directionPlace(st.dir, st.loc.lat);
+  return place ? `Sprawdź też, czy horyzont ${place} jest odsłonięty.` : "Zorza jest prawie nad Tobą, więc liczy się całe niebo.";
 };
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
 // Stan pod liczbą jak w kafelku: znaczenie dla zorzy, a przy za starym pomiarze jego wiek.
@@ -200,7 +205,7 @@ export const DETAILS = {
         ) +
         infoText(
           ...(change ? [change.sentence] : []),
-          `Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. Sprawdź też, czy północny horyzont jest odsłonięty.`,
+          `Niskie chmury zasłaniają niebo całkowicie, średnie prawie całkowicie, a wysokie i cienkie tylko częściowo. ${horizonTip(st)}`,
         ),
     };
   },
