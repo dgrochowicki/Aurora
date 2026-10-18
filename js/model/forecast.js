@@ -1,7 +1,7 @@
 // Prognoza godzinowa i oś nocy dla miejsca. Łączy aktywność, ciemność i chmury w szansę, bez dotykania DOM.
 import { clamp, num, localMs, hmIn, offsetAt, validTz } from "../util.js";
 import { skyAt, darknessOf, magLat, DAY_MS } from "./sky.js";
-import { auroraAt, kpVisible, activityAt, clearSky } from "./aurora.js";
+import { auroraAt, kpVisible, activityAt, clearSky, clearAlong } from "./aurora.js";
 
 // Wynik to widoczna aktywność × ciemność × część czystego nieba, dla 12 pigułek: „Teraz” i 11 kolejnych pełnych godzin.
 // „Teraz” jak w pogodzie Apple: bieżące warunki (Open-Meteo „current”, co 15 minut) i położenie Słońca w tej chwili,
@@ -18,20 +18,38 @@ export function buildForecast(loc, w, grid, space, now = Date.now()) {
   const mlat = magLat(loc.lat, loc.lon);
   const ovation = nowActivity(loc, grid, space);
   // Jeden wiersz z danych w układzie Open-Meteo: h to obiekt z tablicami (hourly albo bieżące w tablicach jednoelementowych).
+  // Chmury na linii wzroku w stronę zorzy (w.ray z getWeather, punkty z rayPoints). Dla chwili t: warstwa z jej punktu.
+  const rayAt = (t) => {
+    if (!w.ray) return null;
+    const val = (layer) => {
+      const p = w.ray[layer];
+      if (!p) return null;
+      const key = `cloud_cover_${layer}`;
+      if (p.current && toMs(p.current.time) === t) return num(p.current[key]);
+      const j = p.hourly?.time?.findIndex((x) => toMs(x) === t);
+      return j >= 0 ? num(p.hourly[key][j]) : null;
+    };
+    return { low: val("low"), mid: val("mid"), high: val("high"), km: { low: w.ray.low?.km, mid: w.ray.mid?.km, high: w.ray.high?.km } };
+  };
   const makeRow = (h, i, t, ms, label) => {
     const layer = (k) => {
       const v = num(h[k]?.[i]);
       return v == null ? null : Math.round(v);
     };
+    const home = { low: layer("cloud_cover_low"), mid: layer("cloud_cover_mid"), high: layer("cloud_cover_high") };
+    const ray = rayAt(t);
     const sky = skyAt(ms, loc.lat, loc.lon),
       dark = darknessOf(sky),
       night = sky.sunAlt < -6;
     const act = ovation == null ? null : activityAt(ovation, mlat, space, ms, Math.max(0, (ms - now) / 3600000));
-    const clear = clearSky(h, i),
+    // Do wyniku: niebo na linii wzroku, gdy mamy jej punkty, a bez nich niebo nad głową. cloud to zawsze zachmurzenie nad głową (kafelek, pigułki).
+    const clearHome = clearSky(h, i),
+      clearRay = ray ? clearAlong(ray, home) : null,
+      clear = clearRay ?? clearHome,
       cover = clear == null ? null : Math.round((1 - clear) * 100),
-      cloud = cloudAt(h, i, clear);
+      cloud = cloudAt(h, i, clearHome);
     const score = act == null || clear == null ? null : Math.round(clamp(act * dark * clear, 0, 99));
-    return { t, ms, label, hm: hmIn(ms, tz), cloud, cover, clear, low: layer("cloud_cover_low"), mid: layer("cloud_cover_mid"), high: layer("cloud_cover_high"), dark, night, sky, act, score };
+    return { t, ms, label, hm: hmIn(ms, tz), cloud, cover, clear, clearHome, ray: clearRay == null ? null : ray, ...home, dark, night, sky, act, score };
   };
   const rows = [];
   const cur = currentClouds(w);

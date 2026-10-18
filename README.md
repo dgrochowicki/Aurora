@@ -10,7 +10,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 
 - Zobaczyć heurystyczny wynik 0–99%, obliczany dla bieżącej i kolejnych godzin prognozy, z rozbiciem na aktywność, ciemność i zachmurzenie.
 - Przejrzeć najbliższe 12 godzin, wybrać godzinę i sprawdzić zachmurzenie, porę dnia oraz wpływ Księżyca.
-- Dowiedzieć się, w którą stronę patrzeć: kierunek do najsilniejszej widocznej zorzy z modelu NOAA (np. „na północny zachód”, „w górę”).
+- Dowiedzieć się, w którą stronę patrzeć: kierunek do najsilniejszej widocznej zorzy z modelu NOAA (np. „na północny zachód”, „w górę”). Wynik uwzględnia chmury na linii wzroku w tę stronę, a nie tylko nad głową.
 - Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy.
 - Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
 - Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce.

@@ -23,6 +23,15 @@ const ACTIVITY_SOURCE = {
   ovation: "NOAA SWPC · aktywność z modelu OVATION",
   kp: "NOAA SWPC · aktywność z indeksu Kp (brak aktualnego modelu OVATION)",
 };
+// Podpis paska „Czyste niebo”: przy linii wzroku skąd są chmury (warstwa, procent, odległość), inaczej ogólna zasada wag.
+const pctOr = (v) => (v == null ? "—" : `${Math.round(v)}%`);
+function rayHint(r, st) {
+  if (!r.ray) return "Chmury nad Tobą. Niskie ważą najwięcej, wysokie najmniej.";
+  const where = directionPlace(st.dir, st.loc.lat) || "w stronę zorzy";
+  const { low, mid, high, km } = r.ray;
+  return `Chmury na linii wzroku ${where}: niskie ${pctOr(low)} (${km.low} km), średnie ${pctOr(mid)} (${km.mid} km), wysokie ${pctOr(high)} (${km.high} km).`;
+}
+
 // Rada o horyzoncie w kierunku zorzy (z lookDirection w stronie głównej); pod zorzą rada o całym niebie.
 const horizonTip = (st) => {
   const place = directionPlace(st.dir, st.loc.lat);
@@ -47,7 +56,7 @@ export const DETAILS = {
           "Czyste niebo",
           first.clear ?? 0,
           first.clear == null ? "Brak danych" : `${Math.round(first.clear * 100)}%`,
-          "Niskie chmury ważą najwięcej, wysokie najmniej.",
+          rayHint(first, st),
         )
       : "";
     // Dlaczego nie ma liczby: brak pogody, brak aktualnych danych o zorzy albo brak prognozy chmur.

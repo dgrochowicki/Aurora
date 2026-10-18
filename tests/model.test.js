@@ -5,7 +5,7 @@ import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
 import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
-import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel } from "../js/labels.js";
+import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText } from "../js/labels.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
 const hour = (h) => ({ cloud_cover: [h.total], cloud_cover_low: [h.low], cloud_cover_mid: [h.mid], cloud_cover_high: [h.high] });
@@ -259,4 +259,56 @@ test("uśrednianie wzdłuż łuku: pojedyncza mocna komórka spada do 1/5, szero
   // Wynik dla miejsca: łuk nad głową daje pełną wartość, pojedynczy szczyt nad głową tylko 1/5.
   assert.equal(auroraAt(60, 14, arc), 50);
   assert.equal(auroraAt(60, 14, spike), 20);
+});
+
+test("linia wzroku: wysokość kątowa zorzy maleje z odległością, warstwy chmur coraz dalej", async () => {
+  const { elevationDeg, rayPoints, destination, bearing, OVERHEAD_KM } = await import("../js/model/aurora.js");
+  // 110 km w górę, 300 km dalej: ok. 18°; 900 km dalej: blisko horyzontu, ale co najmniej 1°.
+  assert.ok(Math.abs(elevationDeg(300) - 18.8) < 1, `${elevationDeg(300)}`);
+  assert.ok(elevationDeg(900) < elevationDeg(500) && elevationDeg(900) >= 1);
+  assert.equal(elevationDeg(2000), 1);
+  // destination odwraca bearing.
+  const p = destination(SZCZECIN.lat, SZCZECIN.lon, 315, 100);
+  const b = bearing(SZCZECIN.lat, SZCZECIN.lon, p.lat, p.lon);
+  assert.ok(Math.abs(b.az - 315) < 0.5 && Math.abs(b.km - 100) < 0.5);
+  // Zorza 600 km na północny zachód: niskie chmury najbliżej, wysokie najdalej, wszystkie na północny zachód.
+  const ray = rayPoints(SZCZECIN, { az: 315, km: 600 });
+  assert.ok(ray.low.km < ray.mid.km && ray.mid.km < ray.high.km && ray.high.km <= 150);
+  for (const q of Object.values(ray)) assert.ok(Math.abs(bearing(SZCZECIN.lat, SZCZECIN.lon, q.lat, q.lon).az - 315) < 1);
+  // Pod zorzą i bez kierunku: niebo nad głową.
+  assert.equal(rayPoints(SZCZECIN, { az: 0, km: OVERHEAD_KM - 1 }), null);
+  assert.equal(rayPoints(SZCZECIN, null), null);
+  // Kierunek z modelu Kp (bez odległości): zorza przyjęta tuż nad horyzontem, punkty i tak są.
+  assert.ok(rayPoints(SZCZECIN, { az: 340, km: null }).high.km > 0);
+});
+
+test("chmury na linii wzroku: czysto nad głową, ale pochmurno w stronę zorzy daje niski wynik", () => {
+  const now = Date.parse("2026-10-04T20:30:00Z");
+  const t0 = Date.parse("2026-10-04T20:00:00Z") / 1000;
+  const time = Array.from({ length: 24 }, (_, h) => t0 + h * 3600);
+  const hourly = (c) => ({ time, cloud_cover: time.map(() => c), cloud_cover_low: time.map(() => c), cloud_cover_mid: time.map(() => 0), cloud_cover_high: time.map(() => 0) });
+  const home = { timezone: "Europe/Warsaw", utc_offset_seconds: 7200, hourly: hourly(0) };
+  const grid = { coords: Array.from({ length: 11 }, (_, i) => [3 + i, 58, 60]), time: null };
+  const space = { kp: 5, kpForecast: [], bzAvg: null };
+  const clearAll = buildForecast(SZCZECIN, home, grid, space, now);
+  const ray = (c) => ({ low: { hourly: hourly(c), km: 10 }, mid: { hourly: hourly(0), km: 30 }, high: { hourly: hourly(0), km: 60 } });
+  const cloudyRay = buildForecast(SZCZECIN, { ...home, ray: ray(100) }, grid, space, now);
+  const clearRay = buildForecast(SZCZECIN, { ...home, ray: ray(0) }, grid, space, now);
+  assert.ok(clearAll.rows[1].score > 0);
+  assert.equal(cloudyRay.rows[1].score, 0, "niskie chmury na linii wzroku zasłaniają zorzę");
+  assert.equal(clearRay.rows[1].score, clearAll.rows[1].score);
+  // Kafelek i pigułki pokazują dalej chmury nad głową, a wynik i „cover” liczą linię wzroku.
+  assert.equal(cloudyRay.rows[1].cloud, 0);
+  assert.equal(cloudyRay.rows[1].cover, 100);
+  assert.equal(cloudyRay.rows[1].ray.low, 100);
+  // Brak danych w punkcie linii wzroku: ta warstwa z nieba nad głową.
+  const gap = { low: { hourly: { time, cloud_cover_low: time.map(() => null) }, km: 10 }, mid: { hourly: hourly(0), km: 30 }, high: { hourly: hourly(0), km: 60 } };
+  assert.equal(buildForecast(SZCZECIN, { ...home, ray: gap }, grid, space, now).rows[1].score, clearAll.rows[1].score);
+});
+
+test("zdanie o warunkach mówi o chmurach w stronę zorzy, gdy wyraźnie różnią się od nieba nad głową", () => {
+  const night = { night: true, sky: { moonAlt: -5, moonIllum: 0 } };
+  assert.equal(conditionsText({ ...night, cloud: 5, cover: 80, ray: {} }), "Warunki obserwacji są słabe, nad Tobą 5% chmur, w stronę zorzy 80%.");
+  assert.equal(conditionsText({ ...night, cloud: 5, cover: 10, ray: {} }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
+  assert.equal(conditionsText({ ...night, cloud: 5, cover: 80 }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
 });

@@ -33,8 +33,6 @@ Nadal otwarte:
 ## P1 — geometria i warunki dla lokalizacji
 
 - [ ] Rozważyć faktyczną wysokość zorzy nad horyzontem zamiast samego zaniku z odległością do 1000 km.
-- [ ] Zbadać wpływ pojedynczego maksimum OVATION na wynik i porównać bardziej odporną agregację przestrzenną.
-- [ ] Uwzględnić zachmurzenie w kierunku obserwacji, a nie jedynie w punkcie miejscowości.
 - [ ] **Kp potrzebne dla miejsca:** wyliczyć orientacyjny próg aktywności dla lokalizacji, z podaniem niepewności.
 - [ ] Rozważyć lokalne zanieczyszczenie światłem i przesłonięcie horyzontu.
 

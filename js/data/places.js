@@ -8,10 +8,20 @@ export const TEST_PLACES = (TEST_ON ? [67, 99] : []).map((test) => ({ name: `Tes
 export const FALLBACK = { name: "Szczecin", country: "Polska", lat: 53.4285, lon: 14.5528, isDefault: true };
 const KEY = "aurora-places";
 
-export const getWeather = (loc) =>
-  fetchJSON(
-    `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&hourly=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high&current=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high&forecast_days=3&timezone=auto&timeformat=unixtime`,
+// Pogoda dla miejsca, a z ray (punkty z rayPoints w model/aurora.js) w tym samym zapytaniu także dla punktów na linii wzroku
+// w stronę zorzy. Open-Meteo zwraca wtedy tablicę: pierwsze miejsce, potem punkty. Wynik: pogoda miejsca z polem ray
+// { low, mid, high }, każde z pogodą swojego punktu oraz { lat, lon, km }.
+const CLOUDS = "cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high";
+export async function getWeather(loc, ray = null) {
+  const pts = [loc, ...(ray ? Object.values(ray) : [])];
+  const list = (k) => pts.map((p) => p[k].toFixed(4)).join(",");
+  const d = await fetchJSON(
+    `https://api.open-meteo.com/v1/forecast?latitude=${list("lat")}&longitude=${list("lon")}&hourly=${CLOUDS}&current=${CLOUDS}&forecast_days=3&timezone=auto&timeformat=unixtime`,
   );
+  if (!Array.isArray(d)) return d;
+  const [home, ...rest] = d;
+  return { ...home, ray: Object.fromEntries(Object.entries(ray).map(([layer, p], k) => [layer, { ...rest[k], ...p }])) };
+}
 
 export async function searchPlaces(q) {
   const d = await fetchJSON(

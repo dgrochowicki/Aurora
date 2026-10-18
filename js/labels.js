@@ -1,3 +1,5 @@
+import { OVERHEAD_KM } from "./model/aurora.js";
+
 // Słowne opisy wartości. Progi są w jednym miejscu, żeby kafelki i panele mówiły to samo.
 
 export const activityLabel = (a) => (a == null ? "Brak danych" : a < 10 ? "Niska" : a < 35 ? "Umiarkowana" : "Wysoka");
@@ -46,18 +48,20 @@ export const chanceLabel = (score) => CHANCE[chanceIndex(score)];
 export const chanceLevel = (score) => Math.max(0, chanceIndex(score) - 1);
 
 // Zdanie o warunkach obserwacji w danej godzinie: jasność nieba, chmury i jasny Księżyc wysoko.
+// Gdy niebo w stronę zorzy (r.cover, z linii wzroku) wyraźnie różni się od nieba nad głową (r.cloud), zdanie mówi o obu.
 export function conditionsText(r) {
   if (r.cloud == null) return r.night ? "Brak prognozy zachmurzenia, więc nie ocenimy warunków obserwacji." : "Teraz jest za jasno na obserwację, brak prognozy zachmurzenia.";
-  const cloud = `zachmurzenie ${Math.round(r.cloud)}%`;
+  const toward = r.ray && r.cover != null && Math.abs(r.cover - r.cloud) >= 15;
+  const cloud = toward ? `nad Tobą ${Math.round(r.cloud)}% chmur, w stronę zorzy ${r.cover}%` : `zachmurzenie ${Math.round(r.cloud)}%`;
+  const sky = toward ? r.cover : r.cloud;
   if (!r.night) return `Teraz jest za jasno na obserwację, ${cloud}.`;
   const brightMoon = r.sky.moonAlt > 15 && r.sky.moonIllum > 0.5;
-  const quality = r.cloud >= 70 ? "słabe" : r.cloud >= 30 || brightMoon ? "umiarkowane" : "dobre";
+  const quality = sky >= 70 ? "słabe" : sky >= 30 || brightMoon ? "umiarkowane" : "dobre";
   return `Warunki obserwacji są ${quality}, ${cloud}${brightMoon ? ", jasny Księżyc" : ""}.`;
 }
 
 // Kierunek patrzenia z lookDirection(): „na północny zachód” itd. (8 stron świata), a gdy zorza jest prawie nad głową
 // (komórka modelu bliżej niż OVERHEAD_KM), „w górę”. Bez kierunku zwykła strona półkuli.
-export const OVERHEAD_KM = 150;
 const SIDES = ["na północ", "na północny wschód", "na wschód", "na południowy wschód", "na południe", "na południowy zachód", "na zachód", "na północny zachód"];
 export function directionLabel(dir, lat) {
   if (!dir) return lat >= 0 ? "na północ" : "na południe";

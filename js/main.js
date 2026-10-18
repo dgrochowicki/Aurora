@@ -2,6 +2,8 @@
 import { $ } from "./util.js";
 import { getAuroraGrid, getSpaceWeather, noaaStale } from "./data/noaa.js";
 import { FALLBACK, getWeather, reverseGeocode } from "./data/places.js";
+import { freshData } from "./model/fresh.js";
+import { lookDirection, rayPoints } from "./model/aurora.js";
 import { initHome, renderForecast, renderSpaceOnly, clearHome, showLoading } from "./views/home.js";
 import { initMap, openMap, refreshMap } from "./views/map.js";
 import { initPlaces, openPlaces, renderPlaces } from "./views/places.js";
@@ -31,7 +33,9 @@ async function loadLocation(loc, { quiet = false } = {}) {
   // Błąd pobierania pogody to brak danych. Błąd w rysowaniu to błąd w kodzie i ma trafić do konsoli, a nie udawać brak połączenia.
   let weather = null;
   try {
-    weather = await getWeather(loc);
+    // Kierunek zorzy z aktualnych danych NOAA, żeby w tym samym zapytaniu pobrać chmury na linii wzroku.
+    const dir = lookDirection(loc, freshData(grid, space, Date.now()).grid);
+    weather = await getWeather(loc, rayPoints(loc, dir));
   } catch {}
   if (seq !== loadSeq) return;
   if (!weather) {

@@ -49,14 +49,14 @@ Za stara wartość (albo wartość bez znanego czasu) jest dla modelu brakiem: s
 
 ## 3. Aktywność z modelu OVATION
 
-`auroraAt(lat, lon, grid)` w `js/model/aurora.js` szuka **maksymalnego** iloczynu intensywności komórki i wagi odległości od miejsca obserwacji.
+`auroraAt(lat, lon, grid)` w `js/model/aurora.js` szuka **maksymalnego** iloczynu intensywności komórki i wagi odległości od miejsca obserwacji. **Od 18.10.2026 intensywność komórki to średnia z 5 sąsiednich komórek na tym samym równoleżniku** (`arcAveraged()`, `ARC_CELLS = 5`, decyzja autora): łuk zorzy biegnie ze wschodu na zachód, więc szeroki łuk zostaje bez zmian, a pojedynczy skok modelu spada do 1/5. Na prawdziwym modelu z 18.10.2026 różnica była mała (np. Tromsø 1,9 → 1,7).
 
 ```js
 HORIZON_KM = 1000;
 visWeight(km) = clamp(1 - km / HORIZON_KM, 0, 1);
 ```
 
-Odległość geograficzna obliczana jest z przybliżeniem 111,2 km/stopień i poprawką długości geograficznej uwzględniającą cosinus szerokości. Wybierane jest pojedyncze maksimum, nie średnia z owalu. Pusty model daje `null`.
+Odległość geograficzna obliczana jest z przybliżeniem 111,2 km/stopień i poprawką długości geograficznej uwzględniającą cosinus szerokości. Wybierane jest maksimum spośród uśrednionych komórek. Pusty model daje `null`.
 
 **Ograniczenia:** 1000 km i liniowy spadek są założeniami modelu. Wzór nie wylicza fizycznej wysokości zorzy nad horyzontem, jej azymutu ani wpływu przeszkód terenowych. Jedna intensywna komórka siatki może nadmiernie wpłynąć na wynik.
 
@@ -95,6 +95,10 @@ Bz pochodzi z oficjalnej sondy NOAA (wiersze `active: true`). Gdy jej wierszy br
 Prędkość i gęstość wiatru wybierane są tak samo jak Bz: z oficjalnej sondy, a bez niej z zapasowej (`space.windBackup`, oznaczona na kafelku i w panelu). `goes` to składowa Hp satelity GOES, a `goesRange` to rozstęp jej wartości w ostatniej godzinie. **Nie jest to pomiar lokalnej stacji naziemnej.**
 
 ## 6. Zachmurzenie
+
+**Chmury na linii wzroku (od 18.10.2026, decyzja autora).** Do wyniku liczy się niebo w stronę zorzy, a nie tylko nad głową. `rayPoints()` w `js/model/aurora.js` wyznacza trzy punkty w kierunku z `lookDirection()`: tam, gdzie linia wzroku na zorzę (dolny brzeg ok. 110 km nad Ziemią, `elevationDeg()` z krzywizną Ziemi, co najmniej 1°) mija wysokość niskich (1,5 km), średnich (4,5 km) i wysokich chmur (9 km). Odległość to wysokość warstwy / tan(wysokość kątowa zorzy), w granicach 2–150 km; np. dla zorzy 600 km na północny zachód od Szczecina 13, 39 i 78 km. `getWeather()` pobiera pogodę miejsca i tych punktów jednym zapytaniem (Open-Meteo przyjmuje listę współrzędnych). `clearAlong()` liczy część czystego nieba tym samym wzorem warstw co niżej, ale każdą warstwę z jej punktu; brak warstwy w punkcie bierze wartość znad głowy. Bez kierunku (nic nie świeci w zasięgu) albo pod zorzą (bliżej niż 150 km) zostaje niebo nad głową. Przy aktywności z Kp (bez odległości) zorza jest przyjmowana 800 km dalej. Kafelek „Zachmurzenie” i pigułki pokazują dalej chmury **nad głową** (`row.cloud`), a wynik, `row.cover` i zdanie o warunkach liczą linię wzroku; gdy różnią się o 15 punktów lub więcej, zdanie podaje oba („nad Tobą 5% chmur, w stronę zorzy 80%”). Kierunek liczony jest raz, z bieżącego modelu, dla wszystkich 12 godzin.
+
+**Niebo nad głową (bez linii wzroku):**
 
 Dla warstw niskiej `L`, średniej `M` i wysokiej `H` (w procentach):
 
