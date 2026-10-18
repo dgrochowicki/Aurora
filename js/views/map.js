@@ -77,6 +77,8 @@ function drawTile(coords) {
 // current: funkcja zwracająca bieżące miejsce, żeby mapa pokazywała znacznik tam, gdzie prognoza.
 export function initMap({ current }) {
   getCurrent = current;
+  // Safari na iPhonie przybliża całą stronę gestem szczypania mimo touch-action; na karcie mapy przybliża tylko Leaflet.
+  ["gesturestart", "gesturechange"].forEach((ev) => $("#mapSheet").addEventListener(ev, (e) => e.preventDefault()));
   $("#closeMap").innerHTML = icon("xBold");
   $("#locateMap").innerHTML = icon("gpsBold");
   $("#locateMap").onclick = () => {

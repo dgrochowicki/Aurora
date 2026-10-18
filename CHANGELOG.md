@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — gesty na mapie na iPhonie
+
+- Na karcie mapy wyłączone gesty Safari (`touch-action: none`, `overscroll-behavior: none`, `gesturestart`): przeciąganie przy krawędzi i szczypanie wyprowadzały mapę poza ramkę na telefonie autora. W Chromium z emulacją dotyku problemu nie było, więc to zachowanie Safari; do potwierdzenia na iPhonie.
+
 ## 18.10.2026 — przyciski mapy i lot do lokalizacji
 
 - ✕ na mapie w tym samym wymiarze i z tą samą ikoną bold co w panelach szczegółów, na ciemnym szkle; pod nim nowy przycisk „Wróć do lokalizacji” (celownik Phosphor gps-fix bold).
