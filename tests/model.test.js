@@ -142,7 +142,8 @@ const localWeather = (cloud, current) => {
   return { utc_offset_seconds: 7200, hourly: { time: days, cloud_cover: c, cloud_cover_low: c, cloud_cover_mid: c.map(() => 0), cloud_cover_high: c.map(() => 0) }, ...(current ? { current } : {}) };
 };
 const ABISKO = { lat: 68.35, lon: 18.83 };
-const strongGrid = { coords: [[18, 68, 90]], time: null };
+// Łuk zorzy nad Laponią: 11 komórek wzdłuż równoleżnika, jak w prawdziwym modelu (pojedyncza komórka jest uśredniana w dół).
+const strongGrid = { coords: Array.from({ length: 11 }, (_, i) => [13 + i, 68, 90]), time: null };
 const strongSpace = { kp: 6, kpForecast: [], bzAvg: null };
 
 test("„Teraz” o 17:40 to godzina 17:00, a nie 18:00, a kolejne pigułki to pełne godziny", () => {
@@ -241,4 +242,21 @@ test("kierunek w miejscowniku do rady o horyzoncie", async () => {
   assert.equal(directionPlace({ az: 2, km: null }, 53), "na północy");
   assert.equal(directionPlace({ az: 10, km: 50 }, 68), null);
   assert.equal(directionPlace(null, -40), "na południu");
+});
+
+test("uśrednianie wzdłuż łuku: pojedyncza mocna komórka spada do 1/5, szeroki łuk zostaje", async () => {
+  const { arcAveraged, auroraAt, ARC_CELLS } = await import("../js/model/aurora.js");
+  assert.equal(ARC_CELLS, 5);
+  const spike = { coords: [[14, 60, 100]] };
+  assert.equal(arcAveraged(spike)[0][2], 20);
+  const arc = { coords: Array.from({ length: 21 }, (_, i) => [i + 4, 60, 50]) };
+  assert.equal(arcAveraged(arc)[10][2], 50);
+  // Brzeg łuku: 3 z 5 komórek świecą.
+  assert.equal(arcAveraged(arc)[0][2], 30);
+  // Zawijanie długości: łuk przez południk 0 (komórki 358, 359, 0, 1, 2).
+  const wrap = { coords: [358, 359, 0, 1, 2].map((lon) => [lon, 60, 40]) };
+  assert.equal(arcAveraged(wrap)[2][2], 40);
+  // Wynik dla miejsca: łuk nad głową daje pełną wartość, pojedynczy szczyt nad głową tylko 1/5.
+  assert.equal(auroraAt(60, 14, arc), 50);
+  assert.equal(auroraAt(60, 14, spike), 20);
 });

@@ -53,15 +53,37 @@ export function ovationField(grid, { smooth = 0 } = {}) {
 // Najwyższa widoczna aktywność z modelu OVATION w promieniu 1000 km. null, gdy modelu brak.
 export const auroraAt = (lat, lon, grid) => auroraBest(lat, lon, grid)?.v ?? null;
 
+// Wartości OVATION uśrednione wzdłuż długości geograficznej: każda komórka to średnia z ARC_CELLS sąsiadów na tym samym równoleżniku.
+// Łuk zorzy biegnie ze wschodu na zachód, więc szeroki łuk zostaje bez zmian, a pojedyncza mocna komórka (szum modelu) spada do 1/ARC_CELLS.
+// Decyzja autora z 18.10.2026: zamiast jednej najmocniejszej komórki. Wynik w pamięci podręcznej per siatka.
+export const ARC_CELLS = 5;
+const arcCache = new WeakMap();
+export function arcAveraged(grid) {
+  if (arcCache.has(grid)) return arcCache.get(grid);
+  const W = 360,
+    v = new Map();
+  for (const p of grid.coords) v.set(Math.round(p[1]) * W + (((Math.round(p[0]) % W) + W) % W), Number(p[2]) || 0);
+  const half = (ARC_CELLS - 1) / 2,
+    out = grid.coords.map((p) => {
+      const lat = Math.round(p[1]),
+        lon = (((Math.round(p[0]) % W) + W) % W);
+      let sum = 0;
+      for (let d = -half; d <= half; d++) sum += v.get(lat * W + ((lon + d + W) % W)) || 0;
+      return [p[0], p[1], sum / ARC_CELLS];
+    });
+  arcCache.set(grid, out);
+  return out;
+}
+
 // To samo co auroraAt, razem z położeniem komórki siatki, która daje tę aktywność (do kierunku patrzenia).
-// { v, lat, lon } albo null, gdy modelu brak. Przy zerowej aktywności lat i lon są null.
+// { v, lat, lon } albo null, gdy modelu brak. Przy zerowej aktywności lat i lon są null. Wartości z arcAveraged().
 export function auroraBest(lat, lon, grid) {
   if (!grid.coords.length) return null;
   const targetLon = lon < 0 ? lon + 360 : lon,
     cosLat = Math.cos(lat * RAD);
   let best = { v: 0, lat: null, lon: null };
-  for (const p of grid.coords) {
-    const v = Number(p[2]) || 0;
+  for (const p of arcAveraged(grid)) {
+    const v = p[2];
     if (v <= best.v) continue;
     const dLat = (p[1] - lat) * 111.2;
     if (Math.abs(dLat) > HORIZON_KM) continue;
