@@ -903,7 +903,9 @@ html.sheet-open body {
 #auroraMap {
   position: absolute;
   inset: 0;
-  background: var(--bg);
+  /* Kolor wody OpenStreetMap po filtrze poniżej (#AAD3DF → #2F3B3E). Przy przybliżaniu, zanim wczytają się kafelki,
+     widać to tło; w kolorze wody (większość mapy) nie mruga ciemniejszymi plamami. Ląd po filtrze to #1F1E1D. */
+  background: #2f3b3e;
 }
 /* Na karcie mapy gesty obsługuje tylko Leaflet. Bez tego Safari na iPhonie przy przeciąganiu przy krawędzi albo nad legendą
    przesuwał całą kartę z „gumowym” odbiciem, a szczypanie przybliżało stronę, więc mapa wychodziła poza ramkę. */
