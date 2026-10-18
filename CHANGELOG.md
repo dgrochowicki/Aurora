@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — dwa palce na mapie nie wyprowadzają poza ramkę
+
+- Przyczyna zgłoszenia autora (zrzut z iPhone'a): Leaflet przy szczypaniu i przesuwaniu dwoma palcami nie pilnował granic w trakcie gestu, mapa wyjeżdżała poza świat i wracała dopiero po puszczeniu palców. Teraz środek mapy jest przycinany w każdej klatce gestu (`keepInsideWhilePinching()` w `js/views/map.js`, nakładka na wewnętrzne `_move` i `_animateZoom` Leaflet 1.9.4). Sprawdzone emulacją dotyku w Chromium: przed poprawką 437 px poza krawędzią, po niej 0.
+
 ## 18.10.2026 — gesty na mapie na iPhonie
 
 - Na karcie mapy wyłączone gesty Safari (`touch-action: none`, `overscroll-behavior: none`, `gesturestart`): przeciąganie przy krawędzi i szczypanie wyprowadzały mapę poza ramkę na telefonie autora. W Chromium z emulacją dotyku problemu nie było, więc to zachowanie Safari; do potwierdzenia na iPhonie.

@@ -106,6 +106,26 @@ export function refreshMap(current) {
   if (sheet.isOpen) showMap(current);
 }
 
+// Leaflet przy szczypaniu i przesuwaniu dwoma palcami nie pilnuje maxBounds w trakcie gestu: mapa wyjeżdża poza świat
+// i wraca dopiero po puszczeniu palców. Przycinamy środek w każdej klatce gestu (_move) i w animacji końcowej (_animateZoom).
+// _move, _animateZoom i _limitCenter to wewnętrzne funkcje Leaflet 1.9.4 (wersja przypięta w index.html).
+function keepInsideWhilePinching(m) {
+  const limit = (center, zoom) => m._limitCenter(L.latLng(center), zoom ?? m.getZoom(), m.options.maxBounds);
+  const move = m._move,
+    animateZoom = m._animateZoom;
+  m._move = function (center, zoom, ...rest) {
+    return move.call(this, limit(center, zoom), zoom, ...rest);
+  };
+  m._animateZoom = function (center, zoom, ...rest) {
+    return animateZoom.call(this, limit(center, zoom), zoom, ...rest);
+  };
+  // Koniec gestu: TouchZoom pamięta własny środek, więc wyrównujemy go do przyciętego.
+  m.on("zoomstart movestart", () => {
+    const tz = m.touchZoom;
+    if (tz?._center) tz._center = limit(tz._center, tz._zoom);
+  });
+}
+
 // Najmniejsze przybliżenie, przy którym wysokość świata (256 px · 2^z) nie jest mniejsza niż wysokość mapy na ekranie.
 function fitWorld() {
   const h = map.getSize().y;
@@ -138,6 +158,7 @@ async function showMap(current) {
       bounceAtZoomLimits: false,
     }).setView(current ? [current.lat, current.lon] : [65, 18], 3);
     map.on("resize", fitWorld);
+    keepInsideWhilePinching(map);
     // Przybliżenie do 12 (okolica miasta); wcześniej tylko do 8.
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: MAX_ZOOM, attribution: "© OpenStreetMap" }).addTo(map);
   }
