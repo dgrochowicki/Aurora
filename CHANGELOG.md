@@ -5,6 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 18.10.2026 — ekran miejsc z kartami według makiety autora
 
 - Zapisane miejsca jako osobne karty jak w pogodzie Apple: nazwa, podpis („Moja lokalizacja” albo kraj) i linia warunków z godziną miejscową, ikoną pogody, zachmurzeniem i szansą teraz („Mała · 12%”); plakietka „Teraz” przy bieżącym miejscu. Wyniki wyszukiwania zostają listą.
+- Wciśnięcie podświetla i zmniejsza całą kartę, a nie tylko obszar przycisku obok plakietki i ✕ (uwaga autora).
 - Nowe wymiary według makiety: tytuł 21 px, pole wyszukiwania 54 px z lupą Phosphor, odstępy 32 px, szary tekst `--muted` (biały 60%).
 - Warunki dla wszystkich kart jednym zapytaniem do Open-Meteo (`getWeatherMany()` w `js/data/places.js`, `placeSummary()` w `js/model/forecast.js`), z chmurami na linii wzroku, więc karta zgadza się ze stroną główną; pamięć na 5 minut.
 

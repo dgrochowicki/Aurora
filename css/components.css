@@ -1082,6 +1082,19 @@ html.sheet-open body {
   padding: 0;
   border-radius: var(--radius);
   overflow: hidden;
+  transition: var(--press);
+}
+/* Wciśnięcie dotyczy całej karty (jak kafelki na stronie głównej), a nie samego obszaru przycisku obok plakietki i ✕.
+   ✕ ma własne wciśnięcie i nie rusza karty. */
+.place-card:has(.place-main:active) {
+  transform: scale(var(--press-scale));
+  background: rgba(255, 255, 255, 0.12);
+}
+.place-card .place-main:active {
+  background: none;
+}
+.place-card .delete-place:active {
+  color: var(--text);
 }
 .place-card .place-main {
   display: block;
