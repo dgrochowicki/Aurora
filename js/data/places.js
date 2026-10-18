@@ -12,15 +12,34 @@ const KEY = "aurora-places";
 // w stronę zorzy. Open-Meteo zwraca wtedy tablicę: pierwsze miejsce, potem punkty. Wynik: pogoda miejsca z polem ray
 // { low, mid, high }, każde z pogodą swojego punktu oraz { lat, lon, km }.
 const CLOUDS = "cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high";
-export async function getWeather(loc, ray = null) {
-  const pts = [loc, ...(ray ? Object.values(ray) : [])];
+// Jedno zapytanie dla listy punktów; Open-Meteo zwraca tablicę (przy jednym punkcie sam obiekt).
+async function fetchClouds(pts) {
   const list = (k) => pts.map((p) => p[k].toFixed(4)).join(",");
   const d = await fetchJSON(
     `https://api.open-meteo.com/v1/forecast?latitude=${list("lat")}&longitude=${list("lon")}&hourly=${CLOUDS}&current=${CLOUDS}&forecast_days=3&timezone=auto&timeformat=unixtime`,
   );
-  if (!Array.isArray(d)) return d;
-  const [home, ...rest] = d;
-  return { ...home, ray: Object.fromEntries(Object.entries(ray).map(([layer, p], k) => [layer, { ...rest[k], ...p }])) };
+  return Array.isArray(d) ? d : [d];
+}
+const rayPts = (ray) => (ray ? Object.values(ray) : []);
+const withRay = (home, ray, rest) =>
+  ray ? { ...home, ray: Object.fromEntries(Object.entries(ray).map(([layer, p], k) => [layer, { ...rest[k], ...p }])) } : home;
+
+export async function getWeather(loc, ray = null) {
+  const [home, ...rest] = await fetchClouds([loc, ...rayPts(ray)]);
+  return withRay(home, ray, rest);
+}
+
+// To samo dla wielu miejsc naraz (karty na ekranie miejsc): items to [{ loc, ray }], wynik w tej samej kolejności.
+export async function getWeatherMany(items) {
+  if (!items.length) return [];
+  const d = await fetchClouds(items.flatMap(({ loc, ray }) => [loc, ...rayPts(ray)]));
+  let k = 0;
+  return items.map(({ ray }) => {
+    const home = d[k++],
+      rest = d.slice(k, k + rayPts(ray).length);
+    k += rest.length;
+    return withRay(home, ray, rest);
+  });
 }
 
 export async function searchPlaces(q) {

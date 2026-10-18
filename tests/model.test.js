@@ -312,3 +312,15 @@ test("zdanie o warunkach mówi o chmurach w stronę zorzy, gdy wyraźnie różni
   assert.equal(conditionsText({ ...night, cloud: 5, cover: 10, ray: {} }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
   assert.equal(conditionsText({ ...night, cloud: 5, cover: 80 }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
 });
+
+test("skrót warunków dla karty miejsca: godzina miejscowa, chmury i szansa teraz", async () => {
+  const { placeSummary } = await import("../js/model/forecast.js");
+  const t0 = Date.parse("2026-10-04T20:00:00Z") / 1000;
+  const time = Array.from({ length: 24 }, (_, h) => t0 + h * 3600);
+  const w = { timezone: "Atlantic/Reykjavik", hourly: { time, cloud_cover: time.map(() => 30), cloud_cover_low: time.map(() => 0), cloud_cover_mid: time.map(() => 0), cloud_cover_high: time.map(() => 50) } };
+  const s = placeSummary({ lat: 64.15, lon: -21.94 }, w, { coords: [] }, { kp: 4, kpForecast: [] }, Date.parse("2026-10-04T21:31:00Z"));
+  assert.equal(s.hm, "21:31");
+  assert.equal(s.cloud, 30);
+  assert.equal(s.night, true);
+  assert.ok(Number.isInteger(s.score));
+});

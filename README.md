@@ -13,7 +13,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 - Dowiedzieć się, w którą stronę patrzeć: kierunek do najsilniejszej widocznej zorzy z modelu NOAA (np. „na północny zachód”, „w górę”). Wynik uwzględnia chmury na linii wzroku w tę stronę, a nie tylko nad głową.
 - Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy.
 - Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
-- Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce.
+- Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce. Każde zapisane miejsce ma kartę z godziną miejscową, zachmurzeniem i szansą teraz.
 
 ## Co oznacza „szansa” w aplikacji?
 
