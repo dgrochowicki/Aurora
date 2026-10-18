@@ -60,6 +60,8 @@ Odległość geograficzna obliczana jest z przybliżeniem 111,2 km/stopień i po
 
 **Ograniczenia:** 1000 km i liniowy spadek są założeniami modelu. Wzór nie wylicza fizycznej wysokości zorzy nad horyzontem, jej azymutu ani wpływu przeszkód terenowych. Jedna intensywna komórka siatki może nadmiernie wpłynąć na wynik.
 
+**Kierunek patrzenia** (od 18.10.2026): `auroraBest()` zwraca też położenie komórki, która daje tę najwyższą widoczną aktywność, a `lookDirection()` liczy do niej azymut i odległość po wielkim kole (`bearing()`). `directionLabel()` w `js/labels.js` zamienia azymut na 8 stron świata („na północny zachód”), a gdy komórka jest bliżej niż 150 km, na „w górę”. Bez modelu OVATION (aktywność z Kp) kierunek wskazuje biegun geomagnetyczny tego samego dipola co `magLat()`, bo owal leży wokół niego; z Polski to lekko na zachód od północy. Gdy model jest, ale nic w zasięgu nie świeci, zostaje strona półkuli („na północ” / „na południe”). Ten sam kierunek jest w radzie o horyzoncie w panelu zachmurzenia (`directionPlace()`). Ograniczenie: kierunek wskazuje jedną komórkę siatki, nie środek widocznego łuku.
+
 `magLat()` w `js/model/sky.js` oblicza orientacyjną szerokość geomagnetyczną na podstawie dipola z biegunem ok. 80,8°N, 72,6°W; nie jest to pełny współczesny model geomagnetyczny.
 
 ## 4. Model oparty na Kp

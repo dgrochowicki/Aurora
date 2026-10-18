@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 18.10.2026 — kierunek patrzenia i testy na prawdziwych danych
+
+- Zamiast stałego „Patrz na północ” kierunek z modelu OVATION: azymut do najsilniejszej widocznej zorzy w 8 stronach świata (np. „Skieruj go na północny zachód”), „Patrz w górę”, gdy zorza jest prawie nad głową, a bez OVATION w stronę bieguna geomagnetycznego. Ten sam kierunek w radzie o horyzoncie w panelu zachmurzenia. `auroraBest()`, `bearing()`, `lookDirection()` w `js/model/aurora.js`, `directionLabel()` i `directionPlace()` w `js/labels.js`, z testami.
+- Testy na zapisanych prawdziwych odpowiedziach NOAA i Open-Meteo (`tests/real.test.js`, próbki w `tests/fixtures/`, odświeżanie `npm run fixtures`): format siatki OVATION, Kp, prognozy Kp, RTSW, GOES i pogody, sonda, kolejność serii, świeżość, 12 godzin prognozy w strefie Europe/Warsaw. Działają w CI bez sieci.
+
 ## 18.10.2026 — tło mapy w kolorze wody
 
 - Pod kafelkami mapy tło #2F3B3E (woda OpenStreetMap po ciemnym filtrze) zamiast #15191D. Przy przybliżaniu i oddalaniu, zanim wczytają się kafelki, nie widać już ciemnych prostokątów. Prośba autora.

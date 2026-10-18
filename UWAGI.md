@@ -32,7 +32,6 @@ Nadal otwarte:
 
 ## P1 — geometria i warunki dla lokalizacji
 
-- [ ] **Kierunek patrzenia:** zastąpić regułę „na północ” / „na południe” obliczeniem azymutu najlepiej widocznego obszaru owalu.
 - [ ] Rozważyć faktyczną wysokość zorzy nad horyzontem zamiast samego zaniku z odległością do 1000 km.
 - [ ] Zbadać wpływ pojedynczego maksimum OVATION na wynik i porównać bardziej odporną agregację przestrzenną.
 - [ ] Uwzględnić zachmurzenie w kierunku obserwacji, a nie jedynie w punkcie miejscowości.
@@ -43,7 +42,6 @@ Nadal otwarte:
 
 - [ ] **Magnetometr naziemny.** Dziś kafelek bazuje na satelitarnym GOES Hp, nie pomiarze z lokalnej stacji. Ewentualne wprowadzenie stacji IMAGE/FMI wymaga nowego źródła.
 - [ ] **PWA / offline.** Manifest, service worker i możliwość odczytu zapisanej prognozy, zawsze z wyraźną informacją o jej wieku.
-- [ ] **Testy integracyjne** z zapisanymi prawdziwymi odpowiedziami NOAA/Open-Meteo (CI z `npm test` już działa).
 - [ ] **Dostępność.** Fokus w panelach jest zrobiony; zostały kontrasty, alternatywne opisy wykresów i tryb ograniczonego ruchu.
 - [ ] **Wykresy.** Kolorowe strefy tła (Bz poniżej 0, wiatr 500 i 700 km/s), znacznik „teraz”, odczyt po dotknięciu, zakres 2 h / 6 h, poprawa osi i kolizji zera przy Bz.
 - [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.

@@ -96,7 +96,7 @@ Pigułka około 70 × 123 px, padding 20/16, gap 12, radius 30. Wybrana: białe 
 
 Zielona poświata od dołu (`--glow`, zmienna `--aurora`) pokazuje narastanie i gaśnięcie wyników, nie osobny pomiar. Najlepsza godzina ma świecić z siłą 0,5 przy wyniku 10 i dochodzić do 1 przy 70; pozostałe proporcjonalnie do własnego wyniku. Gdy maksimum <10, godziny pozostają ciemne.
 
-Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem, status obserwacyjny („aparat” / „gołe oko”) w linii wybranej godziny, najlepsza godzina w tekście na dole bloku szansy.
+Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem (8 stron świata z modelu OVATION, „w górę” pod zorzą), status obserwacyjny („aparat” / „gołe oko”) w linii wybranej godziny, najlepsza godzina w tekście na dole bloku szansy.
 
 ## 8. Ruch i zachowania mobilne
 
