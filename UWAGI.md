@@ -26,7 +26,6 @@ Nadal otwarte:
 
 ## P1 — semantyka i trafność prognozy
 
-- [ ] Zdecydować, czy zachować nazwę „% szansy” z bardzo wyraźnym zastrzeżeniem, czy przed walidacją prezentować „indeks warunków”. Dzisiaj wynik nie jest kalibrowanym prawdopodobieństwem.
 - [ ] Rozdzielić ocenę bliską (OVATION) od dalszych godzin (aproksymacja Kp). **Decyzja autora 17.10.2026: na razie nie pokazujemy tego w UI**, bo wymagałoby tłumaczenia; ewentualnie później jako pomoc.
 - [ ] **Dzień i noc w całości:** autor ma pomysł, jak lepiej pokazać wynik w dzień (dziś 0%); wrócimy do tego.
 - [ ] Zweryfikować progi „przez aparat” i „gołym okiem”, obecnie ustawione ręcznie.
