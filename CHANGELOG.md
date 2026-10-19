@@ -4,7 +4,8 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 ## 19.10.2026 — szare tło strony
 
-- Tło główne `--bg` zmienione z `#15191D` na neutralny szary `#2C2C2C` (decyzja autora); góra gradientu `--bg-top` i `theme-color` przeliczone tą samą regułą (czarny 20% na `--bg`) na `#232323`. `css/tokens.css`, `index.html`, `STYL.md`.
+- Tło główne `--bg` zmienione z `#15191D` na neutralny szary `#2C2C2C` (decyzja autora).
+- Gradient jak w makiecie autora: na tle warstwa `--bg-shade` od czarnego 50% u góry do przezroczystego w połowie ekranu (438 px z 876), zamiast dawnego przejścia `--bg-top` → `--bg` na 600 px. Góra wychodzi `#161616` (`--bg-top`, `theme-color`). Strona, ramka na desktopie i ekran miejsc. `css/tokens.css`, `css/base.css`, `css/components.css`, `index.html`, `STYL.md`.
 
 ## 18.10.2026 — ekran miejsc z kartami według makiety autora
 

@@ -2,8 +2,10 @@
 :root {
   color-scheme: dark;
   --bg: #2c2c2c;
-  /* Góra gradientu tła: --bg przykryte czarnym 20%. */
-  --bg-top: #232323;
+  /* Warstwa na tle według makiety autora (19.10.2026): czarny 50% u góry, przezroczysty w połowie ekranu 876 px. */
+  --bg-shade: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0, rgba(0, 0, 0, 0) 438px);
+  /* Kolor góry tła (--bg pod czarnym 50%): pasek adresu Safari i theme-color. */
+  --bg-top: #161616;
   --text: #ffffff;
   --sub: #afc7c2;
   --sub-65: rgba(175, 199, 194, 0.65);

@@ -487,7 +487,7 @@
 }
 .places-sheet {
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) 0;
-  background: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 600px, var(--bg) 100%) var(--bg-top);
+  background: var(--bg-shade), var(--bg);
 }
 /* Ekran miejsc według makiety autora (18.10.2026): tytuł 21 px, 32 px do pola wyszukiwania i 32 px do kart. */
 .places-head {

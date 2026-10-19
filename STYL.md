@@ -19,7 +19,8 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
 | `--bg` | `#2C2C2C` | Tło główne (od 19.10.2026, decyzja autora) |
-| `--bg-top` | `#232323` | Góra gradientu (`--bg` przykryte czarnym 20%) |
+| `--bg-shade` | `linear-gradient(180deg, rgba(0,0,0,.5) 0, transparent 438px)` | Warstwa na tle strony i ekranu miejsc (makieta: czarny 50% → 0% w połowie ekranu 876 px) |
+| `--bg-top` | `#161616` | Kolor góry tła (`--bg` pod czarnym 50%): `html`, `theme-color` |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--sub` | `#AFC7C2` | Tytuły kart, opisy |
 | `--sub-65` | `rgba(175, 199, 194, 0.65)` | Notki i tekst drugorzędny |
