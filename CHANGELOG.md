@@ -2,6 +2,15 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 19.10.2026 — ekran miejsc: tryb wyszukiwania i nowe karty według makiety
+
+- Stuknięcie w pole wyszukiwania włącza tryb wyszukiwania: tytuł i karty znikają z animacją, pole podjeżdża do góry, obok wysuwa się okrągły ✕. ✕ albo Escape wraca do kart (drugi Escape zamyka ekran). `setSearching()`, `endSearch()` w `js/views/places.js`, `.searching` w `css/components.css`.
+- Pole wyszukiwania i ✕ według wartości autora z Figmy: 46 px, promień 24 px, tło `rgba(196, 221, 255, 0.08)` z rozmyciem 7 px; bez wbudowanego ✕ przeglądarki.
+- Karty: tło 4%, po najechaniu i przy wciśnięciu 8% (makieta autora). Linia warunków „21:48 Mała szansa · 12% Zachmurzenie: 52%” (autor wybrał tekst z makiety z godziną miejscową, bez ikony pogody; `chancePhrase()` w `js/labels.js`). Plakietka „Teraz”, ✕ i strzałka „Moja lokalizacja” (przeniesiona na prawo) na środku wysokości karty.
+- Zielona poświata w lewym dolnym rogu karty zależna od szansy, w tej samej skali co pigułki godzin (decyzja autora): `glowOf()` w `js/model/forecast.js`, z której korzysta też `hourGlow()`.
+- Pod kartami i w trybie wyszukiwania notka „Pewność prognozy: wysoka • wynik łączy…” (nazwa z makiety na życzenie autora; na stronie głównej dalej „Kompletność danych”, sprawa w `UWAGI.md`). Poziom liczy wspólna `dataLevel()` w `js/labels.js`.
+- Wyniki wyszukiwania w liście z tłem 4%. Testy: `glowOf`, `chancePhrase`, `dataLevel`.
+
 ## 19.10.2026 — szare tło strony
 
 - Tło główne `--bg` zmienione z `#15191D` na neutralny szary `#2C2C2C` (decyzja autora).

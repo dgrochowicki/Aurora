@@ -143,7 +143,9 @@ Model OVATION ma krótki horyzont i nie powinien być utożsamiany pod względem
 
 ## 9. „Kompletność danych”
 
-Linia pod kafelkami (dawniej „Pewność prognozy”, zmiana nazwy 17.10.2026). `renderConfidence()` dostaje dane po `freshData()`: „pełna”, gdy jest świeża siatka OVATION (do godziny), świeże Kp i prognoza Kp; „częściowa”, gdy jest świeże OVATION lub Kp; „brak aktualnych danych o aktywności zorzy”, gdy nie ma żadnego. To **dostępność źródeł**, a nie trafność prognozy ani przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
+Linia pod kafelkami (dawniej „Pewność prognozy”, zmiana nazwy 17.10.2026). `dataLevel()` w `js/labels.js` dostaje dane po `freshData()`: „pełna”, gdy jest świeża siatka OVATION (do godziny), świeże Kp i prognoza Kp; „częściowa”, gdy jest świeże OVATION lub Kp; `null` („brak aktualnych danych o aktywności zorzy”), gdy nie ma żadnego.
+
+Na ekranie miejsc ten sam poziom stoi pod kartami jako „Pewność prognozy: wysoka / średnia” (makieta autora z 19.10.2026, nazwa z makiety na wyraźne życzenie autora): „wysoka” to „pełna”, „średnia” to „częściowa”. Mimo nazwy to nadal ta sama dostępność źródeł, nie trafność. To **dostępność źródeł**, a nie trafność prognozy ani przedział niepewności. Nie obejmuje jakości prognozy zachmurzenia, zmiany trafności z horyzontem ani rzeczywistego błędu obserwacji.
 
 ## 10. Pozostałe ograniczenia i walidacja
 

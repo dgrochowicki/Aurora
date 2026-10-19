@@ -44,6 +44,16 @@ export function moonLabel(sky) {
 const CHANCE = ["Brak", "Bardzo mała", "Mała", "Umiarkowana", "Duża", "Bardzo duża"];
 const chanceIndex = (score) => (score < 3 ? 0 : score < 10 ? 1 : score < 15 ? 2 : score < 40 ? 3 : score < 70 ? 4 : 5);
 export const chanceLabel = (score) => CHANCE[chanceIndex(score)];
+// Szansa na karcie miejsca, np. „Mała szansa”, a dla najniższego progu „Brak szans”.
+export const chancePhrase = (score) => (chanceIndex(score) === 0 ? "Brak szans" : `${CHANCE[chanceIndex(score)]} szansa`);
+
+// Ile źródeł o aktywności mamy: model OVATION, Kp i prognozę Kp. To nie jest trafność prognozy.
+// "pełna", "częściowa" albo null, gdy nie ma ani OVATION, ani Kp. Dostaje dane po freshData().
+export function dataLevel(space, grid) {
+  const hasGrid = grid.coords.length > 0;
+  if (!hasGrid && space.kp == null) return null;
+  return hasGrid && space.kp != null && space.kpForecast?.length ? "pełna" : "częściowa";
+}
 // Poziom zorzy w tle 0–4: „Brak” i „Bardzo mała” mają tę samą małą plamę przy krawędzi.
 export const chanceLevel = (score) => Math.max(0, chanceIndex(score) - 1);
 

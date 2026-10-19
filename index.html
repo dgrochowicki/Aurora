@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="./css/tokens.css?v=31" />
   <link rel="stylesheet" href="./css/base.css?v=24" />
-  <link rel="stylesheet" href="./css/components.css?v=65" />
+  <link rel="stylesheet" href="./css/components.css?v=66" />
 </head>
 <body>
   <main class="app-shell">
@@ -55,12 +55,16 @@
   <section class="places-sheet sheet" id="placesSheet" tabindex="-1" aria-modal="true" role="dialog" aria-labelledby="placesTitle" hidden>
     <div class="places-head">
       <h2 id="placesTitle">Wybierz miejsce</h2>
-      <label class="search-field"><span class="search-icon" aria-hidden="true"></span><input id="searchInput" type="search" placeholder="Wpisz miasto lub miejscowość" autocomplete="off" aria-label="Szukaj miejsca" /></label>
+      <div class="search-row">
+        <label class="search-field"><span class="search-icon" aria-hidden="true"></span><input id="searchInput" type="search" placeholder="Wpisz miasto lub miejscowość" autocomplete="off" aria-label="Szukaj miejsca" /></label>
+        <button type="button" class="search-close" id="searchClose" aria-label="Zamknij wyszukiwanie"></button>
+      </div>
     </div>
     <div class="sheet-scroll">
       <p class="search-hint" id="searchHint" hidden></p>
       <div class="search-results" id="searchResults"></div>
       <div class="places" id="places"></div>
+      <p class="places-note" id="placesNote">Pewność prognozy: sprawdzam…</p>
     </div>
   </section>
 
@@ -87,6 +91,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script type="module" src="./js/main.js?v=68"></script>
+  <script type="module" src="./js/main.js?v=69"></script>
 </body>
 </html>

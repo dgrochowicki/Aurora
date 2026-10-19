@@ -152,10 +152,13 @@ export function cloudChange(rows) {
 // a pozostałe proporcjonalnie słabiej, żeby w pasku było widać, jak zorza narasta i gaśnie. Gdy najlepsza szansa jest poniżej 10%, pasek zostaje ciemny.
 export function hourGlow(rows) {
   const top = Math.max(0, ...rows.map((r) => r.score ?? 0));
-  if (top < 10) return rows.map(() => 0);
-  const peak = 0.5 + 0.5 * clamp((top - 10) / 60, 0, 1);
-  return rows.map((r) => (peak * (r.score ?? 0)) / top);
+  const peak = glowOf(top);
+  return rows.map((r) => (peak ? (peak * (r.score ?? 0)) / top : 0));
 }
+
+// Siła poświaty dla jednej szansy w skali 0–1, ta sama co dla najlepszej godziny: 0 poniżej 10%, od 0,5 przy 10% do 1 przy 70%.
+// Używa jej też karta miejsca na ekranie miejsc. Bez wyniku (null) brak poświaty.
+export const glowOf = (score) => (score == null || !(score >= 10) ? 0 : 0.5 + 0.5 * clamp((score - 10) / 60, 0, 1));
 
 // „yours” to godzina najlepszej szansy w czasie użytkownika, gdy miejsce leży w innej strefie.
 export function outlookText(best, maxAct, change, yours = "") {
