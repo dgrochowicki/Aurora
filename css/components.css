@@ -1016,15 +1016,39 @@ html.sheet-open body {
      widać to tło; w kolorze wody (większość mapy) nie mruga ciemniejszymi plamami. Ląd po filtrze to #1F1E1D. */
   background: #2f3b3e;
 }
-/* Mapa pod paskami Safari (próba z 19.10.2026, do potwierdzenia na iPhonie). Safari na iOS 26 ucina przypiętą warstwę
-   z w pełni kryjącym tłem na krawędzi pasków i pod nimi pokazuje tło strony (jednolita góra, odcięcie na dole). Warstwa z tłem
-   choć trochę przezroczystym (99%) jest składana osobno i sięga pod paski. Kolor to woda mapy po filtrze, jak tło #auroraMap.
-   Wysokość 100lvh (największy widok), żeby mapa sięgała pod dolny pasek, a nie kończyła się nad nim. */
-.map-sheet {
+/* Mapa pod paskami Safari (19.10.2026, do potwierdzenia na iPhonie). Safari na iOS 26 nie rysuje przypiętej warstwy (fixed)
+   pod swoimi paskami, a zwykłą treść strony owszem (jak strona główna albo mapa w Google). Dlatego po wysunięciu mapa staje się
+   treścią strony (html.map-page, map.js): strona główna się chowa, mapa wystaje o --map-bleed w górę i w dół, a strona jest
+   przewinięta o --map-bleed, więc te zapasy leżą pod paskami. Przyciski, legenda i atrybucja przesuwają się o zapas,
+   żeby zostały w widocznej części; na dole jeszcze o wysokość pasków (100lvh − 100dvh). */
+:root {
+  --map-bleed: 160px;
+}
+html.map-page,
+html.map-page body {
+  overflow: visible;
+}
+html.map-page .app-shell,
+html.map-page .fab-bar,
+html.map-page #mapBackdrop {
+  display: none;
+}
+html.map-page .map-sheet {
+  position: absolute;
   bottom: auto;
-  height: 100vh;
-  height: 100lvh;
-  background: rgba(47, 59, 62, 0.99);
+  height: calc(100lvh + 2 * var(--map-bleed));
+}
+html.map-page .map-close {
+  top: calc(var(--map-bleed) + 16px + env(safe-area-inset-top));
+}
+html.map-page .map-locate {
+  top: calc(var(--map-bleed) + 16px + 44px + 12px + env(safe-area-inset-top));
+}
+html.map-page .map-panel {
+  bottom: calc(var(--map-bleed) + 100lvh - 100dvh + 24px + env(safe-area-inset-bottom));
+}
+html.map-page #auroraMap .leaflet-bottom {
+  bottom: calc(var(--map-bleed) + 100lvh - 100dvh);
 }
 /* Na karcie mapy gesty obsługuje tylko Leaflet. Bez tego Safari na iPhonie przy przeciąganiu przy krawędzi albo nad legendą
    przesuwał całą kartę z „gumowym” odbiciem, a szczypanie przybliżało stronę, więc mapa wychodziła poza ramkę. */
@@ -1085,8 +1109,6 @@ html.sheet-open body {
   left: var(--gutter);
   right: var(--gutter);
   bottom: calc(24px + env(safe-area-inset-bottom));
-  /* Mapa sięga pod dolny pasek Safari (100lvh), więc legenda podnosi się o wysokość widocznych pasków (100lvh − 100dvh). */
-  bottom: calc(24px + env(safe-area-inset-bottom) + 100lvh - 100dvh);
   padding: 14px 16px;
   border: 1px solid var(--card-border);
   border-radius: var(--radius);

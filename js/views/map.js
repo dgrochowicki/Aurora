@@ -1,4 +1,5 @@
 // Mapa modelu OVATION na pełnym ekranie (Leaflet, ładowany osobnym skryptem jako window.L). Zamyka się ✕ albo Escape.
+// Po wysunięciu mapa staje się zwykłą treścią strony (html.map-page), żeby Safari na iOS 26 pokazywał ją pod swoimi paskami.
 import { $, esc } from "../util.js";
 import { getAuroraGrid } from "../data/noaa.js";
 import { ovationField } from "../model/aurora.js";
@@ -7,6 +8,7 @@ import { icon } from "../ui/icons.js";
 
 const note = $("#mapNote");
 let map, auroraLayer, locationMarker, field = null, justOpened = false, getCurrent = () => null;
+let pageTimer, homeY = 0;
 
 const sheet = createSheet({
   sheet: $("#mapSheet"),
@@ -15,8 +17,36 @@ const sheet = createSheet({
   onOpen: () => {
     justOpened = true;
     showMap(getCurrent());
+    // Po animacji wysuwania (0,4 s w CSS .sheet.open).
+    pageTimer = setTimeout(enterPage, 420);
+  },
+  onClose: () => {
+    clearTimeout(pageTimer);
+    exitPage();
   },
 });
+
+// Zapas mapy nad i pod widoczną częścią ekranu (--map-bleed w CSS), w pikselach.
+const bleed = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--map-bleed")) || 0;
+
+// Mapa jako treść strony: strona główna znika, mapa wystaje o zapas w górę i w dół, a strona przewija się o zapas,
+// więc górny i dolny kawałek mapy leżą pod paskami Safari. Położenie strony głównej wraca po zamknięciu.
+// invalidateSize() po zmianie wysokości zostawia ten sam środek mapy, więc obraz nie skacze.
+function enterPage() {
+  if (!sheet.isOpen) return;
+  homeY = window.scrollY;
+  document.documentElement.classList.add("map-page");
+  window.scrollTo(0, bleed());
+  map?.invalidateSize({ animate: false });
+}
+
+function exitPage() {
+  const html = document.documentElement;
+  if (!html.classList.contains("map-page")) return;
+  html.classList.remove("map-page");
+  window.scrollTo(0, homeY);
+  map?.invalidateSize({ animate: false });
+}
 
 // Kolory warstwy zorzy, te same co w legendzie (.map-legend i): płynnie od turkusu przy słabej do czerwieni przy silnej.
 // a: krycie. Poniżej 10 (jak na mapie NOAA) warstwa jest przezroczysta, a nawet najsilniejsza zorza nie zasłania całkiem podkładu.
