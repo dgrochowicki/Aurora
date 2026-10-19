@@ -1016,14 +1016,15 @@ html.sheet-open body {
      widać to tło; w kolorze wody (większość mapy) nie mruga ciemniejszymi plamami. Ląd po filtrze to #1F1E1D. */
   background: #2f3b3e;
 }
-/* Mapa pod paskami Safari (próba z 19.10.2026, do potwierdzenia na iPhonie): Safari na iOS 26 maluje górny i dolny pasek
-   kolorem tła przypiętego elementu przy krawędzi, więc panel mapy nie ma własnego tła, a mapa pod paskami ma być widoczna jak treść
-   strony głównej. Wysokość 100lvh (największy widok, bez odjętych pasków), żeby mapa sięgała pod dolny pasek, a nie kończyła się nad nim. */
+/* Mapa pod paskami Safari (próba z 19.10.2026, do potwierdzenia na iPhonie). Safari na iOS 26 ucina przypiętą warstwę
+   z w pełni kryjącym tłem na krawędzi pasków i pod nimi pokazuje tło strony (jednolita góra, odcięcie na dole). Warstwa z tłem
+   choć trochę przezroczystym (99%) jest składana osobno i sięga pod paski. Kolor to woda mapy po filtrze, jak tło #auroraMap.
+   Wysokość 100lvh (największy widok), żeby mapa sięgała pod dolny pasek, a nie kończyła się nad nim. */
 .map-sheet {
   bottom: auto;
   height: 100vh;
   height: 100lvh;
-  background: transparent;
+  background: rgba(47, 59, 62, 0.99);
 }
 /* Na karcie mapy gesty obsługuje tylko Leaflet. Bez tego Safari na iPhonie przy przeciąganiu przy krawędzi albo nad legendą
    przesuwał całą kartę z „gumowym” odbiciem, a szczypanie przybliżało stronę, więc mapa wychodziła poza ramkę. */
