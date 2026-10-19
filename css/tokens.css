@@ -1,9 +1,9 @@
 /* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  --bg: #15191d;
+  --bg: #2c2c2c;
   /* Góra gradientu tła: --bg przykryte czarnym 20%. */
-  --bg-top: #111417;
+  --bg-top: #232323;
   --text: #ffffff;
   --sub: #afc7c2;
   --sub-65: rgba(175, 199, 194, 0.65);

@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 19.10.2026 — szare tło strony
+
+- Tło główne `--bg` zmienione z `#15191D` na neutralny szary `#2C2C2C` (decyzja autora); góra gradientu `--bg-top` i `theme-color` przeliczone tą samą regułą (czarny 20% na `--bg`) na `#232323`. `css/tokens.css`, `index.html`, `STYL.md`.
+
 ## 18.10.2026 — ekran miejsc z kartami według makiety autora
 
 - Zapisane miejsca jako osobne karty jak w pogodzie Apple: nazwa, podpis („Moja lokalizacja” albo kraj) i linia warunków z godziną miejscową, ikoną pogody, zachmurzeniem i szansą teraz („Mała · 12%”); plakietka „Teraz” przy bieżącym miejscu. Wyniki wyszukiwania zostają listą.
