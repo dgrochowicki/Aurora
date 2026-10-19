@@ -5,7 +5,7 @@ import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { lookDirection } from "../model/aurora.js";
-import { directionLabel, ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel } from "../labels.js";
+import { directionLabel, ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -248,14 +248,10 @@ function selectHour(i) {
 
 // Dostaje dane po freshData, więc siatka OVATION jest tu tylko wtedy, gdy ma mniej niż godzinę.
 function renderConfidence(space, grid) {
-  const hasGrid = grid.coords.length > 0;
-  if (!hasGrid && space.kp == null) {
-    els.confidence.textContent = "Kompletność danych: brak aktualnych danych o aktywności zorzy";
-    return;
-  }
-  // To nie jest trafność prognozy, tylko to, ile źródeł o aktywności mamy: model OVATION, Kp i prognozę Kp.
-  const level = hasGrid && space.kp != null && space.kpForecast?.length ? "pełna" : "częściowa";
-  els.confidence.textContent = `Kompletność danych: ${level} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`;
+  const level = dataLevel(space, grid);
+  els.confidence.textContent = level
+    ? `Kompletność danych: ${level} • wynik łączy aktywność, prognozę Kp, ciemność, Księżyc i chmury`
+    : "Kompletność danych: brak aktualnych danych o aktywności zorzy";
 }
 
 // Akapit pod wynikiem: co z zorzą (z kierunkiem patrzenia, gdy jest szansa) i jakie są warunki obserwacji teraz.

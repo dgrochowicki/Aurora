@@ -3,9 +3,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
-import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, outlookText } from "../js/model/forecast.js";
+import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, glowOf, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
-import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText } from "../js/labels.js";
+import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText, chancePhrase, dataLevel } from "../js/labels.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
 const hour = (h) => ({ cloud_cover: [h.total], cloud_cover_low: [h.low], cloud_cover_mid: [h.mid], cloud_cover_high: [h.high] });
@@ -105,6 +105,39 @@ test("poświata godzin narasta i gaśnie razem z szansą, a przy słabej nocy pa
   assert.ok(glow[2] >= 0.5 && glow[2] < 0.7);
   assert.deepEqual(hourGlow([{ score: 4 }, { score: 9 }]), [0, 0]);
   assert.deepEqual(hourGlow([]), []);
+});
+
+test("poświata karty miejsca: od 10% połowa siły, pełna od 70%, bez wyniku i poniżej progu brak", () => {
+  assert.equal(glowOf(null), 0);
+  assert.equal(glowOf(undefined), 0);
+  assert.equal(glowOf(NaN), 0);
+  assert.equal(glowOf(9.9), 0);
+  assert.equal(glowOf(10), 0.5);
+  assert.ok(glowOf(12) > 0.5 && glowOf(12) < 0.55);
+  assert.equal(glowOf(70), 1);
+  assert.equal(glowOf(99), 1);
+  // Ta sama skala co najlepsza godzina w pasku godzin.
+  assert.equal(Math.max(...hourGlow([{ score: 12 }, { score: 5 }])), glowOf(12));
+});
+
+test("szansa na karcie miejsca słowami", () => {
+  assert.equal(chancePhrase(0), "Brak szans");
+  assert.equal(chancePhrase(2.9), "Brak szans");
+  assert.equal(chancePhrase(3), "Bardzo mała szansa");
+  assert.equal(chancePhrase(12), "Mała szansa");
+  assert.equal(chancePhrase(15), "Umiarkowana szansa");
+  assert.equal(chancePhrase(40), "Duża szansa");
+  assert.equal(chancePhrase(99), "Bardzo duża szansa");
+});
+
+test("kompletność danych o aktywności: pełna, częściowa albo brak", () => {
+  const grid = { coords: [[0, 60, 5]] },
+    none = { coords: [] };
+  assert.equal(dataLevel({ kp: 3, kpForecast: [{}] }, grid), "pełna");
+  assert.equal(dataLevel({ kp: 3, kpForecast: [] }, grid), "częściowa");
+  assert.equal(dataLevel({ kp: null, kpForecast: [{}] }, grid), "częściowa");
+  assert.equal(dataLevel({ kp: 3, kpForecast: [{}] }, none), "częściowa");
+  assert.equal(dataLevel({ kp: null }, none), null);
 });
 
 test("najlepsza szansa z godziną użytkownika dla miejsca w innej strefie", () => {

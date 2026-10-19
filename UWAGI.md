@@ -23,6 +23,7 @@ Wdrożone 17.10.2026 (opis w `MODEL.md`, historia w `CHANGELOG.md`): limity wiek
 Nadal otwarte:
 
 - [ ] Wiek i status danych Open-Meteo (dziś tylko brak albo obecność prognozy).
+- [ ] **Dwie nazwy jednej wartości:** strona główna pisze „Kompletność danych: pełna/częściowa” (decyzja z 17.10.2026), a ekran miejsc od 19.10.2026 „Pewność prognozy: wysoka/średnia” (makieta autora). Słowa „średnia” w makiecie nie było, przyjęte tymczasowo dla „częściowa”. Do decyzji autora: ujednolicić nazwę albo zostawić.
 
 ## P1 — semantyka i trafność prognozy
 
