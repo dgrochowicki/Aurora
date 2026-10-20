@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — wykresy: cieńsze łuki, jaśniejsze podpisy osi Y
+
+- „Jasność nieba”: łuki Słońca i Księżyca mają grubość linii pozostałych wykresów (2,3 px zamiast 5 px), a pod horyzontem są jaśniejsze (75% → 45% przy −18° → 25% u dołu, wcześniej 50/20/8%). `js/ui/sky-chart.js`, `css/components.css`.
+- Liczby osi Y po prawej na wszystkich wykresach: biały 80% (nowy token `--text-80`) i nad wykresem, także nad kropkami łuków (`.chart-y`, `z-index: 2`). Decyzje autora. `css/tokens.css`, `STYL.md`.
+
 ## 20.10.2026 — aplikacja z ekranu początkowego (test)
 
 - Stronę można dodać do ekranu początkowego iPhone'a i otwierać jak aplikację, bez pasków Safari, przez które ekran miejsc, mapa i panele miały u góry i u dołu płaski kolor. Pomysł zaakceptowany przez autora jako test na gałęzi.

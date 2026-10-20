@@ -19,11 +19,12 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
-  // Nad horyzontem łuk ma pełny kolor, pod nim zaczyna od połowy jasności i gaśnie w dół: ok. 20% przy −18°, 8% na dole.
+  // Nad horyzontem łuk ma pełny kolor, pod nim zaczyna od 75% jasności i gaśnie w dół: 45% przy −18°, 25% na dole
+  // (jaśniej niż wcześniej 50/20/8%, bo cieńsza linia ginęła; decyzja autora 20.10.2026).
   // Każdy łuk jest rysowany dwa razy, przycięty nad i pod horyzontem.
   const y0 = y(0).toFixed(1);
   const fade = (id, color) =>
-    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="0.5"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.2"/><stop offset="1" stop-color="${color}" stop-opacity="0.08"/></linearGradient>`;
+    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="0.75"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.45"/><stop offset="1" stop-color="${color}" stop-opacity="0.25"/></linearGradient>`;
   const arc = (d, id, color) =>
     `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="url(#${id})" clip-path="url(#skyBelow)" d="${d}"/>`;
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", SUN)}${fade("skyMoon", MOON)}

@@ -12,6 +12,8 @@
   /* Cały tekst biały w trzech poziomach hierarchii (decyzja autora 20.10.2026): 100%, 60%, 40%. */
   --text: #ffffff;
   --text-60: rgba(255, 255, 255, 0.6);
+  /* Liczby osi Y na wykresach (decyzja autora 20.10.2026). */
+  --text-80: rgba(255, 255, 255, 0.8);
   --text-40: rgba(255, 255, 255, 0.4);
   --green: #68f7bb;
   --green-rgb: 104 247 187;

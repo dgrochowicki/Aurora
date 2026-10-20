@@ -855,10 +855,12 @@ html.sheet-open body {
   height: 1px;
   background: repeating-linear-gradient(90deg, var(--track) 0 4px, transparent 4px 8px);
 }
-/* Liczby osi Y leżą nad wykresem i mogą zachodzić na linię. */
+/* Liczby osi Y leżą nad wykresem (także nad kropkami łuków) i mogą zachodzić na linię. Jaśniejsze niż reszta podpisów
+   (biały 80%, decyzja autora 20.10.2026). */
 .chart-y {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
+  color: var(--text-80);
   right: 24px;
   line-height: 16px;
   transform: translateY(calc(-100% - 4px));
@@ -947,7 +949,8 @@ html.sheet-open body {
 }
 .sky-arc {
   fill: none;
-  stroke-width: 5px;
+  /* Grubość jak linia pozostałych wykresów (.chart-line). */
+  stroke-width: 2.3px;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;

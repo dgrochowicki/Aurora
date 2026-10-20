@@ -24,6 +24,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--sub` `#AFC7C2` i `--muted`) |
+| `--text-80` | `rgba(255, 255, 255, 0.80)` | Liczby osi Y na wykresach (po prawej, nad linią i kropkami wykresu) |
 | `--text-40` | `rgba(255, 255, 255, 0.40)` | Notki i tekst drugorzędny (dawniej `--sub-65`) |
 | `--green` | `#68F7BB` | Akcent aktywności |
 | `--yellow` | `#FFC867` | Chmury/ostrzeżenia |
@@ -128,7 +129,7 @@ Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałk
 
 ### Jasność nieba (dawniej „Jasność nieba”)
 
-Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 5 px pełnym kolorem nad horyzontem. Pod horyzontem gradient od 50% do 20% przy −18° i 8% u dołu. Kropki „teraz” 18 px, wschody/zachody 8 px. Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
+Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 2,3 px jak linia pozostałych wykresów, pełnym kolorem nad horyzontem. Pod horyzontem gradient od 75% do 45% przy −18° i 25% u dołu. Kropki „teraz” 18 px, wschody/zachody 8 px. Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
 
 Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Jasność nieba” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
 
