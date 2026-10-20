@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — aplikacja z ekranu początkowego (test)
+
+- Stronę można dodać do ekranu początkowego iPhone'a i otwierać jak aplikację, bez pasków Safari, przez które ekran miejsc, mapa i panele miały u góry i u dołu płaski kolor. Pomysł zaakceptowany przez autora jako test na gałęzi.
+- Nowe `manifest.webmanifest` (nazwa „Aurora Now”, krótka „Aurora”, `standalone`, kolory `#12151A`) i ikony w `icons/` (180, 192, 512 i maskable 512 px, zielona fala z dotychczasowej ikony). W `index.html` znaczniki `apple-mobile-web-app-*` z paskiem statusu `black-translucent`. `README.md`, `STYL.md`, `CLAUDE.md`.
+- Zapisane miejsca w aplikacji z ekranu początkowego są osobne niż w Safari (iOS rozdziela ich dane).
+
 ## 20.10.2026 — mapa pod paskami Safari
 
 - Mapa była przypiętą warstwą, więc Safari zalewał oba paski płaskim kolorem (`--sheet`). Mapa jest teraz treścią strony na cały duży widok (`100lvh`): `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, blokuje przewijanie i po zamknięciu przywraca miejsce przewinięcia strony głównej. Pod paskami Safari widać mapę.

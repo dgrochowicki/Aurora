@@ -14,6 +14,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 - Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy.
 - Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
 - Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce. Każde zapisane miejsce ma kartę z godziną miejscową, szansą teraz i zachmurzeniem, a przy szansie od 10% zieloną poświatę. Stuknięcie w pole wyszukiwania chowa karty i zostawia samo wyszukiwanie; ✕ obok pola wraca do kart.
+- Dodać stronę do ekranu początkowego iPhone'a (Safari → Udostępnij → Do ekranu początkowego). Otwiera się wtedy jak aplikacja, bez pasków Safari. Zapisane miejsca są w niej osobne niż w Safari (iOS trzyma dane aplikacji z ekranu początkowego oddzielnie).
 
 ## Co oznacza „szansa” w aplikacji?
 
@@ -59,6 +60,7 @@ Alternatywnie serwer: `python3 -m http.server 4173`.
 
 ```text
 index.html          — główna struktura HTML
+manifest.webmanifest, icons/ — aplikacja z ekranu początkowego: nazwa, kolory, ikony
 css/                — tokeny, układ i komponenty
 js/main.js          — start, geolokalizacja, wybór miejsca i odświeżanie
 js/data/            — NOAA, Open-Meteo, geokodowanie, zapisywane miejsca
