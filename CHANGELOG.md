@@ -2,11 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 20.10.2026 — ekran miejsc przewijany jak strona główna
+## 20.10.2026 — panele szczegółów: pasek Safari bez odcięcia
 
-- Na ekranie miejsc pod paskami Safari był płaski kolor, bo ekran był przypiętą warstwą (`position: fixed`), a Safari pod paskami nie pokazuje jej treści. Ekran jest teraz treścią strony: `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, a po zamknięciu przywraca jej miejsce przewinięcia. Pod paskami widać karty i gradient, jak na stronie głównej. Próby z wysokością `100lvh` i wysunięciem warstwy pod pasek na iPhonie nie zadziałały (autor sprawdził na telefonie).
-- Wejście: wyciszenie i przesunięcie o 16 px zamiast wysuwania od dołu. Tytuł i pole przewijają się z kartami. Escape, fokus i tryb wyszukiwania bez zmian. Zniknął przypięty pas u góry (`.places-sheet::before`). `css/components.css`, `css/base.css`, `js/views/places.js`, `STYL.md`.
-- Panele szczegółów: pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor.
+- Pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor. `css/tokens.css`, `css/components.css`, `STYL.md`.
+- Ekran miejsc bez zmian: próby ze sięganiem pod dolny pasek (`100lvh`, wysunięcie warstwy) nie zadziałały, a wersja przewijana jak strona przewijała też tytuł i pole, więc autor wybrał przypiętą warstwę z płaskim kolorem pod paskiem.
 
 ## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
 

@@ -142,11 +142,4 @@ button,
     background: var(--bg-gradient), var(--bg-top);
     min-height: 900px;
   }
-  /* Ekran miejsc w tej samej ramce co strona główna. */
-  .places-sheet.sheet {
-    min-height: 900px;
-    border: 1px solid var(--line);
-    border-radius: 36px;
-    background: var(--bg-gradient), var(--bg-top);
-  }
 }

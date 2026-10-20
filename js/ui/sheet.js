@@ -2,9 +2,6 @@
 // backdrop i closeButton są opcjonalne: ekran miejsc zajmuje cały ekran i zamyka się wyborem miejsca albo klawiszem Escape.
 // Fokus: po otwarciu trafia do focusOn (domyślnie przycisk zamknięcia, a bez niego sam panel), po zamknięciu wraca do przycisku,
 // który panel otworzył. Reszta strony jest inert, więc Tab nie wychodzi z panelu.
-// page: ekran zamiast panelu (ekran miejsc). Zastępuje treść strony i przewija go sam Safari, jak stronę główną,
-// bo pod paskami Safari przypięta warstwa pokazuje płaski kolor albo stronę pod spodem. Po zamknięciu wraca
-// położenie przewinięcia strony głównej.
 import { $ } from "../util.js";
 
 // Czas animacji zamykania z CSS (.sheet) z zapasem. Po nim panel dostaje hidden; wcześniej ucinało koniec ruchu.
@@ -18,11 +15,10 @@ const setInert = (on) => {
   document.documentElement.classList.toggle("sheet-open", on);
 };
 
-export function createSheet({ sheet, backdrop, closeButton, focusOn, onOpen, onClose, page = false }) {
+export function createSheet({ sheet, backdrop, closeButton, focusOn, onOpen, onClose }) {
   let opener = null,
     shown = false,
-    hideTimer,
-    homeScroll = 0;
+    hideTimer;
   const api = {
     get isOpen() {
       return shown;
@@ -31,16 +27,6 @@ export function createSheet({ sheet, backdrop, closeButton, focusOn, onOpen, onC
       opener = from || null;
       shown = true;
       clearTimeout(hideTimer);
-      if (page) {
-        homeScroll = window.scrollY;
-        document.documentElement.classList.add("page-open");
-        sheet.hidden = false;
-        window.scrollTo(0, 0);
-        if (!open.includes(api)) open.push(api);
-        onOpen?.();
-        (focusOn || closeButton || sheet).focus({ preventScroll: true });
-        return;
-      }
       sheet.hidden = false;
       if (backdrop) backdrop.hidden = false;
       // Odczyt wymiaru zapisuje stan początkowy (panel pod ekranem), żeby przejście do .open było animowane.
@@ -55,16 +41,6 @@ export function createSheet({ sheet, backdrop, closeButton, focusOn, onOpen, onC
     close() {
       if (!shown) return;
       shown = false;
-      if (page) {
-        sheet.hidden = true;
-        document.documentElement.classList.remove("page-open");
-        window.scrollTo(0, homeScroll);
-        open.splice(open.indexOf(api), 1);
-        onClose?.();
-        opener?.focus({ preventScroll: true });
-        opener = null;
-        return;
-      }
       sheet.classList.remove("open");
       backdrop?.classList.remove("open");
       hideTimer = setTimeout(() => {
