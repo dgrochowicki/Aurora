@@ -19,7 +19,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
 | `--bg` | `#22242A` | Tło główne (od 20.10.2026, decyzja autora) |
-| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor do obu pasków) ma kolor `--bg`, a u góry osobny przypięty pas `.places-topbar` (wysokość paska statusu, `--bg-top` z tym samym gradientem, poza panelem, bo w przesuwanym panelu Safari go pomijał); pod dolnym paskiem Safari jest płaski kolor `--bg` (decyzja autora 20.10.2026) |
+| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
 | `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color` |
 | `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |

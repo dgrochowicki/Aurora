@@ -6,7 +6,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 - Pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor. `css/tokens.css`, `css/components.css`, `STYL.md`.
 - Ekran miejsc bez zmian: próby ze sięganiem pod dolny pasek (`100lvh`, wysunięcie warstwy) nie zadziałały, a wersja przewijana jak strona przewijała też tytuł i pole, więc autor wybrał przypiętą warstwę z płaskim kolorem pod paskiem.
-- Górny pasek Safari na ekranie miejsc był jasny jak dolny: pas `.places-sheet::before` w przesuwanym panelu Safari pomijał. Zastępuje go osobny element `.places-topbar` w `index.html`, widoczny przy `html.places-open` (`js/views/places.js`).
+- Ekran miejsc ma znów kolor tła `--bg-top`, jak po pierwszej poprawce paska: górny pasek Safari bez odcięcia, pod dolnym płaski ciemny kolor. Safari bierze jeden kolor przypiętej warstwy do obu pasków; dodatkowy pas u góry (`::before`, osobny element) pomijał. Decyzja autora.
 
 ## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
 

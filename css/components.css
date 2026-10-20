@@ -490,28 +490,9 @@
 }
 .places-sheet {
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) 0;
-  /* Safari zalewa paski u góry i u dołu kolorem tła (background-color) przypiętej warstwy. Na dole ma być --bg,
-     inaczej pod paskiem sterowania widać płaski ciemny pas. */
-  background: var(--bg-gradient), var(--bg);
-}
-/* Kolor paska u góry przy otwartym ekranie miejsc: osobny przypięty pas na wysokość paska statusu w kolorze --bg-top,
-   z tym samym gradientem co ekran. Leży poza .places-sheet, bo w przesuwanym (transform) panelu Safari go pomijał
-   i brał do górnego paska kolor panelu. Widoczny tylko przy html.places-open (places.js). */
-.places-topbar {
-  display: none;
-  position: fixed;
-  z-index: 22;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: min(100%, 560px);
-  height: env(safe-area-inset-top);
-  margin-inline: auto;
-  background: var(--bg-gradient) 0 0 / 100% 438px no-repeat, var(--bg-top);
-  pointer-events: none;
-}
-html.places-open .places-topbar {
-  display: block;
+  /* Safari zalewa oba paski kolorem tła (background-color) przypiętej warstwy. --bg-top daje górny pasek bez odcięcia;
+     pod dolnym paskiem zostaje płaski ciemny kolor (wybór autora 20.10.2026). */
+  background: var(--bg-gradient), var(--bg-top);
 }
 /* Ekran miejsc według makiety autora (18.10.2026): tytuł 21 px, 32 px do pola wyszukiwania i 32 px do kart.
    Tryb wyszukiwania (makieta z 19.10.2026, klasa .searching): tytuł się zwija, pole podjeżdża na jego miejsce,
