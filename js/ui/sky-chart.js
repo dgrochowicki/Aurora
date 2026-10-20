@@ -1,7 +1,7 @@
-// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, jak łuk Słońca w pogodzie Apple, według makiety autora.
-// Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są tylko horyzont (linia ciągła) i −18°
-// (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Kropki to „teraz”. Bez kropek wschodów i zachodów na horyzoncie
-// (usunięte na prośbę autora 20.10.2026, były niezrozumiałe; godziny są w liczbach pod wykresem).
+// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, w duchu wykresu Słońca w pogodzie Apple (propozycja 20.10.2026).
+// Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są horyzont (linia ciągła) i −18° (początek nocy
+// astronomicznej). Pod horyzontem „ziemia” ciemnieje od horyzontu i zanika w dół, nad nim poświata pod łukiem Słońca.
+// Łuki pod horyzontem płynnie gasną. Kropki to „teraz”; pod horyzontem puste w środku, z obwódką w kolorze łuku.
 import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
@@ -20,18 +20,22 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
-  // Nad horyzontem łuk ma pełny kolor, pod nim zaczyna od 75% jasności i gaśnie w dół: 45% przy −18°, 25% na dole
-  // (jaśniej niż wcześniej 50/20/8%, bo cieńsza linia ginęła; decyzja autora 20.10.2026).
-  // Każdy łuk jest rysowany dwa razy, przycięty nad i pod horyzontem.
+  // Nad horyzontem i tuż pod nim (do −6°, zmierzch cywilny) łuk ma pełny kolor. Niżej gaśnie: 55% przy −18° (koniec
+  // zmierzchu), 15% na dole.
+  // Każdy łuk jest rysowany dwa razy: nad horyzontem przycięty, pod nim przez maskę z gradientem. Maska, a nie gradient
+  // na linii, bo Safari (WebKit) przy vector-effect: non-scaling-stroke rozciąga gradient linii i pokazywał od razu
+  // najciemniejszy koniec.
   const y0 = y(0).toFixed(1);
-  const fade = (id, color) =>
-    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="0.75"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.45"/><stop offset="1" stop-color="${color}" stop-opacity="0.25"/></linearGradient>`;
-  const arc = (d, id, color) =>
-    `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="url(#${id})" clip-path="url(#skyBelow)" d="${d}"/>`;
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", SUN)}${fade("skyMoon", MOON)}
+  const fade = `<linearGradient id="skyFade" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="${(6 / -lo).toFixed(3)}" stop-color="#fff" stop-opacity="1"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0.15"/></linearGradient>`;
+  const arc = (d, color) =>
+    `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="${color}" mask="url(#skyBelow)" d="${d}"/>`;
+  // Poświata pod łukiem Słońca, tylko nad horyzontem: od koloru Słońca u góry wykresu do zera na horyzoncie.
+  const glow = `<linearGradient id="skyGlow" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${y0}"><stop offset="0" stop-color="${SUN}" stop-opacity="0.35"/><stop offset="1" stop-color="${SUN}" stop-opacity="0.04"/></linearGradient>`;
+  const sun = path("sun");
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade}${glow}
 <clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
-<clipPath id="skyBelow"><rect x="-1" y="${y0}" width="102" height="${H + 10}"/></clipPath></defs>${arc(path("moon"), "skyMoon", MOON)}${arc(path("sun"), "skySun", SUN)}</svg>`;
-  const lines = [];
+<mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${H + 10}"><rect x="-1" y="${y0}" width="102" height="${H + 10}" fill="url(#skyFade)"/></mask></defs><path class="sky-glow" fill="url(#skyGlow)" clip-path="url(#skyAbove)" d="${sun}L100 ${y0}L0 ${y0}Z"/>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
+  const lines = [`<i class="sky-ground" style="top:${y0}px"></i>`];
   for (let a = hi; a >= lo; a -= STEP) {
     const pos = `top:${y(a).toFixed(1)}px`;
     lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);
@@ -42,7 +46,7 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   let dots = "";
   if (now > n.start && now < n.end) {
     const a = n.arcs[clamp(Math.round((now - n.start) / (n.arcs[1].t - n.start)), 0, n.arcs.length - 1)];
-    dots = dot(now, a.moon, "is-moon") + dot(now, a.sun, "is-sun");
+    dots = dot(now, a.moon, `is-moon${a.moon < 0 ? " is-below" : ""}`) + dot(now, a.sun, `is-sun${a.sun < 0 ? " is-below" : ""}`);
   }
   // Godziny co 6 h od początku osi, rozłożone równo jak na pozostałych wykresach.
   const ticks = Array.from({ length: 5 }, (_, i) => `<span>${hmIn(n.start + i * 6 * 3600000, tz)}</span>`);

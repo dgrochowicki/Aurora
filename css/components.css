@@ -947,6 +947,14 @@ html.sheet-open body {
   height: 1px;
   background: rgba(255, 255, 255, 0.3);
 }
+/* Część wykresu pod horyzontem jak ziemia: najciemniej przy horyzoncie, w dół zanika, bez krawędzi nad godzinami. */
+.sky-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
+}
 .sky-arc {
   fill: none;
   /* Grubość jak linia pozostałych wykresów (.chart-line). */
@@ -964,6 +972,11 @@ html.sheet-open body {
   margin: -9px 0 0 -9px;
   border-radius: 50%;
   background: var(--sky);
+}
+/* Pod horyzontem kropka jest pusta w środku, z obwódką w kolorze łuku (jak w pogodzie Apple). */
+.sky-dot.is-below {
+  border: 2px solid var(--sky);
+  background: var(--sheet);
 }
 /* Faza Księżyca obok procentu tarczy. */
 .moon-phase {
