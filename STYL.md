@@ -70,13 +70,13 @@ Ruch jest powolny: przesunięcie ~±3%, skala do 110%, rotacja ~±3° w 13–23 
 
 Szkło w kartach i kafelkach: `backdrop-filter: blur(20px)`, zgodnie z rzeczywistym CSS. Ikony podstawowego UI to lokalnie zdefiniowane SVG oparte na Phosphor w `js/ui/icons.js`, **nie zewnętrznie ładowany font ikon**.
 
-## 5. Blok „Szansa na zorzę”
+## 5. Blok zdania głównego (dawniej „Szansa na zorzę”)
 
 `.chance` nie ma obramowanej karty. Treść jest bezpośrednio na tle, wcięta o `--text-inset`, z paddingiem 32 px nad i pod. Między nagłówkiem z datą a blokiem około 16 px; pod blokiem około 16 px do kolejnej sekcji.
 
-Kolejność: tytuł 13 px (`--text-60`), opis słowny i procent po 28 px, akapit o aktywności i warunkach, na dole zapowiedź godzin. Odstępy przeważnie 8 px, między wartością a akapitem 16 px. Po stuknięciu tytułu otwierany jest panel „Skąd ten wynik”.
+Od 20.10.2026 (makieta autora, uproszczenie góry) bez tytułu „Szansa na zorzę”, opisu słownego szansy i procentu. Zostaje zdanie główne `.headline` 21/27 px, szare `--text-60`, z kluczowymi słowami (`<strong>`) białymi. To dotychczasowe teksty akapitu (`renderVerdict()` w `js/views/home.js`), np. „Aktywność zorzy jest **zbyt niska** dla Twojej lokalizacji.”, „Zorza może być widoczna **przez aparat**. Skieruj go…”, „**Wyjdź teraz**, zorza jest aktywna…”, a po nich krótka ocena warunków bez szczegółów chmur (`conditionsParts()` w `js/labels.js`): „Warunki obserwacji są **słabe**.”, w dzień „Teraz jest **za jasno** na obserwację.”. Pod nim zapowiedź godzin `.tip` 13/18 px `--text-60`, 16 px niżej. Całe zdanie jest przyciskiem panelu „Skąd ten wynik”.
 
-`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+. Bez wyniku (brak aktualnych danych NOAA albo prognozy chmur) zamiast opisu i procentu stoją „Brak danych” i kreska, zorza w tle jest ukryta, a pigułki godzin pokazują kreskę i nie świecą. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
+Szansa (`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 10–14, Umiarkowana 15–39, Duża 40–69, Bardzo duża 70+) jest dalej w pigułkach godzin, kartach miejsc i panelu, a na stronie głównej ustawia zorzę w tle. Bez wyniku zorza w tle jest ukryta, a pigułki godzin pokazują kreskę i nie świecą. Wartość jest zaokrąglana, także 0%, nie używamy już „<1%”. **Opis procentu musi uwzględniać ograniczenia opisane w `MODEL.md`**; obecnie nie jest to zweryfikowane prawdopodobieństwo.
 
 ## 6. Kafelki i wskaźniki
 

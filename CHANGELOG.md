@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — uproszczona góra strony: zdanie główne zamiast „Szansa na zorzę”
+
+- Na górze strony głównej nie ma już tytułu „Szansa na zorzę”, opisu słownego (np. „Bardzo mała”) ani procentu. Dotychczasowy akapit jest teraz zdaniem głównym 21 px, szarym 60%, z białymi słowami kluczowymi („zbyt niska”, „przez aparat”, „gołym okiem”, „słabe”…), a ocena warunków jest krótka, bez szczegółów chmur („zachmurzenie 85%, jasny Księżyc” są w kafelkach i linii pod godzinami). Zapowiedź godzin zostaje pod spodem jako 13 px, szara 60%. Decyzja autora: teksty bez zmian, chodziło o uproszczenie góry.
+- Nowa `conditionsParts()` w `js/labels.js` z testami (granice, Księżyc, linia wzroku, dzień, brak chmur); wspólna ocena z `conditionsText()`. Szansa dalej ustawia zorzę w tle. Stuknięcie w zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
+
 ## 20.10.2026 — „Jasność nieba” według makiety autora
 
 - Słońce w żółtym z innych wykresów (`--yellow` #FFC867 zamiast `--sun` #CC9200, token usunięty). Bez poświaty pod łukiem Słońca i bez przyciemnionej „ziemi”: tło jednolite jak w makiecie. Kropka „teraz” pod horyzontem z ciemnym środkiem podbarwionym kolorem łuku. `js/ui/sky-chart.js`, `css/components.css`, `css/tokens.css`, `STYL.md`.

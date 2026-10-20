@@ -5,7 +5,7 @@ import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
 import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, glowOf, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
-import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText, chancePhrase, dataLevel } from "../js/labels.js";
+import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText, chancePhrase, dataLevel, conditionsParts } from "../js/labels.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
 const hour = (h) => ({ cloud_cover: [h.total], cloud_cover_low: [h.low], cloud_cover_mid: [h.mid], cloud_cover_high: [h.high] });
@@ -344,6 +344,19 @@ test("zdanie o warunkach mówi o chmurach w stronę zorzy, gdy wyraźnie różni
   assert.equal(conditionsText({ ...night, cloud: 5, cover: 80, ray: {} }), "Warunki obserwacji są słabe, nad Tobą 5% chmur, w stronę zorzy 80%.");
   assert.equal(conditionsText({ ...night, cloud: 5, cover: 10, ray: {} }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
   assert.equal(conditionsText({ ...night, cloud: 5, cover: 80 }), "Warunki obserwacji są dobre, zachmurzenie 5%.");
+});
+
+test("krótkie zdanie o warunkach do zdania głównego: wyróżniona ocena, bez szczegółów chmur", () => {
+  const night = { night: true, sky: { moonAlt: -5, moonIllum: 0 } };
+  const text = (parts) => parts.map(([t, s]) => (s ? `[${t}]` : t)).join("");
+  assert.equal(text(conditionsParts({ ...night, cloud: 90 })), "Warunki obserwacji są [słabe].");
+  assert.equal(text(conditionsParts({ ...night, cloud: 10 })), "Warunki obserwacji są [dobre].");
+  // Granica 30% i jasny Księżyc wysoko dają „umiarkowane”; liczy się niebo w stronę zorzy, gdy wyraźnie inne.
+  assert.equal(text(conditionsParts({ ...night, cloud: 30 })), "Warunki obserwacji są [umiarkowane].");
+  assert.equal(text(conditionsParts({ night: true, sky: { moonAlt: 30, moonIllum: 0.9 }, cloud: 0 })), "Warunki obserwacji są [umiarkowane].");
+  assert.equal(text(conditionsParts({ ...night, cloud: 5, cover: 80, ray: {} })), "Warunki obserwacji są [słabe].");
+  assert.equal(text(conditionsParts({ ...night, night: false, cloud: 0 })), "Teraz jest [za jasno] na obserwację.");
+  assert.equal(text(conditionsParts({ ...night, cloud: null })), "Brak prognozy zachmurzenia.");
 });
 
 test("skrót warunków dla karty miejsca: godzina miejscowa, chmury i szansa teraz", async () => {

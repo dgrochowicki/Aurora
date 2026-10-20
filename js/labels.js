@@ -57,17 +57,31 @@ export function dataLevel(space, grid) {
 // Poziom zorzy w tle 0–4: „Brak” i „Bardzo mała” mają tę samą małą plamę przy krawędzi.
 export const chanceLevel = (score) => Math.max(0, chanceIndex(score) - 1);
 
+// Niebo, które liczy się dla obserwacji: w stronę zorzy (r.cover, z linii wzroku), gdy wyraźnie różni się od nieba
+// nad głową (r.cloud), inaczej nad głową.
+const towardAurora = (r) => r.ray && r.cover != null && Math.abs(r.cover - r.cloud) >= 15;
+const brightMoonUp = (r) => r.sky.moonAlt > 15 && r.sky.moonIllum > 0.5;
+// Ocena warunków w nocy: „słabe”, „umiarkowane” albo „dobre”. Wymaga r.cloud.
+const obsQuality = (r) => {
+  const sky = towardAurora(r) ? r.cover : r.cloud;
+  return sky >= 70 ? "słabe" : sky >= 30 || brightMoonUp(r) ? "umiarkowane" : "dobre";
+};
+
 // Zdanie o warunkach obserwacji w danej godzinie: jasność nieba, chmury i jasny Księżyc wysoko.
-// Gdy niebo w stronę zorzy (r.cover, z linii wzroku) wyraźnie różni się od nieba nad głową (r.cloud), zdanie mówi o obu.
+// Gdy niebo w stronę zorzy wyraźnie różni się od nieba nad głową, zdanie mówi o obu.
 export function conditionsText(r) {
   if (r.cloud == null) return r.night ? "Brak prognozy zachmurzenia, więc nie ocenimy warunków obserwacji." : "Teraz jest za jasno na obserwację, brak prognozy zachmurzenia.";
-  const toward = r.ray && r.cover != null && Math.abs(r.cover - r.cloud) >= 15;
-  const cloud = toward ? `nad Tobą ${Math.round(r.cloud)}% chmur, w stronę zorzy ${r.cover}%` : `zachmurzenie ${Math.round(r.cloud)}%`;
-  const sky = toward ? r.cover : r.cloud;
+  const cloud = towardAurora(r) ? `nad Tobą ${Math.round(r.cloud)}% chmur, w stronę zorzy ${r.cover}%` : `zachmurzenie ${Math.round(r.cloud)}%`;
   if (!r.night) return `Teraz jest za jasno na obserwację, ${cloud}.`;
-  const brightMoon = r.sky.moonAlt > 15 && r.sky.moonIllum > 0.5;
-  const quality = sky >= 70 ? "słabe" : sky >= 30 || brightMoon ? "umiarkowane" : "dobre";
-  return `Warunki obserwacji są ${quality}, ${cloud}${brightMoon ? ", jasny Księżyc" : ""}.`;
+  return `Warunki obserwacji są ${obsQuality(r)}, ${cloud}${brightMoonUp(r) ? ", jasny Księżyc" : ""}.`;
+}
+
+// Krótkie zdanie o warunkach teraz do zdania głównego strony (bez szczegółów chmur, które są w kafelkach): odcinki
+// [tekst, wyróżniony], wyróżniona ocena jest biała. r: wiersz prognozy na teraz.
+export function conditionsParts(r) {
+  if (r.cloud == null) return [["Brak prognozy zachmurzenia."]];
+  if (!r.night) return [["Teraz jest "], ["za jasno", true], [" na obserwację."]];
+  return [["Warunki obserwacji są "], [obsQuality(r), true], ["."]];
 }
 
 // Kierunek patrzenia z lookDirection(): „na północny zachód” itd. (8 stron świata), a gdy zorza jest prawie nad głową

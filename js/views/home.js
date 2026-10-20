@@ -1,11 +1,11 @@
 // Strona główna: szansa teraz, godziny, kafelki danych i panele szczegółów.
-import { $, fmtNum, browserOffset, offsetAt } from "../util.js";
+import { $, esc, fmtNum, browserOffset, offsetAt } from "../util.js";
 import { phaseAt, moonLitRight } from "../model/sky.js";
 import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { lookDirection } from "../model/aurora.js";
-import { directionLabel, ageLabel, activityLabel, chanceLabel, chanceLevel, conditionsText, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
+import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -14,8 +14,6 @@ import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
 import { DETAILS } from "./details.js";
 
 const els = {
-  score: $("#score"),
-  chance: $("#chanceText"),
   sky: $("#auroraSky"),
   activityLevel: $("#activityLevel"),
   summary: $("#summary"),
@@ -76,8 +74,7 @@ function openDetail(key, opener) {
 export function clearHome() {
   state = null;
   info.close();
-  els.score.textContent = "—";
-  els.chance.textContent = "—";
+  showHeadline([]);
   els.sky.removeAttribute("data-level");
   els.activityLevel.textContent = "";
   [...ACTIVITY_TILES, ...CONDITION_TILES].forEach(({ key }) => setTile(document, key));
@@ -94,10 +91,13 @@ function clearPlaceTime() {
   els.today.textContent = "";
 }
 
-export const showLoading = () => {
-  els.score.textContent = "—";
-  els.chance.textContent = "Sprawdzam…";
-};
+export const showLoading = () => showHeadline([["Sprawdzam…"]]);
+
+// Zdanie główne z odcinków [tekst, wyróżniony]: wyróżnione jako <strong> (białe), reszta szara. Odcinki łączymy spacją
+// między zdaniami, więc każdy kończy się bez spacji.
+function showHeadline(parts) {
+  els.summary.innerHTML = parts.map(([t, strong]) => (strong ? `<strong>${esc(t)}</strong>` : esc(t))).join("");
+}
 
 // Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
 // Opis mówi, co pomiar znaczy dla zorzy, a wskaźnik pod nim pokazuje to samo kolorem: miernik dla Kp, mini wykres z 2 godzin dla reszty.
@@ -175,16 +175,15 @@ export function renderForecast(loc, w, grid, space) {
   els.outlook.textContent = fc.activity ? outlookText(best, maxAct, change, yours) : change?.sentence || "";
   els.outlook.hidden = !rows.length || !els.outlook.textContent;
   renderConfidence(live.space, live.grid);
-  if (!fc.activity) els.summary.textContent = `${noActivityText(live.stale, now)} ${conditionsText(first)}`;
+  if (!fc.activity) showHeadline([[`${noActivityText(live.stale, now)} `], ...conditionsParts(first)]);
   else if (first.score == null)
-    els.summary.textContent = `Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy. Aktywność zorzy jest ${activityLabel(first.act).toLowerCase()}.`;
+    showHeadline([[`Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy. Aktywność zorzy jest ${activityLabel(first.act).toLowerCase()}.`]]);
   else renderVerdict(first, best, maxAct, directionLabel(dir, loc.lat));
 }
 
-// Wynik i jego opis słowny. null to kreska i „Brak danych”, bez zorzy w tle.
+// Szansa nie jest już pokazana liczbą na stronie głównej (decyzja autora 20.10.2026), ale ustawia zorzę w tle.
+// null to brak zorzy w tle.
 function showScore(score) {
-  els.score.textContent = score == null ? "—" : `${score}%`;
-  els.chance.textContent = score == null ? "Brak danych" : chanceLabel(score);
   if (score == null) els.sky.removeAttribute("data-level");
   else els.sky.dataset.level = chanceLevel(score);
 }
@@ -220,13 +219,15 @@ export function renderSpaceOnly(loc, grid, space) {
   els.hourDetail.textContent = "Bez prognozy pogody nie pokażemy szansy w kolejnych godzinach.";
   els.outlook.hidden = true;
   clearPlaceTime();
-  els.chance.textContent = "Brak prognozy";
   els.sky.removeAttribute("data-level");
   els.activityLevel.textContent = act == null ? "" : activityLabel(act);
-  els.summary.textContent =
-    act == null
-      ? "Nie znamy teraz zachmurzenia ani aktualnej aktywności zorzy, więc nie policzymy szansy. Spróbuj ponownie za chwilę."
-      : `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`;
+  showHeadline([
+    [
+      act == null
+        ? "Nie znamy teraz zachmurzenia ani aktualnej aktywności zorzy, więc nie policzymy szansy. Spróbuj ponownie za chwilę."
+        : `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`,
+    ],
+  ]);
 }
 
 // Data w strefie miejsca (tz; bez niej strefa przeglądarki) i godzina pobrania danych w czasie użytkownika.
@@ -254,17 +255,18 @@ function renderConfidence(space, grid) {
     : "Kompletność danych: brak aktualnych danych o aktywności zorzy";
 }
 
-// Akapit pod wynikiem: co z zorzą (z kierunkiem patrzenia, gdy jest szansa) i jakie są warunki obserwacji teraz.
+// Zdanie główne (uproszczona góra strony według makiety autora z 20.10.2026): co z zorzą (z kierunkiem patrzenia, gdy jest
+// szansa) i krótka ocena warunków teraz. Teksty jak wcześniej w akapicie, bez szczegółów chmur; kluczowe słowa są białe.
 // „where” to kierunek z directionLabel(): np. „na północny zachód” albo „w górę”.
 function renderVerdict(first, best, activity, where) {
   let reason;
-  if (activity < 8 && best.score < 10) reason = "Aktywność zorzy jest zbyt niska dla Twojej lokalizacji.";
-  else if (!first.night && best.score < 10) reason = "Nawet po zmroku aktywność, chmury lub Księżyc nie dadzą dobrej szansy.";
-  else if (!first.night) reason = "Zorza może być widoczna po zmroku. Najlepsze godziny są podświetlone poniżej.";
-  else if (first.cover >= 75 && first.act >= 8) reason = "Zorza jest aktywna, ale zasłaniają ją chmury. Sprawdź późniejsze godziny.";
-  else if (first.score >= 70) reason = `Wyjdź teraz, zorza jest aktywna. Patrz ${where}.`;
-  else if (first.score >= 40) reason = `Zorza może być widoczna gołym okiem. Patrz ${where}, z dala od świateł miasta.`;
-  else if (first.score >= 14) reason = `Zorza może być widoczna przez aparat. Skieruj go ${where} i spróbuj trybu nocnego.`;
-  else reason = "Zorza jest aktywna, ale za słaba, żeby ją teraz zobaczyć.";
-  els.summary.textContent = `${reason} ${conditionsText(first)}`;
+  if (activity < 8 && best.score < 10) reason = [["Aktywność zorzy jest "], ["zbyt niska", true], [" dla Twojej lokalizacji."]];
+  else if (!first.night && best.score < 10) reason = [["Nawet po zmroku aktywność, chmury lub Księżyc "], ["nie dadzą dobrej szansy", true], ["."]];
+  else if (!first.night) reason = [["Zorza może być widoczna "], ["po zmroku", true], [". Najlepsze godziny są podświetlone poniżej."]];
+  else if (first.cover >= 75 && first.act >= 8) reason = [["Zorza jest aktywna, ale "], ["zasłaniają ją chmury", true], [". Sprawdź późniejsze godziny."]];
+  else if (first.score >= 70) reason = [["Wyjdź teraz", true], [`, zorza jest aktywna. Patrz ${where}.`]];
+  else if (first.score >= 40) reason = [["Zorza może być widoczna "], ["gołym okiem", true], [`. Patrz ${where}, z dala od świateł miasta.`]];
+  else if (first.score >= 14) reason = [["Zorza może być widoczna "], ["przez aparat", true], [`. Skieruj go ${where} i spróbuj trybu nocnego.`]];
+  else reason = [["Zorza jest aktywna, ale "], ["za słaba", true], [", żeby ją teraz zobaczyć."]];
+  showHeadline([...reason, [" "], ...conditionsParts(first)]);
 }

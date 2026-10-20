@@ -191,34 +191,31 @@
   inset: 0;
   border-radius: inherit;
 }
-/* Słowny opis szansy po lewej, liczba procent po prawej, oba 28 px. */
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 1.75rem;
-  line-height: 34px;
-}
-.score-row strong {
-  font-weight: 500;
-}
-/* W bloku szansy teksty są co 8 px, tylko pod opisem szansy 16 px. */
-.summary {
-  margin: 16px 0 0;
-  font-size: 0.9375rem;
-  line-height: 20px;
+/* Zdanie główne (makieta autora z 20.10.2026): 21 px, szare 60%, kluczowe słowa (strong) białe.
+   Całe jest przyciskiem panelu „Skąd ten wynik”. */
+.headline {
+  display: block;
+  text-align: left;
+  font-size: 1.3125rem;
+  line-height: 27px;
+  font-weight: 400;
   color: var(--text-60);
 }
-/* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
-.outlook {
+.headline strong {
+  font-weight: inherit;
+  color: var(--text);
+}
+/* Zapowiedź pod zdaniem głównym, 13 px szara 60%: najlepsza godzina albo zmiana chmur. */
+.tip {
   margin: 8px 0 0;
   font-size: 0.8125rem;
-  line-height: 1.45;
-  color: var(--text-40);
+  line-height: 18px;
+  color: var(--text-60);
 }
-.outlook[hidden] {
+.headline + .tip {
+  margin-top: 16px;
+}
+.tip[hidden] {
   display: none;
 }
 
