@@ -20,11 +20,12 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
-  // Nad horyzontem łuk ma pełny kolor, pod nim płynnie gaśnie od pełnego na horyzoncie do 20% na dole.
+  // Nad horyzontem łuk ma pełny kolor. Pod nim gaśnie jak światło zmierzchu: powoli do 70% przy −18° (koniec zmierzchu),
+  // niżej szybciej, do 15% na dole.
   // Każdy łuk jest rysowany dwa razy, przycięty nad i pod horyzontem.
   const y0 = y(0).toFixed(1);
   const fade = (id, color) =>
-    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="1"/><stop offset="1" stop-color="${color}" stop-opacity="0.2"/></linearGradient>`;
+    `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="1"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.7"/><stop offset="1" stop-color="${color}" stop-opacity="0.15"/></linearGradient>`;
   const arc = (d, id, color) =>
     `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="url(#${id})" clip-path="url(#skyBelow)" d="${d}"/>`;
   // Poświata pod łukiem Słońca, tylko nad horyzontem: od koloru Słońca u góry wykresu do zera na horyzoncie.
