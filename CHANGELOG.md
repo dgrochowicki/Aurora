@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — „Jasność nieba” w duchu wykresu Apple (propozycja)
+
+- Wykres łuków bez przerywanych linii co 18° i podpisu −18°: zostaje sam horyzont. Pod horyzontem przyciemniona „ziemia”, nad nim poświata pod łukiem Słońca, jak wypełnienie pod linią na innych wykresach. Księżyc jako sama linia. Na prośbę autora, który wskazał wykres Słońca z pogody Apple. `js/ui/sky-chart.js`, `css/components.css`, `STYL.md`.
+
 ## 20.10.2026 — wykresy: cieńsze łuki, jaśniejsze podpisy osi Y
 
 - „Jasność nieba”: łuki Słońca i Księżyca mają grubość linii pozostałych wykresów (2,3 px zamiast 5 px), a pod horyzontem są jaśniejsze (75% → 45% przy −18° → 25% u dołu, wcześniej 50/20/8%). `js/ui/sky-chart.js`, `css/components.css`.

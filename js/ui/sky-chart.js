@@ -1,7 +1,6 @@
-// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, jak łuk Słońca w pogodzie Apple, według makiety autora.
-// Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są tylko horyzont (linia ciągła) i −18°
-// (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Kropki to „teraz”. Bez kropek wschodów i zachodów na horyzoncie
-// (usunięte na prośbę autora 20.10.2026, były niezrozumiałe; godziny są w liczbach pod wykresem).
+// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, w duchu wykresu Słońca w pogodzie Apple (propozycja 20.10.2026):
+// bez siatki i stopni, tylko horyzont; pod nim przyciemniona „ziemia”, nad nim poświata pod łukiem Słońca. Łuki gasną,
+// im niżej schodzą. Kropki to „teraz”. Skala pionowa jak wcześniej: co 18° w odstępach 37 px.
 import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
@@ -28,15 +27,14 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
     `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="${color}" stop-opacity="0.75"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="${color}" stop-opacity="0.45"/><stop offset="1" stop-color="${color}" stop-opacity="0.25"/></linearGradient>`;
   const arc = (d, id, color) =>
     `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="url(#${id})" clip-path="url(#skyBelow)" d="${d}"/>`;
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", SUN)}${fade("skyMoon", MOON)}
+  // Poświata pod łukiem Słońca, tylko nad horyzontem: od koloru Słońca u góry wykresu do zera na horyzoncie.
+  const glow = `<linearGradient id="skyGlow" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${y0}"><stop offset="0" stop-color="${SUN}" stop-opacity="0.35"/><stop offset="1" stop-color="${SUN}" stop-opacity="0.04"/></linearGradient>`;
+  const sun = path("sun");
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade("skySun", SUN)}${fade("skyMoon", MOON)}${glow}
 <clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
-<clipPath id="skyBelow"><rect x="-1" y="${y0}" width="102" height="${H + 10}"/></clipPath></defs>${arc(path("moon"), "skyMoon", MOON)}${arc(path("sun"), "skySun", SUN)}</svg>`;
-  const lines = [];
-  for (let a = hi; a >= lo; a -= STEP) {
-    const pos = `top:${y(a).toFixed(1)}px`;
-    lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);
-    if (a === 0 || a === -STEP) lines.push(`<span class="chart-y" style="${pos}">${a ? "−18°" : "Horyzont"}</span>`);
-  }
+<clipPath id="skyBelow"><rect x="-1" y="${y0}" width="102" height="${H + 10}"/></clipPath></defs><path class="sky-glow" fill="url(#skyGlow)" clip-path="url(#skyAbove)" d="${sun}L100 ${y0}L0 ${y0}Z"/>${arc(path("moon"), "skyMoon", MOON)}${arc(sun, "skySun", SUN)}</svg>`;
+  // Tylko horyzont z podpisem i przyciemniona część pod nim; bez linii co 18° i podpisu −18°.
+  const lines = [`<i class="sky-ground" style="top:${y0}px"></i>`, `<i class="sky-horizon" style="top:${y0}px"></i>`, `<span class="chart-y" style="top:${y0}px">Horyzont</span>`];
   const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
   // Kropki „teraz” w miejscu najbliższej próbki.
   let dots = "";
