@@ -205,18 +205,25 @@
   font-weight: inherit;
   color: var(--text);
 }
-/* Zapowiedź pod zdaniem głównym, 13 px szara 60%: najlepsza godzina albo zmiana chmur. */
-.tip {
-  margin: 8px 0 0;
+/* Strzałka jak na kafelkach: zdanie otwiera panel „Skąd ten wynik”. */
+.headline i {
+  margin-left: 6px;
+  font-style: normal;
+  color: var(--text-40);
+}
+/* Wskazówki pod zdaniem głównym w jednym akapicie 13 px, szarym 60%, 16 px niżej (autor: bez osobnych akapitów, żeby nie było
+   trzeciego poziomu): co zrobić teraz i zapowiedź (najlepsza godzina albo zmiana chmur). Bez obu akapit znika. */
+.tips {
+  margin: 16px 0 0;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--text-60);
 }
-.headline + .tip {
-  margin-top: 16px;
-}
-.tip[hidden] {
+.tips:not(:has(> :not([hidden]))) {
   display: none;
+}
+.tips > :not([hidden]) ~ :not([hidden])::before {
+  content: " ";
 }
 
 /* Godziny: pigułki przewijane w poziomie aż do krawędzi ekranu. */
