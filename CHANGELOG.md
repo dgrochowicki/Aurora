@@ -6,6 +6,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 - Na ekranie miejsc pod paskami Safari był płaski kolor, bo ekran był przypiętą warstwą (`position: fixed`), a Safari pod paskami nie pokazuje jej treści. Ekran jest teraz treścią strony: `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, a po zamknięciu przywraca jej miejsce przewinięcia. Pod paskami widać karty i gradient, jak na stronie głównej. Próby z wysokością `100lvh` i wysunięciem warstwy pod pasek na iPhonie nie zadziałały (autor sprawdził na telefonie).
 - Wejście: wyciszenie i przesunięcie o 16 px zamiast wysuwania od dołu. Tytuł i pole przewijają się z kartami. Escape, fokus i tryb wyszukiwania bez zmian. Zniknął przypięty pas u góry (`.places-sheet::before`). `css/components.css`, `css/base.css`, `js/views/places.js`, `STYL.md`.
+- Panele szczegółów: pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor.
 
 ## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
 

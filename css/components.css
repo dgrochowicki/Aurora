@@ -433,7 +433,10 @@
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: rgba(0, 0, 0, 0.6);
+  /* Przyciemnienie jako obraz, nie kolor tła: Safari zalewa pasek u góry kolorem tła przypiętej warstwy, a półprzezroczystego
+     nie składa z treścią, więc pasek się odcinał. Bez koloru bierze kolor strony, który przy otwartym panelu
+     jest --bg-top-dim (niżej). */
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -612,10 +615,12 @@ html.page-open .aurora-sky {
   overscroll-behavior: contain;
   padding-bottom: calc(30px + env(safe-area-inset-bottom));
 }
-/* Strona pod otwartym panelem się nie przewija. */
+/* Strona pod otwartym panelem się nie przewija. Kolor tła strony (widoczny tylko w pasku Safari, bo body maluje gradient
+   obrazem) to przyciemniona góra, żeby pasek nie odcinał się od przyciemnionej treści. */
 html.sheet-open,
 html.sheet-open body {
   overflow: hidden;
+  background-color: var(--bg-top-dim);
 }
 @media (prefers-reduced-motion: reduce) {
   .sheet,

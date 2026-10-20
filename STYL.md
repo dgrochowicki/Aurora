@@ -21,6 +21,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--bg` | `#22242A` | Tło główne (od 20.10.2026, decyzja autora) |
 | `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc nie ma własnego tła: jest treścią strony na tle `body` |
 | `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color` |
+| `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--text-60` i `--text-60`) |
 | `--text-40` | `rgba(255, 255, 255, 0.40)` | Notki i tekst drugorzędny (dawniej `--text-40`) |

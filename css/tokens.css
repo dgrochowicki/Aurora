@@ -4,6 +4,8 @@
   /* Tło według decyzji autora (20.10.2026): #12151A u góry przechodzi w --bg w połowie ekranu 876 px. */
   --bg: #22242a;
   --bg-top: #12151a;
+  /* --bg-top pod przyciemnieniem paneli (czarny 60%): kolor paska Safari, gdy otwarty jest panel szczegółów. */
+  --bg-top-dim: #07080a;
   /* Gradient tła jako obraz. Kolorem tła (background-color) jest --bg-top, bo z niego Safari bierze kolor paska u góry;
      przy kolorze --bg pasek odcinał się od ciemnej góry gradientu. */
   --bg-gradient: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 438px);
