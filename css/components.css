@@ -485,33 +485,38 @@
   border-radius: 0;
   border: 0;
 }
-.places-sheet {
+/* Ekran miejsc to treść strony, nie przypięta warstwa (sheet.js, page): przewija go Safari jak stronę główną, więc pod
+   paskami Safari widać karty i gradient body. Na czas otwarcia (html.page-open) strona główna jest ukryta. */
+.places-sheet.sheet {
+  position: relative;
+  inset: auto;
+  left: auto;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  display: block;
+  overflow: visible;
+  transform: none;
+  transition: none;
+  background: none;
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) 0;
-  /* Safari zalewa paski u góry i u dołu kolorem tła (background-color) przypiętej warstwy. Na dole ma być --bg,
-     inaczej pod paskiem sterowania widać płaski ciemny pas. */
-  background: var(--bg-gradient), var(--bg);
+  animation: places-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-/* Próba (20.10.2026): ekran miejsc wystaje 160 px poniżej ekranu, żeby sięgał pod dolny pasek Safari; wtedy pod paskiem
-   widać przewijane karty zamiast płaskiego koloru albo strony głównej (przy 100lvh panel kończył się nad paskiem).
-   Lista ma na dole ten sam zapas, żeby ostatnia karta dała się wysunąć ponad pasek. */
-.places-sheet {
-  bottom: -160px;
+.places-sheet.sheet[hidden] {
+  display: none;
 }
 .places-sheet .sheet-scroll {
-  padding-bottom: calc(30px + env(safe-area-inset-bottom) + 160px);
+  overflow: visible;
 }
-/* Kolor paska u góry: przypięty pas w kolorze --bg-top, z tym samym gradientem co ekran, więc go nie widać.
-   Leży pod treścią (z-index: -1 w obrębie panelu). */
-.places-sheet::before {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(44px + env(safe-area-inset-top));
-  background: var(--bg-gradient) 0 0 / 100% 438px no-repeat, var(--bg-top);
-  pointer-events: none;
+@keyframes places-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+html.page-open .app-shell,
+html.page-open .fab-bar,
+html.page-open .aurora-sky {
+  display: none;
 }
 /* Ekran miejsc według makiety autora (18.10.2026): tytuł 21 px, 32 px do pola wyszukiwania i 32 px do kart.
    Tryb wyszukiwania (makieta z 19.10.2026, klasa .searching): tytuł się zwija, pole podjeżdża na jego miejsce,
@@ -576,7 +581,8 @@
   .search-close {
     transition: none;
   }
-  .searching .places-note {
+  .searching .places-note,
+  .places-sheet.sheet {
     animation: none;
   }
 }

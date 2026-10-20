@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — ekran miejsc przewijany jak strona główna
+
+- Na ekranie miejsc pod paskami Safari był płaski kolor, bo ekran był przypiętą warstwą (`position: fixed`), a Safari pod paskami nie pokazuje jej treści. Ekran jest teraz treścią strony: `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, a po zamknięciu przywraca jej miejsce przewinięcia. Pod paskami widać karty i gradient, jak na stronie głównej. Próby z wysokością `100lvh` i wysunięciem warstwy pod pasek na iPhonie nie zadziałały (autor sprawdził na telefonie).
+- Wejście: wyciszenie i przesunięcie o 16 px zamiast wysuwania od dołu. Tytuł i pole przewijają się z kartami. Escape, fokus i tryb wyszukiwania bez zmian. Zniknął przypięty pas u góry (`.places-sheet::before`). `css/components.css`, `css/base.css`, `js/views/places.js`, `STYL.md`.
+
 ## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
 
 - Na ekranie miejsc pod dolnym paskiem Safari był płaski ciemny pas, bo Safari zalewa paski kolorem tła przypiętej warstwy (`#12151A` po poprzedniej poprawce). Ekran ma teraz kolor `--bg`, a kolor górnego paska daje przypięty pas `.places-sheet::before` w `--bg-top` z tym samym gradientem. `css/components.css`, `STYL.md`.

@@ -41,10 +41,8 @@ const store = () => {
 
 const sheet = createSheet({
   sheet: $("#placesSheet"),
-  onOpen: () => {
-    renderPlaces();
-    $("#placesSheet .sheet-scroll").scrollTop = 0;
-  },
+  page: true,
+  onOpen: () => renderPlaces(),
   onClose: () => {
     clearTimeout(timer);
     searchSeq++;
