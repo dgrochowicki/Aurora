@@ -76,21 +76,12 @@ export function conditionsText(r) {
   return `Warunki obserwacji są ${obsQuality(r)}, ${cloud}${brightMoonUp(r) ? ", jasny Księżyc" : ""}.`;
 }
 
-// Zdanie główne strony (makieta autora z 20.10.2026): aktywność zorzy i ocena warunków teraz. Zwraca odcinki [tekst, wyróżniony];
-// wyróżnione (poziom aktywności i ocena warunków) są białe, reszta szara. act: widoczna aktywność 0–100 albo null,
-// gdy jej nie znamy (wtedy zdanie mówi tylko o warunkach). r: wiersz prognozy na teraz albo null.
-export function headline(act, r) {
-  const parts = [];
-  if (act != null) {
-    const level = activityLabel(act);
-    if (act < 10) parts.push(["Aktywność zorzy jest "], [level.toLowerCase(), true], [" dla Twojej lokalizacji. "]);
-    else parts.push([level, true], [` aktywność zorzy około ${Math.round(act)}%. `]);
-  }
-  if (!r) return parts;
-  if (r.cloud == null) parts.push(["Brak prognozy zachmurzenia."]);
-  else if (!r.night) parts.push(["Teraz jest "], ["za jasno", true], [" na obserwację."]);
-  else parts.push(["Warunki obserwacji są "], [obsQuality(r), true], ["."]);
-  return parts;
+// Krótkie zdanie o warunkach teraz do zdania głównego strony (bez szczegółów chmur, które są w kafelkach): odcinki
+// [tekst, wyróżniony], wyróżniona ocena jest biała. r: wiersz prognozy na teraz.
+export function conditionsParts(r) {
+  if (r.cloud == null) return [["Brak prognozy zachmurzenia."]];
+  if (!r.night) return [["Teraz jest "], ["za jasno", true], [" na obserwację."]];
+  return [["Warunki obserwacji są "], [obsQuality(r), true], ["."]];
 }
 
 // Kierunek patrzenia z lookDirection(): „na północny zachód” itd. (8 stron świata), a gdy zorza jest prawie nad głową

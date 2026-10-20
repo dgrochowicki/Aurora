@@ -5,7 +5,7 @@ import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { lookDirection } from "../model/aurora.js";
-import { directionLabel, ageLabel, activityLabel, chanceLevel, headline, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
+import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
@@ -17,7 +17,6 @@ const els = {
   sky: $("#auroraSky"),
   activityLevel: $("#activityLevel"),
   summary: $("#summary"),
-  tip: $("#tip"),
   updated: $("#updatedText"),
   hourly: $("#hourly"),
   hourDetail: $("#hourDetail"),
@@ -82,7 +81,6 @@ export function clearHome() {
   els.hourly.innerHTML = "";
   els.hourDetail.textContent = "";
   els.outlook.hidden = true;
-  showTip("");
   clearPlaceTime();
 }
 
@@ -95,14 +93,10 @@ function clearPlaceTime() {
 
 export const showLoading = () => showHeadline([["Sprawdzam…"]]);
 
-// Zdanie główne z odcinków headline(): wyróżnione jako <strong> (białe), reszta szara.
+// Zdanie główne z odcinków [tekst, wyróżniony]: wyróżnione jako <strong> (białe), reszta szara. Odcinki łączymy spacją
+// między zdaniami, więc każdy kończy się bez spacji.
 function showHeadline(parts) {
   els.summary.innerHTML = parts.map(([t, strong]) => (strong ? `<strong>${esc(t)}</strong>` : esc(t))).join("");
-}
-// Wskazówka pod zdaniem głównym; pusta jest ukryta.
-function showTip(text) {
-  els.tip.textContent = text || "";
-  els.tip.hidden = !text;
 }
 
 // Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
@@ -181,10 +175,9 @@ export function renderForecast(loc, w, grid, space) {
   els.outlook.textContent = fc.activity ? outlookText(best, maxAct, change, yours) : change?.sentence || "";
   els.outlook.hidden = !rows.length || !els.outlook.textContent;
   renderConfidence(live.space, live.grid);
-  // Zdanie główne: aktywność i warunki teraz. Bez danych o aktywności mówi tylko o warunkach, a powód jest we wskazówce.
-  showHeadline(headline(fc.activity ? first.act : null, first));
-  if (!fc.activity) showTip(noActivityText(live.stale, now));
-  else if (first.score == null) showTip("Bez prognozy zachmurzenia na tę godzinę nie liczymy szansy.");
+  if (!fc.activity) showHeadline([[`${noActivityText(live.stale, now)} `], ...conditionsParts(first)]);
+  else if (first.score == null)
+    showHeadline([[`Brak prognozy zachmurzenia na tę godzinę, więc nie liczymy szansy. Aktywność zorzy jest ${activityLabel(first.act).toLowerCase()}.`]]);
   else renderVerdict(first, best, maxAct, directionLabel(dir, loc.lat));
 }
 
@@ -228,8 +221,13 @@ export function renderSpaceOnly(loc, grid, space) {
   clearPlaceTime();
   els.sky.removeAttribute("data-level");
   els.activityLevel.textContent = act == null ? "" : activityLabel(act);
-  showHeadline(act == null ? [["Brak danych o aktywności zorzy i zachmurzeniu."]] : headline(act, null));
-  showTip("Bez prognozy pogody nie policzymy szansy. Spróbuj ponownie za chwilę.");
+  showHeadline([
+    [
+      act == null
+        ? "Nie znamy teraz zachmurzenia ani aktualnej aktywności zorzy, więc nie policzymy szansy. Spróbuj ponownie za chwilę."
+        : `Nie znamy teraz zachmurzenia. Aktywność zorzowa jest ${activityLabel(act).toLowerCase()}, ale bez danych o chmurach nie policzymy szansy. Spróbuj ponownie za chwilę.`,
+    ],
+  ]);
 }
 
 // Data w strefie miejsca (tz; bez niej strefa przeglądarki) i godzina pobrania danych w czasie użytkownika.
@@ -257,17 +255,18 @@ function renderConfidence(space, grid) {
     : "Kompletność danych: brak aktualnych danych o aktywności zorzy";
 }
 
-// Wskazówka pod zdaniem głównym: co zrobić z zorzą teraz (z kierunkiem patrzenia, gdy jest szansa). Gdy aktywność jest
-// za niska, zdanie główne mówi to samo, więc wskazówki nie ma. „where” to kierunek z directionLabel(): np. „na północny zachód”.
+// Zdanie główne (uproszczona góra strony według makiety autora z 20.10.2026): co z zorzą (z kierunkiem patrzenia, gdy jest
+// szansa) i krótka ocena warunków teraz. Teksty jak wcześniej w akapicie, bez szczegółów chmur; kluczowe słowa są białe.
+// „where” to kierunek z directionLabel(): np. „na północny zachód” albo „w górę”.
 function renderVerdict(first, best, activity, where) {
   let reason;
-  if (activity < 8 && best.score < 10) reason = "";
-  else if (!first.night && best.score < 10) reason = "Nawet po zmroku aktywność, chmury lub Księżyc nie dadzą dobrej szansy.";
-  else if (!first.night) reason = "Zorza może być widoczna po zmroku. Najlepsze godziny są podświetlone poniżej.";
-  else if (first.cover >= 75 && first.act >= 8) reason = "Zorza jest aktywna, ale zasłaniają ją chmury. Sprawdź późniejsze godziny.";
-  else if (first.score >= 70) reason = `Wyjdź teraz, zorza jest aktywna. Patrz ${where}.`;
-  else if (first.score >= 40) reason = `Zorza może być widoczna gołym okiem. Patrz ${where}, z dala od świateł miasta.`;
-  else if (first.score >= 14) reason = `Zorza może być widoczna przez aparat. Skieruj go ${where} i spróbuj trybu nocnego.`;
-  else reason = "Zorza jest aktywna, ale za słaba, żeby ją teraz zobaczyć.";
-  showTip(reason);
+  if (activity < 8 && best.score < 10) reason = [["Aktywność zorzy jest "], ["zbyt niska", true], [" dla Twojej lokalizacji."]];
+  else if (!first.night && best.score < 10) reason = [["Nawet po zmroku aktywność, chmury lub Księżyc "], ["nie dadzą dobrej szansy", true], ["."]];
+  else if (!first.night) reason = [["Zorza może być widoczna "], ["po zmroku", true], [". Najlepsze godziny są podświetlone poniżej."]];
+  else if (first.cover >= 75 && first.act >= 8) reason = [["Zorza jest aktywna, ale "], ["zasłaniają ją chmury", true], [". Sprawdź późniejsze godziny."]];
+  else if (first.score >= 70) reason = [["Wyjdź teraz", true], [`, zorza jest aktywna. Patrz ${where}.`]];
+  else if (first.score >= 40) reason = [["Zorza może być widoczna "], ["gołym okiem", true], [`. Patrz ${where}, z dala od świateł miasta.`]];
+  else if (first.score >= 14) reason = [["Zorza może być widoczna "], ["przez aparat", true], [`. Skieruj go ${where} i spróbuj trybu nocnego.`]];
+  else reason = [["Zorza jest aktywna, ale "], ["za słaba", true], [", żeby ją teraz zobaczyć."]];
+  showHeadline([...reason, [" "], ...conditionsParts(first)]);
 }

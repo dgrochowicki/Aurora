@@ -2,10 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 20.10.2026 — zdanie główne zamiast „Szansa na zorzę”
+## 20.10.2026 — uproszczona góra strony: zdanie główne zamiast „Szansa na zorzę”
 
-- Na górze strony głównej nie ma już tytułu „Szansa na zorzę”, opisu słownego (np. „Bardzo mała”) ani procentu. Zostaje zdanie główne 21 px, szare 60%, z białymi słowami poziomu aktywności i oceny warunków: „**Umiarkowana** aktywność zorzy około 28%. Warunki obserwacji są **dobre**.” albo „Aktywność zorzy jest **niska** dla Twojej lokalizacji. Warunki obserwacji są **słabe**.” Pod nim wskazówki 13 px, szare 60%: co zrobić teraz i zapowiedź godzin. Według makiety autora.
-- Zdanie buduje nowa `headline()` w `js/labels.js` (z testami: granica 10, dzień, brak chmur, brak aktywności). Poziomy i progi bez zmian; „bardzo niska/wysoka” z makiety wymagałyby nowych progów i decyzji autora. Szczegóły chmur („zachmurzenie 85%, jasny Księżyc”) zniknęły ze zdania; są w kafelkach i linii pod godzinami. Stuknięcie w zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
+- Na górze strony głównej nie ma już tytułu „Szansa na zorzę”, opisu słownego (np. „Bardzo mała”) ani procentu. Dotychczasowy akapit jest teraz zdaniem głównym 21 px, szarym 60%, z białymi słowami kluczowymi („zbyt niska”, „przez aparat”, „gołym okiem”, „słabe”…), a ocena warunków jest krótka, bez szczegółów chmur („zachmurzenie 85%, jasny Księżyc” są w kafelkach i linii pod godzinami). Zapowiedź godzin zostaje pod spodem jako 13 px, szara 60%. Decyzja autora: teksty bez zmian, chodziło o uproszczenie góry.
+- Nowa `conditionsParts()` w `js/labels.js` z testami (granice, Księżyc, linia wzroku, dzień, brak chmur); wspólna ocena z `conditionsText()`. Szansa dalej ustawia zorzę w tle. Stuknięcie w zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
 
 ## 20.10.2026 — „Jasność nieba” według makiety autora
 

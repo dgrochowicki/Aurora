@@ -191,7 +191,7 @@
   inset: 0;
   border-radius: inherit;
 }
-/* Zdanie główne (makieta autora z 20.10.2026): 21 px, szare 60%, a poziom aktywności i ocena warunków (strong) białe.
+/* Zdanie główne (makieta autora z 20.10.2026): 21 px, szare 60%, kluczowe słowa (strong) białe.
    Całe jest przyciskiem panelu „Skąd ten wynik”. */
 .headline {
   display: block;
@@ -205,15 +205,14 @@
   font-weight: inherit;
   color: var(--text);
 }
-/* Wskazówki pod zdaniem głównym, 13 px szare 60%: co zrobić teraz i zapowiedź najlepszej godziny albo zmiany chmur. */
+/* Zapowiedź pod zdaniem głównym, 13 px szara 60%: najlepsza godzina albo zmiana chmur. */
 .tip {
   margin: 8px 0 0;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--text-60);
 }
-.headline + .tip,
-.headline + .tip[hidden] + .tip {
+.headline + .tip {
   margin-top: 16px;
 }
 .tip[hidden] {
