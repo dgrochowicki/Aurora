@@ -61,7 +61,7 @@ button,
   margin-top: 6px;
   font-size: 0.9375rem;
   line-height: 20px;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 .section {
   margin-top: 32px;
@@ -78,7 +78,7 @@ button,
 /* Wartość po prawej od tytułu sekcji, np. poziom aktywności zorzy. */
 .section-value {
   font-weight: 400;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* Pływające przyciski mapy i miejsc (72×48, 24 px od krawędzi). Treść przewija się pod nimi, stąd rozmycie tła. */
 .fab-bar {
