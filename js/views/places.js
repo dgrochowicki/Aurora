@@ -42,10 +42,12 @@ const store = () => {
 const sheet = createSheet({
   sheet: $("#placesSheet"),
   onOpen: () => {
+    document.documentElement.classList.add("places-open");
     renderPlaces();
     $("#placesSheet .sheet-scroll").scrollTop = 0;
   },
   onClose: () => {
+    document.documentElement.classList.remove("places-open");
     clearTimeout(timer);
     searchSeq++;
     els.input.value = "";
