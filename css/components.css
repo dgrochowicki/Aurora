@@ -17,7 +17,7 @@
   margin: 0;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--sub);
+  color: var(--text-60);
 }
 .card-title i {
   font-style: normal;
@@ -209,14 +209,14 @@
   margin: 16px 0 0;
   font-size: 0.9375rem;
   line-height: 20px;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* Zapowiedź na dole karty szansy: zmiana chmur i najlepsza godzina, którą widać potem w pasku godzin. */
 .outlook {
   margin: 8px 0 0;
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 .outlook[hidden] {
   display: none;
@@ -266,7 +266,7 @@
 .hour time {
   font-size: 0.8125rem;
   white-space: nowrap;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* „Teraz” na biało, żeby odróżniało się od kolejnych godzin. */
 .hour time.now {
@@ -287,7 +287,7 @@
   padding-inline: var(--text-inset);
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* Drobne teksty wprost na tle: strefa czasowa i pewność prognozy. */
 .note {
@@ -295,7 +295,7 @@
   padding-inline: var(--text-inset);
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 .note[hidden] {
   display: none;
@@ -341,14 +341,14 @@
 .tile-status {
   font-size: 0.9375rem;
   line-height: 20px;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
 .data-tile[data-level="0"] {
-  --state: var(--sub-65);
+  --state: var(--text-40);
 }
 .data-tile[data-level="1"] {
-  --state: var(--sub);
+  --state: var(--text-60);
 }
 .data-tile[data-level="2"] {
   --state: var(--green);
@@ -422,7 +422,7 @@
   padding-top: 20px;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 .next-change:empty {
   display: none;
@@ -528,7 +528,7 @@
   font-size: 0.75rem;
   line-height: 18px;
   text-align: center;
-  color: var(--muted);
+  color: var(--text-60);
 }
 .searching .places-head {
   padding-bottom: 28px;
@@ -629,7 +629,7 @@ html.sheet-open body {
   padding: 12px;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--card-soft);
   color: var(--text);
   cursor: pointer;
   transition: var(--press);
@@ -645,11 +645,11 @@ html.sheet-open body {
 }
 /* Delikatne podświetlenie: tło z 4% do 8%. */
 .sheet-header button:active {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--card);
 }
 @media (hover: hover) {
   .sheet-header button:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--card);
   }
 }
 /* Pole wyszukiwania i ✕ według makiety autora (19.10.2026): 46 px, promień 24 px, niebieskawy biały 8% z rozmyciem 7 px. */
@@ -659,7 +659,7 @@ html.sheet-open body {
 .search-field,
 .search-close {
   height: 46px;
-  background: rgba(196, 221, 255, 0.08);
+  background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: 24px;
   -webkit-backdrop-filter: blur(7px);
@@ -728,13 +728,13 @@ html.sheet-open body {
   display: none;
 }
 .search-field input::placeholder {
-  color: var(--muted);
+  color: var(--text-60);
   font-size: 0.875rem;
 }
 .search-hint {
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--sub-65);
+  color: var(--text-40);
   margin: 12px 0;
   padding-inline: var(--text-inset);
 }
@@ -762,7 +762,7 @@ html.sheet-open body {
   margin: 0;
   font-size: 0.9375rem;
   line-height: 20px;
-  color: var(--sub);
+  color: var(--text-60);
 }
 /* Wykres sięga krawędzi panelu mimo paddingu 24 px. */
 .info-chart {
@@ -787,7 +787,7 @@ html.sheet-open body {
   line-height: 18px;
 }
 .info-stats span {
-  color: var(--sub);
+  color: var(--text-60);
 }
 .info-stats b {
   font-weight: 600;
@@ -796,7 +796,7 @@ html.sheet-open body {
   padding: 16px 0;
   font-size: 0.8125rem;
   line-height: 18px;
-  color: var(--sub);
+  color: var(--text-60);
 }
 .info-text p {
   margin: 0;
@@ -809,7 +809,7 @@ html.sheet-open body {
   padding-bottom: 48px;
   font-size: 0.8125rem;
   line-height: 18px;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 /* Tymczasowo, do projektu: paski „Skąd ten wynik” w karcie. */
 .info-card {
@@ -827,7 +827,7 @@ html.sheet-open body {
   padding-top: 20px;
   font-size: 0.8125rem;
   line-height: 18px;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 .chart.is-yellow {
   --chart: var(--yellow);
@@ -911,7 +911,7 @@ html.sheet-open body {
   right: -12px;
   text-align: center;
   font-style: normal;
-  color: var(--sub);
+  color: var(--text-60);
 }
 .chart-x.is-bars {
   gap: 8px;
@@ -923,7 +923,7 @@ html.sheet-open body {
 .chart-empty {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 /* Łuki Słońca i Księżyca (ui/sky-chart.js): od krawędzi do krawędzi jak inne wykresy, linie co 37 px. */
 .sky-chart .is-sun {
@@ -1005,7 +1005,7 @@ html.sheet-open body {
 .factor small {
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 
 /* Mapa na pełnym ekranie: ✕ w prawym górnym rogu, legenda w karcie na dole. */
@@ -1087,7 +1087,7 @@ html.sheet-open body {
   align-items: center;
   gap: 10px;
   font-size: 0.8125rem;
-  color: var(--sub);
+  color: var(--text-60);
 }
 .map-legend i {
   display: block;
@@ -1100,7 +1100,7 @@ html.sheet-open body {
   margin-top: 8px;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--sub-65);
+  color: var(--text-40);
 }
 
 /* Lista miejsc i wyniki wyszukiwania: wiersze w jednej karcie. */
@@ -1149,7 +1149,7 @@ html.sheet-open body {
   display: block;
   font-size: 0.75rem;
   line-height: 16px;
-  color: var(--muted);
+  color: var(--text-60);
 }
 .place-badge {
   flex: none;
@@ -1169,7 +1169,7 @@ html.sheet-open body {
   margin-right: 6px;
   border: 0;
   background: none;
-  color: var(--sub-65);
+  color: var(--text-40);
   cursor: pointer;
 }
 .delete-place .icon {
@@ -1247,7 +1247,7 @@ html.sheet-open body {
   align-items: center;
   font-size: 0.75rem;
   line-height: 16px;
-  color: var(--muted);
+  color: var(--text-60);
 }
 .place-meta {
   flex-wrap: wrap;
@@ -1261,7 +1261,7 @@ html.sheet-open body {
   right: 16px;
   margin: 0;
   padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--card);
   font-size: 0.8125rem;
   line-height: 16px;
   color: var(--glow);
@@ -1269,7 +1269,7 @@ html.sheet-open body {
 .place-card .delete-place {
   right: 6px;
   margin: 0;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-40);
 }
 .place-card .delete-place .icon,
 .place-icon .icon {

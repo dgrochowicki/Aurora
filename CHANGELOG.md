@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — granatowe tło, niebieskawe kafelki i biały tekst w trzech poziomach
+
+- Tło `--bg` `#22242A`, gradient od `#12151A` u góry (`--bg-top`, `theme-color`) do `--bg` w połowie ekranu (decyzja autora).
+- Kafelki, karty, pigułki, przyciski paneli i plakietka „Teraz” w kolorze `#C4DDFF` (8% i 4%, jak dotąd biel), obwódki tak samo (decyzja autora).
+- Cały tekst biały: 100% (`--text`), 60% (`--text-60`, dawne `--sub` `#AFC7C2` i `--muted`) i 40% (`--text-40`, dawne `--sub-65`). Hierarchia zachowana według dotychczasowych ról; autor poprawi, jeśli coś trzeba przesunąć. `css/tokens.css`, `css/base.css`, `css/components.css`, `index.html`, `STYL.md`.
+
 ## 19.10.2026 — ekran miejsc: tryb wyszukiwania i nowe karty według makiety
 
 - Stuknięcie w pole wyszukiwania włącza tryb wyszukiwania: tytuł i karty znikają z animacją, pole podjeżdża do góry, obok wysuwa się okrągły ✕. ✕ albo Escape wraca do kart (drugi Escape zamyka ekran). `setSearching()`, `endSearch()` w `js/views/places.js`, `.searching` w `css/components.css`.
