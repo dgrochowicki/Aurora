@@ -34,6 +34,7 @@ Na początku każdej pracy przeczytaj, zależnie od zakresu:
 | Plik / katalog | Funkcja |
 |---|---|
 | `index.html` | Szkielet widoku i kontenery paneli |
+| `manifest.webmanifest`, `icons/` | Aplikacja z ekranu początkowego (bez pasków Safari): nazwa, kolory, ikony |
 | `css/tokens.css` | Kolory, wymiary, typografia — punkt odniesienia dla bieżących tokenów |
 | `css/base.css` | Układ, nagłówek, pływające przyciski, toast |
 | `css/components.css` | Kafelki, godziny, panele, wykresy, mapa, wybór miejsc |

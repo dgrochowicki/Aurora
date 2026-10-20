@@ -2,6 +2,23 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — aplikacja z ekranu początkowego (test)
+
+- Stronę można dodać do ekranu początkowego iPhone'a i otwierać jak aplikację, bez pasków Safari, przez które ekran miejsc, mapa i panele miały u góry i u dołu płaski kolor. Pomysł zaakceptowany przez autora jako test na gałęzi.
+- Nowe `manifest.webmanifest` (nazwa „Aurora Now”, krótka „Aurora”, `standalone`, kolory `#12151A`) i ikony w `icons/` (180, 192, 512 i maskable 512 px, zielona fala z dotychczasowej ikony). W `index.html` znaczniki `apple-mobile-web-app-*` z paskiem statusu `black-translucent`. `README.md`, `STYL.md`, `CLAUDE.md`.
+- Zapisane miejsca w aplikacji z ekranu początkowego są osobne niż w Safari (iOS rozdziela ich dane).
+
+## 20.10.2026 — mapa pod paskami Safari
+
+- Mapa była przypiętą warstwą, więc Safari zalewał oba paski płaskim kolorem (`--sheet`). Mapa jest teraz treścią strony na cały duży widok (`100lvh`): `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, blokuje przewijanie i po zamknięciu przywraca miejsce przewinięcia strony głównej. Pod paskami Safari widać mapę.
+- Przyciski ✕, lokalizacji i legenda są przypięte do widocznej części ekranu (`position: fixed`), na szerokim ekranie liczone od krawędzi mapy. Mapa wchodzi z wyciszeniem zamiast wysuwania; bez przyciemnionego tła (`#mapBackdrop` usunięty). `css/components.css`, `js/views/map.js`, `index.html`, `STYL.md`.
+
+## 20.10.2026 — panele szczegółów: pasek Safari bez odcięcia
+
+- Pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor. `css/tokens.css`, `css/components.css`, `STYL.md`.
+- Ekran miejsc bez zmian: próby ze sięganiem pod dolny pasek (`100lvh`, wysunięcie warstwy) nie zadziałały, a wersja przewijana jak strona przewijała też tytuł i pole, więc autor wybrał przypiętą warstwę z płaskim kolorem pod paskiem.
+- Ekran miejsc ma znów kolor tła `--bg-top`, jak po pierwszej poprawce paska: górny pasek Safari bez odcięcia, pod dolnym płaski ciemny kolor. Safari bierze jeden kolor przypiętej warstwy do obu pasków; dodatkowy pas u góry (`::before`, osobny element) pomijał. Decyzja autora.
+
 ## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
 
 - Na ekranie miejsc pod dolnym paskiem Safari był płaski ciemny pas, bo Safari zalewa paski kolorem tła przypiętej warstwy (`#12151A` po poprzedniej poprawce). Ekran ma teraz kolor `--bg`, a kolor górnego paska daje przypięty pas `.places-sheet::before` w `--bg-top` z tym samym gradientem. `css/components.css`, `STYL.md`.
