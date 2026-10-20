@@ -3,7 +3,7 @@
   "short_name": "Aurora",
   "description": "Mobilna prognoza zorzy polarnej dla Twojej lokalizacji.",
   "lang": "pl",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
