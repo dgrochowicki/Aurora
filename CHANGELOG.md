@@ -5,7 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 20.10.2026 — „Jasność nieba” w duchu wykresu Apple (propozycja)
 
 - Na wzór wykresu Słońca z pogody Apple (wskazanego przez autora): pod horyzontem „ziemia” ciemniejąca przy horyzoncie i zanikająca w dół, nad nim poświata pod łukiem Słońca. Księżyc jako sama linia. Siatka co 18° i podpis −18° zostają (autor: siatka pomaga).
-- Łuki tuż pod horyzontem mają pełny kolor (do −6°, zmierzch cywilny), niżej gasną: 55% przy −18°, 15% na dole (wcześniej skok do 75% na horyzoncie; pomysł autora, tak robi Apple). Kropka „teraz” pod horyzontem pusta w środku, z obwódką w kolorze łuku. `js/ui/sky-chart.js`, `css/components.css`, `STYL.md`.
+- Łuki tuż pod horyzontem mają pełny kolor (do −6°, zmierzch cywilny), niżej gasną: 55% przy −18°, 15% na dole (wcześniej skok do 75% na horyzoncie; pomysł autora, tak robi Apple). Gaśnięcie robi maska z gradientem, nie gradient na linii: Safari przy `vector-effect: non-scaling-stroke` rozciągał gradient linii i pod horyzontem pokazywał od razu najciemniejszy koniec (sprawdzone w WebKit z Playwright). Kropka „teraz” pod horyzontem pusta w środku, z obwódką w kolorze łuku. `js/ui/sky-chart.js`, `css/components.css`, `STYL.md`.
 
 ## 20.10.2026 — wykresy: cieńsze łuki, jaśniejsze podpisy osi Y
 
