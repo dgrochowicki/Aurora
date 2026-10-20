@@ -3,14 +3,14 @@
   box-sizing: border-box;
 }
 /* Safari na iOS bierze kolor paska adresu z koloru tła strony (theme-color pomija), więc html i body mają kolor góry.
-   Jaśniejszy dół rysuje body: --bg z warstwą --bg-shade. */
+   Jaśniejszy dół rysuje obraz --bg-gradient na body. */
 html {
   background: var(--bg-top);
 }
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg-shade), var(--bg);
+  background: var(--bg-gradient), var(--bg-top);
   color: var(--text);
 }
 button,
@@ -139,7 +139,7 @@ button,
     border: 1px solid var(--line);
     border-radius: 36px;
     /* To samo tło co na telefonie, żeby ramka nie zmieniała kolorów. */
-    background: var(--bg-shade), var(--bg);
+    background: var(--bg-gradient), var(--bg-top);
     min-height: 900px;
   }
 }

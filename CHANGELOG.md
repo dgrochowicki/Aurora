@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — pasek Safari w kolorze góry gradientu
+
+- Pasek u góry w Safari odcinał się od tła, bo brał kolor z `background-color` strony (`--bg` `#22242A`). Teraz kolorem tła `body`, ramki na desktopie i ekranu miejsc jest `--bg-top` (`#12151A`), a gradient rysuje obraz `--bg-gradient` (zastępuje `--bg-shade`). `css/tokens.css`, `css/base.css`, `css/components.css`, `STYL.md`.
+
 ## 20.10.2026 — granatowe tło, niebieskawe kafelki i biały tekst w trzech poziomach
 
 - Tło `--bg` `#22242A`, gradient od `#12151A` u góry (`--bg-top`, `theme-color`) do `--bg` w połowie ekranu (decyzja autora).

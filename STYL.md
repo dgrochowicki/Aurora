@@ -19,7 +19,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
 | `--bg` | `#22242A` | Tło główne (od 20.10.2026, decyzja autora) |
-| `--bg-shade` | `linear-gradient(180deg, #12151A 0, transparent 438px)` | Warstwa na tle strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px |
+| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła pod nim jest `--bg-top`, bo z koloru tła `body` Safari bierze kolor paska u góry |
 | `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color` |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--text-60` i `--text-60`) |
