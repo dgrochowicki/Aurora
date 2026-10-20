@@ -482,7 +482,6 @@
   padding: 0;
 }
 /* Mapa i ekran miejsc zajmują cały ekran. */
-.map-sheet,
 .places-sheet {
   top: 0;
   border-radius: 0;
@@ -1016,6 +1015,47 @@ html.sheet-open body {
 }
 
 /* Mapa na pełnym ekranie: ✕ w prawym górnym rogu, legenda w karcie na dole. */
+/* Mapa to treść strony, nie przypięta warstwa (sheet.js, page): Safari pokazuje ją pod swoimi paskami zamiast płaskiego
+   koloru. Wypełnia duży widok (lvh, z obszarem pod paskami); przy otwartej mapie (html.page-open) strona główna jest
+   ukryta, a strona się nie przewija. Przyciski i legenda są przypięte do widocznej części ekranu. */
+.map-sheet.sheet {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  width: min(100%, 560px);
+  height: 100vh;
+  height: 100lvh;
+  margin: 0 auto;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  transform: none;
+  transition: none;
+  animation: map-in 0.3s ease;
+}
+.map-sheet.sheet[hidden] {
+  display: none;
+}
+@keyframes map-in {
+  from {
+    opacity: 0;
+  }
+}
+html.page-open,
+html.page-open body {
+  overflow: hidden;
+  padding: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-sheet.sheet {
+    animation: none;
+  }
+}
+html.page-open .app-shell,
+html.page-open .fab-bar,
+html.page-open .aurora-sky {
+  display: none;
+}
 #auroraMap {
   position: absolute;
   inset: 0;
@@ -1044,9 +1084,10 @@ html.sheet-open body {
 /* Okrągłe przyciski na mapie: ✕ i powrót do lokalizacji pod nim. Wymiar i ikona jak ✕ w panelu szczegółów (44 px, ikona bold 20 px),
    ale tło ciemne szkło, bo jasne 4% z panelu znikałoby na mapie. Mniej przezroczyste niż pływające przyciski (85% zamiast 70%), bo mapa pod nimi jest jasna i ruchliwa. */
 .map-btn {
-  position: absolute;
+  position: fixed;
   z-index: 1001;
-  right: 16px;
+  /* Przypięte do ekranu, więc na szerokim ekranie liczone od krawędzi mapy (560 px na środku). */
+  right: max(16px, calc(50% - 280px + 16px));
   display: grid;
   place-items: center;
   width: 44px;
@@ -1077,10 +1118,10 @@ html.sheet-open body {
   /* Przeciągnięcie palcem przez legendę nie zaznacza tekstu. */
   -webkit-user-select: none;
   user-select: none;
-  position: absolute;
+  position: fixed;
   z-index: 1001;
-  left: var(--gutter);
-  right: var(--gutter);
+  left: max(var(--gutter), calc(50% - 280px + var(--gutter)));
+  right: max(var(--gutter), calc(50% - 280px + var(--gutter)));
   bottom: calc(24px + env(safe-area-inset-bottom));
   padding: 14px 16px;
   border: 1px solid var(--card-border);

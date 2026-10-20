@@ -10,7 +10,7 @@ let map, auroraLayer, locationMarker, field = null, justOpened = false, getCurre
 
 const sheet = createSheet({
   sheet: $("#mapSheet"),
-  backdrop: $("#mapBackdrop"),
+  page: true,
   closeButton: $("#closeMap"),
   onOpen: () => {
     justOpened = true;

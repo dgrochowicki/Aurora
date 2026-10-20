@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — mapa pod paskami Safari
+
+- Mapa była przypiętą warstwą, więc Safari zalewał oba paski płaskim kolorem (`--sheet`). Mapa jest teraz treścią strony na cały duży widok (`100lvh`): `createSheet({ page: true })` w `js/ui/sheet.js` ukrywa stronę główną klasą `html.page-open`, blokuje przewijanie i po zamknięciu przywraca miejsce przewinięcia strony głównej. Pod paskami Safari widać mapę.
+- Przyciski ✕, lokalizacji i legenda są przypięte do widocznej części ekranu (`position: fixed`), na szerokim ekranie liczone od krawędzi mapy. Mapa wchodzi z wyciszeniem zamiast wysuwania; bez przyciemnionego tła (`#mapBackdrop` usunięty). `css/components.css`, `js/views/map.js`, `index.html`, `STYL.md`.
+
 ## 20.10.2026 — panele szczegółów: pasek Safari bez odcięcia
 
 - Pasek Safari u góry odcinał się od przyciemnionej strony. Przyciemnienie (`.sheet-backdrop`) jest teraz obrazem bez koloru tła, a przy otwartym panelu kolor tła strony to `--bg-top-dim` (`#07080A`, góra pod czarnym 60%), więc z niego Safari bierze kolor paska. Przy stronie przewiniętej w dół góra jest nieco jaśniejsza niż ten kolor. `css/tokens.css`, `css/components.css`, `STYL.md`.
