@@ -491,6 +491,17 @@
      inaczej pod paskiem sterowania widać płaski ciemny pas. */
   background: var(--bg-gradient), var(--bg);
 }
+/* Próba (20.10.2026): ekran miejsc ma wysokość dużego widoku (lvh) i nie jest przypięty do dołu, żeby sięgał pod dolny
+   pasek Safari; wtedy pod paskiem może być widać przewijane karty zamiast płaskiego koloru. Lista ma na dole zapas
+   na pasek (różnica lvh − dvh), żeby ostatnia karta dała się wysunąć ponad niego. */
+.places-sheet {
+  bottom: auto;
+  height: 100vh;
+  height: 100lvh;
+}
+.places-sheet .sheet-scroll {
+  padding-bottom: calc(30px + env(safe-area-inset-bottom) + 100lvh - 100dvh);
+}
 /* Kolor paska u góry: przypięty pas w kolorze --bg-top, z tym samym gradientem co ekran, więc go nie widać.
    Leży pod treścią (z-index: -1 w obrębie panelu). */
 .places-sheet::before {
