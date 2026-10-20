@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — zdanie główne zamiast „Szansa na zorzę”
+
+- Na górze strony głównej nie ma już tytułu „Szansa na zorzę”, opisu słownego (np. „Bardzo mała”) ani procentu. Zostaje zdanie główne 21 px, szare 60%, z białymi słowami poziomu aktywności i oceny warunków: „**Umiarkowana** aktywność zorzy około 28%. Warunki obserwacji są **dobre**.” albo „Aktywność zorzy jest **niska** dla Twojej lokalizacji. Warunki obserwacji są **słabe**.” Pod nim wskazówki 13 px, szare 60%: co zrobić teraz i zapowiedź godzin. Według makiety autora.
+- Zdanie buduje nowa `headline()` w `js/labels.js` (z testami: granica 10, dzień, brak chmur, brak aktywności). Poziomy i progi bez zmian; „bardzo niska/wysoka” z makiety wymagałyby nowych progów i decyzji autora. Szczegóły chmur („zachmurzenie 85%, jasny Księżyc”) zniknęły ze zdania; są w kafelkach i linii pod godzinami. Stuknięcie w zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
+
 ## 20.10.2026 — „Jasność nieba” według makiety autora
 
 - Słońce w żółtym z innych wykresów (`--yellow` #FFC867 zamiast `--sun` #CC9200, token usunięty). Bez poświaty pod łukiem Słońca i bez przyciemnionej „ziemi”: tło jednolite jak w makiecie. Kropka „teraz” pod horyzontem z ciemnym środkiem podbarwionym kolorem łuku. `js/ui/sky-chart.js`, `css/components.css`, `css/tokens.css`, `STYL.md`.
