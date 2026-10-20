@@ -205,14 +205,21 @@
   font-weight: inherit;
   color: var(--text);
 }
-/* Zapowiedź pod zdaniem głównym, 13 px szara 60%: najlepsza godzina albo zmiana chmur. */
+/* Strzałka jak na kafelkach: zdanie otwiera panel „Skąd ten wynik”. */
+.headline i {
+  margin-left: 6px;
+  font-style: normal;
+  color: var(--text-40);
+}
+/* Wskazówki pod zdaniem głównym, 13 px szare 60%: co zrobić teraz i zapowiedź (najlepsza godzina albo zmiana chmur). */
 .tip {
   margin: 8px 0 0;
   font-size: 0.8125rem;
   line-height: 18px;
   color: var(--text-60);
 }
-.headline + .tip {
+.headline + .tip,
+.headline + .tip[hidden] + .tip {
   margin-top: 16px;
 }
 .tip[hidden] {
