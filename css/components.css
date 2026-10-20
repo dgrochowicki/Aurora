@@ -935,7 +935,7 @@ html.sheet-open body {
 }
 /* Łuki Słońca i Księżyca (ui/sky-chart.js): od krawędzi do krawędzi jak inne wykresy, linie co 37 px. */
 .sky-chart .is-sun {
-  --sky: var(--sun);
+  --sky: var(--yellow);
 }
 .sky-chart .is-moon {
   --sky: var(--moon);
@@ -946,14 +946,6 @@ html.sheet-open body {
   right: 0;
   height: 1px;
   background: rgba(255, 255, 255, 0.3);
-}
-/* Część wykresu pod horyzontem jak ziemia: najciemniej przy horyzoncie, w dół zanika, bez krawędzi nad godzinami. */
-.sky-ground {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
 }
 .sky-arc {
   fill: none;
@@ -973,10 +965,10 @@ html.sheet-open body {
   border-radius: 50%;
   background: var(--sky);
 }
-/* Pod horyzontem kropka jest pusta w środku, z obwódką w kolorze łuku (jak w pogodzie Apple). */
+/* Pod horyzontem kropka ma obwódkę w kolorze łuku i ciemny środek podbarwiony tym kolorem (makieta autora 20.10.2026). */
 .sky-dot.is-below {
   border: 2px solid var(--sky);
-  background: var(--sheet);
+  background: color-mix(in srgb, var(--sky) 22%, var(--sheet));
 }
 /* Faza Księżyca obok procentu tarczy. */
 .moon-phase {

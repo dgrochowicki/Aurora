@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — „Jasność nieba” według makiety autora
+
+- Słońce w żółtym z innych wykresów (`--yellow` #FFC867 zamiast `--sun` #CC9200, token usunięty). Bez poświaty pod łukiem Słońca i bez przyciemnionej „ziemi”: tło jednolite jak w makiecie. Kropka „teraz” pod horyzontem z ciemnym środkiem podbarwionym kolorem łuku. `js/ui/sky-chart.js`, `css/components.css`, `css/tokens.css`, `STYL.md`.
+
 ## 20.10.2026 — „Jasność nieba” w duchu wykresu Apple (propozycja)
 
 - Na wzór wykresu Słońca z pogody Apple (wskazanego przez autora): pod horyzontem „ziemia” ciemniejąca przy horyzoncie i zanikająca w dół, nad nim poświata pod łukiem Słońca. Księżyc jako sama linia. Siatka co 18° i podpis −18° zostają (autor: siatka pomaga).

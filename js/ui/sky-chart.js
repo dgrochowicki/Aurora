@@ -1,13 +1,14 @@
-// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, w duchu wykresu Słońca w pogodzie Apple (propozycja 20.10.2026).
-// Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są horyzont (linia ciągła) i −18° (początek nocy
-// astronomicznej). Pod horyzontem „ziemia” ciemnieje od horyzontu i zanika w dół, nad nim poświata pod łukiem Słońca.
-// Łuki pod horyzontem płynnie gasną. Kropki to „teraz”; pod horyzontem puste w środku, z obwódką w kolorze łuku.
+// Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, w duchu wykresu Słońca w pogodzie Apple, według makiety autora
+// (20.10.2026). Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są horyzont (linia ciągła) i −18°
+// (początek nocy astronomicznej). Łuki pod horyzontem gasną jak zmierzch. Kropki to „teraz”; pod horyzontem z obwódką
+// w kolorze łuku i ciemnym, podbarwionym środkiem.
 import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
 const STEP = 18;
-// Kolory łuków jak --sun i --moon w tokens.css. Wpisane wprost, bo Safari nie zawsze bierze zmienne CSS w gradientach SVG.
-const SUN = "#cc9200",
+// Kolory łuków: Słońce żółte jak --yellow na innych wykresach (decyzja autora 20.10.2026), Księżyc jak --moon w tokens.css.
+// Wpisane wprost, bo Safari nie zawsze bierze zmienne CSS w SVG.
+const SUN = "#ffc867",
   MOON = "#c9d6e3";
 
 // n: wynik nightTimeline(), tz: strefa miejsca (IANA).
@@ -29,13 +30,11 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   const fade = `<linearGradient id="skyFade" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${H}"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="${(6 / -lo).toFixed(3)}" stop-color="#fff" stop-opacity="1"/><stop offset="${(STEP / -lo).toFixed(3)}" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0.15"/></linearGradient>`;
   const arc = (d, color) =>
     `<path class="sky-arc" stroke="${color}" clip-path="url(#skyAbove)" d="${d}"/><path class="sky-arc" stroke="${color}" mask="url(#skyBelow)" d="${d}"/>`;
-  // Poświata pod łukiem Słońca, tylko nad horyzontem: od koloru Słońca u góry wykresu do zera na horyzoncie.
-  const glow = `<linearGradient id="skyGlow" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${y0}"><stop offset="0" stop-color="${SUN}" stop-opacity="0.35"/><stop offset="1" stop-color="${SUN}" stop-opacity="0.04"/></linearGradient>`;
   const sun = path("sun");
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade}${glow}
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade}
 <clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
-<mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${H + 10}"><rect x="-1" y="${y0}" width="102" height="${H + 10}" fill="url(#skyFade)"/></mask></defs><path class="sky-glow" fill="url(#skyGlow)" clip-path="url(#skyAbove)" d="${sun}L100 ${y0}L0 ${y0}Z"/>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
-  const lines = [`<i class="sky-ground" style="top:${y0}px"></i>`];
+<mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${H + 10}"><rect x="-1" y="${y0}" width="102" height="${H + 10}" fill="url(#skyFade)"/></mask></defs>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
+  const lines = [];
   for (let a = hi; a >= lo; a -= STEP) {
     const pos = `top:${y(a).toFixed(1)}px`;
     lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);

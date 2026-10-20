@@ -42,7 +42,6 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--surface` | `rgba(13, 32, 37, 0.78)` | Dodatkowe powierzchnie |
 | `--on-accent` | `#062117` | Tekst na akcentach |
 | `--warn` | `#FFC867` | Ostrzeżenie / Bz |
-| `--sun` | `#CC9200` | Łuk Słońca |
 | `--moon` | `#C9D6E3` | Łuk Księżyca |
 
 Ciemna, neutralna baza; zieleń i fiolet mają wskazywać obecność i skalę zorzy, nie barwić całego interfejsu. Tekst notek ma 65% krycia. We wcześniejszych próbach 50% dawało zbyt niski kontrast (~3,4:1 dla małego tekstu), stąd obecna decyzja; weryfikować rzeczywisty kontrast przy przyszłych zmianach.
@@ -129,7 +128,7 @@ Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałk
 
 ### Jasność nieba (dawniej „Jasność nieba”)
 
-Wykres łuków `js/ui/sky-chart.js` (w duchu wykresu Słońca z pogody Apple, 20.10.2026): doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Pod horyzontem „ziemia” (`.sky-ground`): czarny 28% przy horyzoncie zanikający do zera na dole, bez krawędzi nad godzinami. Nad horyzontem poświata pod łukiem Słońca (kolor Słońca 35% u góry → 4% na horyzoncie). Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3, bez poświaty), łuki 2,3 px jak linia pozostałych wykresów, pełnym kolorem nad horyzontem, tuż pod nim też (do −6°, zmierzch cywilny), niżej gasną: 55% przy −18°, 15% na dole. Kropki „teraz” 18 px; pod horyzontem puste w środku (`--sheet`) z obwódką 2 px w kolorze łuku. Bez kropek wschodów i zachodów (usunięte 20.10.2026, niezrozumiałe). Bez dawnej legendy i zielonego pasa.
+Wykres łuków `js/ui/sky-chart.js` (w duchu wykresu Słońca z pogody Apple, makieta autora z 20.10.2026): doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Tło jednolite, bez poświaty i przyciemnienia. Słońce `--yellow` (#FFC867, jak na innych wykresach), Księżyc `--moon` (#C9D6E3), łuki 2,3 px jak linia pozostałych wykresów, pełnym kolorem nad horyzontem, tuż pod nim też (do −6°, zmierzch cywilny), niżej gasną: 55% przy −18°, 15% na dole (maską z gradientem, bo Safari psuje gradient na linii). Kropki „teraz” 18 px; pod horyzontem z obwódką 2 px w kolorze łuku i środkiem: kolor łuku 22% na `--sheet`. Bez kropek wschodów i zachodów. Bez dawnej legendy i zielonego pasa.
 
 Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Jasność nieba” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
 
