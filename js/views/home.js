@@ -102,7 +102,7 @@ function showHeadline(parts) {
     ? parts.map(([t, strong]) => (strong ? `<strong>${esc(t)}</strong>` : esc(t))).join("") + '<i aria-hidden="true">›</i>'
     : "";
 }
-// Wskazówka pod zdaniem głównym (co zrobić teraz); pusta jest ukryta.
+// Wskazówka pod zdaniem głównym (co zrobić teraz), w jednym akapicie z zapowiedzią; pusta jest ukryta.
 function showTip(text = "") {
   els.tip.textContent = text;
   els.tip.hidden = !text;

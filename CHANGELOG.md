@@ -5,7 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 20.10.2026 — zdanie główne: szansa, krótsze zdanie, strzałka
 
 - W nocy zdanie główne podaje szansę teraz, z białą liczbą: „Zorza może być widoczna **gołym okiem**, szansa **67%**. Warunki obserwacji są **dobre**.” W dzień bez procentu (decyzja: szansa w dzień nic nie mówi). Prośba autora.
-- Instrukcje („Patrz w górę, z dala od świateł miasta”, „Skieruj aparat… i spróbuj trybu nocnego”, „Sprawdź późniejsze godziny”) przeszły do szarej wskazówki 13 px pod zdaniem, żeby zdanie miało najwyżej 3 linie. Na końcu zdania szara strzałka `›` jak na kafelkach: zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
+- Instrukcje („Patrz w górę, z dala od świateł miasta”, „Skieruj aparat… i spróbuj trybu nocnego”, „Sprawdź późniejsze godziny”) przeszły do szarej wskazówki 13 px pod zdaniem, żeby zdanie miało najwyżej 3 linie. Wskazówka i zapowiedź godzin są w jednym akapicie, nie w dwóch (autor: inaczej trzy poziomy tekstu). Na końcu zdania szara strzałka `›` jak na kafelkach: zdanie otwiera panel „Skąd ten wynik”. `index.html`, `css/components.css`, `js/views/home.js`, `STYL.md`.
 
 ## 20.10.2026 — uproszczona góra strony: zdanie główne zamiast „Szansa na zorzę”
 
