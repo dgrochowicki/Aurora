@@ -487,7 +487,22 @@
 }
 .places-sheet {
   padding: calc(56px + env(safe-area-inset-top)) var(--gutter) 0;
-  background: var(--bg-gradient), var(--bg-top);
+  /* Safari zalewa paski u góry i u dołu kolorem tła (background-color) przypiętej warstwy. Na dole ma być --bg,
+     inaczej pod paskiem sterowania widać płaski ciemny pas. */
+  background: var(--bg-gradient), var(--bg);
+}
+/* Kolor paska u góry: przypięty pas w kolorze --bg-top, z tym samym gradientem co ekran, więc go nie widać.
+   Leży pod treścią (z-index: -1 w obrębie panelu). */
+.places-sheet::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(44px + env(safe-area-inset-top));
+  background: var(--bg-gradient) 0 0 / 100% 438px no-repeat, var(--bg-top);
+  pointer-events: none;
 }
 /* Ekran miejsc według makiety autora (18.10.2026): tytuł 21 px, 32 px do pola wyszukiwania i 32 px do kart.
    Tryb wyszukiwania (makieta z 19.10.2026, klasa .searching): tytuł się zwija, pole podjeżdża na jego miejsce,

@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 20.10.2026 — ekran miejsc bez ciemnego pasa pod paskiem Safari
+
+- Na ekranie miejsc pod dolnym paskiem Safari był płaski ciemny pas, bo Safari zalewa paski kolorem tła przypiętej warstwy (`#12151A` po poprzedniej poprawce). Ekran ma teraz kolor `--bg`, a kolor górnego paska daje przypięty pas `.places-sheet::before` w `--bg-top` z tym samym gradientem. `css/components.css`, `STYL.md`.
+
 ## 20.10.2026 — pasek Safari w kolorze góry gradientu
 
 - Pasek u góry w Safari odcinał się od tła, bo brał kolor z `background-color` strony (`--bg` `#22242A`). Teraz kolorem tła `body`, ramki na desktopie i ekranu miejsc jest `--bg-top` (`#12151A`), a gradient rysuje obraz `--bg-gradient` (zastępuje `--bg-shade`). `css/tokens.css`, `css/base.css`, `css/components.css`, `STYL.md`.
