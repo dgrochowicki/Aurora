@@ -1,6 +1,7 @@
 // Wykres łuków Słońca i Księżyca na osi doby 12:00–12:00, jak łuk Słońca w pogodzie Apple, według makiety autora.
 // Podziałka co 18° w odstępach 37 px jak gęsty wykres zachmurzenia; podpisane są tylko horyzont (linia ciągła) i −18°
-// (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Duże kropki to „teraz”, małe na horyzoncie to wschody i zachody.
+// (początek nocy astronomicznej). Łuki gasną, im niżej schodzą. Kropki to „teraz”. Bez kropek wschodów i zachodów na horyzoncie
+// (usunięte na prośbę autora 20.10.2026, były niezrozumiałe; godziny są w liczbach pod wykresem).
 import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
@@ -37,8 +38,6 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
     if (a === 0 || a === -STEP) lines.push(`<span class="chart-y" style="${pos}">${a ? "−18°" : "Horyzont"}</span>`);
   }
   const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
-  // Wschody i zachody: małe kropki tam, gdzie łuk przecina horyzont (Słońce górną krawędzią tarczy, −0,833°).
-  const events = [...n.sunEv.map((e) => dot(e.t, -0.833, "is-sun is-event")), ...n.moonEv.map((e) => dot(e.t, 0, "is-moon is-event"))];
   // Kropki „teraz” w miejscu najbliższej próbki.
   let dots = "";
   if (now > n.start && now < n.end) {
@@ -47,7 +46,7 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   }
   // Godziny co 6 h od początku osi, rozłożone równo jak na pozostałych wykresach.
   const ticks = Array.from({ length: 5 }, (_, i) => `<span>${hmIn(n.start + i * 6 * 3600000, tz)}</span>`);
-  return `<div class="chart sky-chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${lines.join("")}${svg}${events.join("")}${dots}</div><div class="chart-x" aria-hidden="true">${ticks.join("")}</div></div>`;
+  return `<div class="chart sky-chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${lines.join("")}${svg}${dots}</div><div class="chart-x" aria-hidden="true">${ticks.join("")}</div></div>`;
 }
 
 // Faza Księżyca 14 px: ciemna tarcza i oświetlona część. illum: część tarczy 0–1, right: oświetlona prawa strona

@@ -5,6 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 20.10.2026 — wykresy: cieńsze łuki, jaśniejsze podpisy osi Y
 
 - „Jasność nieba”: łuki Słońca i Księżyca mają grubość linii pozostałych wykresów (2,3 px zamiast 5 px), a pod horyzontem są jaśniejsze (75% → 45% przy −18° → 25% u dołu, wcześniej 50/20/8%). `js/ui/sky-chart.js`, `css/components.css`.
+- Bez małych kropek wschodów i zachodów na horyzoncie (autor: „nie wiadomo, o co chodzi”); godziny wschodów i zachodów zostają w liczbach pod wykresem.
 - Liczby osi Y po prawej na wszystkich wykresach: biały 80% (nowy token `--text-80`) i nad wykresem, także nad kropkami łuków (`.chart-y`, `z-index: 2`). Decyzje autora. `css/tokens.css`, `STYL.md`.
 
 ## 20.10.2026 — aplikacja z ekranu początkowego (test)

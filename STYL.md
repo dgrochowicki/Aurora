@@ -129,7 +129,7 @@ Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałk
 
 ### Jasność nieba (dawniej „Jasność nieba”)
 
-Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 2,3 px jak linia pozostałych wykresów, pełnym kolorem nad horyzontem. Pod horyzontem gradient od 75% do 45% przy −18° i 25% u dołu. Kropki „teraz” 18 px, wschody/zachody 8 px. Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
+Wykres łuków `js/ui/sky-chart.js`: doba 12:00–12:00, godziny co 6 h, podziałka wysokości co 18° i odstępy 37 px. Horyzont (linia ciągła, biały 30%) i poziom −18° podpisane; pozostałe linie przerywane. Słońce `--sun` (#CC9200), Księżyc `--moon` (#C9D6E3), łuki 2,3 px jak linia pozostałych wykresów, pełnym kolorem nad horyzontem. Pod horyzontem gradient od 75% do 45% przy −18° i 25% u dołu. Kropki „teraz” 18 px; bez kropek wschodów i zachodów (usunięte 20.10.2026, niezrozumiałe). Bez dawnej legendy, zielonego pasa i wypełnienia pod Słońcem.
 
 Dane w 3 kolumnach: wschody/zachody Słońca i Księżyca, przedział najciemniejszego nieba i tarcza Księżyca. Faza Księżyca rysowana przez `moonPhaseIcon()` i orientowana przez `moonLitRight()`. W kafelku „Jasność nieba” faza pojawia się tylko, gdy Księżyc jest nad horyzontem.
 

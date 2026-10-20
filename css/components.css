@@ -955,7 +955,7 @@ html.sheet-open body {
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
-/* Kropka „teraz” 18 px; mała kropka to wschód albo zachód na horyzoncie. */
+/* Kropka „teraz” 18 px. */
 .sky-dot {
   position: absolute;
   z-index: 1;
@@ -964,11 +964,6 @@ html.sheet-open body {
   margin: -9px 0 0 -9px;
   border-radius: 50%;
   background: var(--sky);
-}
-.sky-dot.is-event {
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
 }
 /* Faza Księżyca obok procentu tarczy. */
 .moon-phase {
