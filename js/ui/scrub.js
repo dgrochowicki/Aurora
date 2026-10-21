@@ -1,4 +1,4 @@
-// Podgląd wartości na wykresie pomiaru (trendChart): przesunięcie palcem albo kursorem pokazuje pionową linię,
+// Podgląd wartości na wykresie pomiaru (lineChart ze scrub): przesunięcie palcem albo kursorem pokazuje pionową linię,
 // kropkę i dymek z godziną i wartością najbliższego punktu. Punkty są w data-points wykresu, policzone przy rysowaniu.
 // touch-action: pan-y w CSS zostawia przewijanie panelu w pionie, a ruch w poziomie trafia do podglądu.
 
