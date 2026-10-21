@@ -89,6 +89,7 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
 
 // Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, level}] od najwcześniejszego.
 // level (0–3): kolor słupka i wartości nad nim, jak poziomy kafelków aktywności; pod słupkiem godzina początku bloku.
+// Godzina jest w kolumnie słupka i wyznacza jej szerokość, więc skrajne godziny są 24 px od krawędzi jak na innych wykresach.
 // ticks: stała podziałka, np. cała skala Kp 0–9.
 export function barChart(items, { label, tz, ticks: fixed = null }) {
   if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
@@ -97,9 +98,8 @@ export function barChart(items, { label, tz, ticks: fixed = null }) {
   const bars = items
     .map(
       (p) =>
-        `<b data-level="${p.level}"><i style="height:${(H - y(p.v)).toFixed(1)}px"><span>${fmtNum(p.v)}</span></i></b>`,
+        `<b data-level="${p.level}"><i style="height:${(H - y(p.v)).toFixed(1)}px"><span>${fmtNum(p.v)}</span></i><em aria-hidden="true">${hmIn(p.t, tz)}</em></b>`,
     )
     .join("");
-  const times = items.map((p) => `<span>${hmIn(p.t, tz)}</span>`).join("");
-  return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div><div class="chart-x is-bars" aria-hidden="true">${times}</div></div>`;
+  return `<div class="chart is-bars" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div></div>`;
 }

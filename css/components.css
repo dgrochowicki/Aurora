@@ -891,21 +891,25 @@ html.sheet-open body {
   margin-top: 9px;
   padding-inline: 24px;
 }
-/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 12 px, zaokrąglone u góry (makieta autora 21.10.2026).
-   Kolor jak kropka w kafelkach aktywności (poziom z data-level), od pełnego u góry do przygaszonego u dołu. Godziny pod środkiem słupków. */
+/* Słupki (prognoza Kp): 12 px, zaokrąglone u góry (makieta autora 21.10.2026). Kolor jak kropka w kafelkach aktywności
+   (poziom z data-level), od pełnego u góry do przygaszonego u dołu. Każda kolumna ma szerokość swojej godziny pod spodem,
+   a kolumny są rozsunięte do krawędzi pasa 24 px, więc skrajne godziny leżą 24 px od krawędzi jak na innych wykresach. */
+.chart.is-bars {
+  /* Miejsce na godziny pod wykresem: 9 px odstępu i wiersz 18 px, jak .chart-x. */
+  padding-bottom: 27px;
+}
 .chart-bars {
   position: absolute;
   inset: 0 24px;
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  justify-content: space-between;
 }
-/* Każdy blok ma równą część szerokości, a słupek 12 px na jej środku. */
 .chart-bars b {
-  flex: 1;
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
   height: 100%;
   font-weight: 400;
   --bar: var(--text-40);
@@ -935,12 +939,13 @@ html.sheet-open body {
   font-style: normal;
   color: var(--bar);
 }
-.chart-x.is-bars {
-  gap: 8px;
-}
-.chart-x.is-bars span {
-  flex: 1;
-  text-align: center;
+/* Godzina pod słupkiem: zerowa wysokość, żeby nie podnosiła słupka, ale nadaje kolumnie szerokość. */
+.chart-bars em {
+  height: 0;
+  margin-top: 9px;
+  font-style: normal;
+  line-height: 18px;
+  white-space: nowrap;
 }
 .chart-empty {
   margin: 0;
