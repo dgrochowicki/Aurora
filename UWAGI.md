@@ -62,7 +62,7 @@ Nadal otwarte:
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
 - [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
-- [ ] Potwierdzić opisy i kolory czterech poziomów „sprzyja zorzy”.
+- [ ] **Skala kolorów poziomów aktywności (21.10.2026).** Opisy są już fizyczne i własne dla każdego pomiaru; zostaje kolor. Dziś: biały 40% → biały 70% → fiolet `#C4A1FF` → zielony `#5AC369`. Wariant do porównania `?kolory=cieple`: → pomarańczowy `#FFA94D` → czerwony `#FF6B6B`, jak Hello Aurora (autor ma obawy, że fiolet/zielony nie będzie zrozumiały). Przy wyborze ciepłej skali sprawdzić kolizje z żółtym wykresem zachmurzenia i łukiem Słońca (`--yellow`) oraz zieloną zorzą w tle; po decyzji usunąć `?kolory=cieple`.
 - [ ] Dopracować oddzielenie pływających przycisków od treści pod spodem (cień, tło, ramka).
 - [ ] Dokończyć projekt ekranu miejsc i mapy oraz szczegóły paneli, bez przywracania starej palety.
 - [ ] Potwierdzić progi nazw zachmurzenia: Brak <10, Małe <30, Umiarkowane <60, Duże <80, Bardzo duże ≥80.

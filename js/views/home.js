@@ -46,6 +46,8 @@ const CONDITION_TILES = [
 
 // Tymczasowo, do wyboru wariantu przez autora: ?kafelki=paski pokazuje we wszystkich kafelkach ten sam miernik zamiast mini wykresów.
 const BARS_ONLY = new URLSearchParams(location.search).get("kafelki") === "paski";
+// Tymczasowo, do wyboru skali kolorów poziomów przez autora: ?kolory=cieple daje szary → pomarańczowy → czerwony zamiast fioletu i zieleni.
+if (new URLSearchParams(location.search).get("kolory") === "cieple") document.documentElement.dataset.kolory = "cieple";
 
 // Ostatnio pokazana prognoza. Z niej budujemy panele szczegółów.
 let state = null;
@@ -108,14 +110,14 @@ function showTip(text = "") {
   els.tip.hidden = !text;
 }
 
-// Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
+// Kafelki aktywności. Przy Bz liczba, opis i poziom pochodzą ze średniej z 30 minut (decyzja autora 21.10.2026), żeby mówiły to samo.
 // Opis jest fizyczny (np. „Niespokojnie”), a kolor kropki mówi, co pomiar znaczy dla zorzy. Wskaźnik pod nim: miernik dla Kp, mini wykres z 2 godzin dla reszty.
 // Za stary pomiar (stale z freshData) zostaje jako liczba, ale bez oceny i wskaźnika, z wiekiem zamiast opisu.
 function renderSpaceTiles(space, stale = {}, now = Date.now()) {
   const bzRef = space.bzAvg ?? space.bz;
   const tiles = [
     { key: "mag", src: "goes", value: space.goes == null ? null : fmtNum(space.goes), ref: space.goesRange, level: goesLevel, text: goesLabel },
-    { key: "bz", src: "bz", value: space.bz == null ? null : fmtNum(space.bz), ref: bzRef, level: bzLevel, text: bzLabel },
+    { key: "bz", src: "bz", value: bzRef == null ? null : fmtNum(bzRef), ref: bzRef, level: bzLevel, text: bzLabel },
     { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), ref: space.kp, level: kpLevel, text: kpLabel },
     { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), ref: space.wind, level: windLevel, text: windLabel },
   ];

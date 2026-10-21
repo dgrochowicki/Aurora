@@ -347,7 +347,8 @@
   line-height: 20px;
   color: var(--text-60);
 }
-/* Kolor stanu kafelka aktywności: ciemny szary gdy nie sprzyja zorzy, jasny szary neutralnie, fiolet gdy sprzyja, zielony gdy mocno sprzyja. */
+/* Kolor stanu kafelka aktywności (miniwykres, miernik): ciemny szary gdy nie sprzyja zorzy, jasny szary neutralnie, fiolet gdy sprzyja,
+   zielony gdy mocno sprzyja. Bez kropki przy opisie, bo kolor niesie wskaźnik (decyzja autora 21.10.2026). */
 .data-tile[data-level="0"] {
   --state: var(--level-0);
 }
@@ -359,16 +360,6 @@
 }
 .data-tile[data-level="3"] {
   --state: var(--level-3);
-}
-.data-tile[data-level] .tile-status::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: var(--state);
-  vertical-align: 1px;
 }
 /* Wskaźnik pod opisem: miernik z segmentów albo mini wykres z 2 godzin. */
 .tile-viz {

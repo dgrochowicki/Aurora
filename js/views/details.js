@@ -3,7 +3,7 @@
 // Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, windLabel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -38,6 +38,8 @@ const horizonTip = (st) => {
   return place ? `Sprawdź też, czy horyzont ${place} jest odsłonięty.` : "Zorza jest prawie nad Tobą, więc liczy się całe niebo.";
 };
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
+// Kolor wykresu jak kropka w kafelku: poziom pomiaru, a przy za starym albo brakującym pomiarze domyślny.
+const tone = (st, src, v, level) => (v == null || src in st.stale ? "" : `level-${level(v)}`);
 // Stan pod liczbą jak w kafelku: opis fizyczny pomiaru, a przy za starym pomiarze jego wiek.
 const status = (st, src, v, label) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : label(v));
 
@@ -94,6 +96,7 @@ export const DETAILS = {
           status: status(st, "goes", s.goesRange, goesLabel),
         }) +
         chart(s.goesSeries, {
+          tone: tone(st, "goes", s.goesRange, goesLevel),
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
           tz: st.tz,
         }) +
@@ -114,18 +117,21 @@ export const DETAILS = {
       title: "Pole wiatru słonecznego · Bz",
       source: rtswSource(s.bzProbe, s.bzBackup),
       html:
-        infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
-          status: status(st, "bz", ref, bzLabel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
+        // Duża liczba to średnia z 30 minut, z której jest opis i kolor (decyzja autora 21.10.2026), a ostatni odczyt jest w danych.
+        infoHero(ref == null ? null : fmtNum(ref), "nT", {
+          status:
+            status(st, "bz", ref, bzLabel) +
+            (s.bzAvg != null && !("bz" in st.stale) ? " · średnia z 30 min" : "") +
+            (s.bzBackup && ref != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
-        // Linia w kolorze poziomu, jak w kafelku; przy za starym pomiarze bez poziomu, w domyślnym kolorze.
         chart(s.bzSeries, {
           zero: true,
           label: "Bz w ostatnich 2 godzinach",
           tz: st.tz,
-          tone: ref == null || "bz" in st.stale ? "" : `level-${bzLevel(ref)}`,
+          tone: tone(st, "bz", ref, bzLevel),
         }) +
         infoStats([
-          ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
+          ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
         ]) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
@@ -168,7 +174,7 @@ export const DETAILS = {
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
           status: status(st, "wind", s.wind, windLabel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
-        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", tz: st.tz }) +
+        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", tz: st.tz, tone: tone(st, "wind", s.wind, windLevel) }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
         ]) +

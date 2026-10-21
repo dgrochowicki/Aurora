@@ -62,3 +62,9 @@
     "Segoe UI",
     sans-serif;
 }
+
+/* Tymczasowo, do wyboru przez autora (?kolory=cieple): skala „cieplna” jak w Hello Aurora, szary → pomarańczowy → czerwony. */
+:root[data-kolory="cieple"] {
+  --level-2: #ffa94d;
+  --level-3: #ff6b6b;
+}
