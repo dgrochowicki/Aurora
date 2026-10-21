@@ -2,6 +2,13 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 21.10.2026 — podziałka wykresu wiatru
+
+- Wykres w panelu wiatru słonecznego ma skalę dopasowaną do danych, ale nie węższą niż 100 km/s, z krokiem 20 (przy szerszym zakresie 50, 100, przy CME 200) i gęstszymi liniami co 37 px. Wahania są widoczne jak w Hello Aurora, a drobne nie wyglądają jak burza. Najpierw próbowaliśmy stałej osi od 300 co 100 (autor: zamiast „0” z makiety `_Research/AuroraNow/Aurora _Wiatr.png`), ale spłaszczała skoki; potem zakres min. 150 km/s co 50, aż autor poprosił o jeszcze bliższy (np. 400–500 co 20). `windTicks()` w `js/ui/chart.js` z testami, `js/views/details.js`.
+- Poprawka podglądu palcem na iPhonie (zgłoszenie autora): przesuwanie po wykresie przesuwało cały panel w bok z paskami przewijania, bo kropka ostatniego pomiaru wystawała poza krawędź. Panel przewija się tylko w pionie, a linia kończy się ok. 8 px przed krawędzią, więc kropka jest cała w kadrze.
+- Wykresy magnetometru, Bz i wiatru mają pod osią 5 godzin zamiast 3 (prośba autora: pusto w środku). `lineChart(…, { labels })` z testem.
+- W wyjaśnieniu panelu wiatru zdanie o typowych prędkościach, żeby górnej linii osi nie brać za maksimum (obawa autora).
+
 ## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
 
 - Tło strony: `#12151A` u góry przechodzi teraz w `#1E1F24` (wcześniej w `#22242A`), panele `#1F2226`. Miernik Kp w kafelku z kółek 8 px od lewej, z odstępem 4 px, wyśrodkowany w pionie, bo był niżej niż miniwykres obok. Decyzje autora. `css/tokens.css`, `css/components.css`, `index.html`, `manifest.webmanifest`.
