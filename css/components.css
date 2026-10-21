@@ -891,7 +891,8 @@ html.sheet-open body {
   margin-top: 9px;
   padding-inline: 24px;
 }
-/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, zielone o jasności zależnej od wartości. Godziny pod środkiem słupków. */
+/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 12 px, zaokrąglone u góry (makieta autora 21.10.2026).
+   Kolor jak kropka w kafelkach aktywności (poziom z data-level), od pełnego u góry do przygaszonego u dołu. Godziny pod środkiem słupków. */
 .chart-bars {
   position: absolute;
   inset: 0 24px;
@@ -899,7 +900,7 @@ html.sheet-open body {
   align-items: flex-end;
   gap: 8px;
 }
-/* Każdy blok ma równą część szerokości, a słupek 24 px na jej środku. */
+/* Każdy blok ma równą część szerokości, a słupek 12 px na jej środku. */
 .chart-bars b {
   flex: 1;
   display: flex;
@@ -907,23 +908,32 @@ html.sheet-open body {
   align-items: flex-end;
   height: 100%;
   font-weight: 400;
+  --bar: var(--text-40);
+}
+.chart-bars b[data-level="1"] {
+  --bar: var(--text-60);
+}
+.chart-bars b[data-level="2"] {
+  --bar: var(--green);
+}
+.chart-bars b[data-level="3"] {
+  --bar: var(--violet);
 }
 .chart-bars i {
   position: relative;
-  width: 24px;
+  width: 12px;
   min-height: 2px;
-  border-radius: 4px 4px 0 0;
-  /* Jasność z --a (0–1) ustawia wykres: im wyższe Kp, tym jaśniejszy zielony. */
-  background: rgb(var(--green-rgb) / var(--a, 1));
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(var(--bar), color-mix(in srgb, var(--bar) 35%, transparent));
 }
 .chart-bars span {
   position: absolute;
   bottom: calc(100% + 4px);
-  left: -12px;
-  right: -12px;
+  left: -18px;
+  right: -18px;
   text-align: center;
   font-style: normal;
-  color: var(--text-60);
+  color: var(--bar);
 }
 .chart-x.is-bars {
   gap: 8px;

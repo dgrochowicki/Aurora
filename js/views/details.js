@@ -1,9 +1,9 @@
 // Treść paneli szczegółów po stuknięciu w kafelek. Każda funkcja dostaje stan strony głównej i zwraca {title, source, html}.
 // Układ wspólny dla wszystkich paneli: metryka ze stanem, wykres, dane, na końcu wyjaśnienie (klocki z ui/parts.js).
-// Pod liczbą stoi to samo co w kafelku (znaczenie dla zorzy), a opis fizyczny jest w danych jako „Ocena”.
+// Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, favorLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, kpLabel, kpLevel, goesLabel, windLabel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -38,8 +38,8 @@ const horizonTip = (st) => {
   return place ? `Sprawdź też, czy horyzont ${place} jest odsłonięty.` : "Zorza jest prawie nad Tobą, więc liczy się całe niebo.";
 };
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
-// Stan pod liczbą jak w kafelku: znaczenie dla zorzy, a przy za starym pomiarze jego wiek.
-const favor = (st, src, v, level) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : favorLabel(level(v)));
+// Stan pod liczbą jak w kafelku: opis fizyczny pomiaru, a przy za starym pomiarze jego wiek.
+const status = (st, src, v, label) => (src in st.stale ? ageLabel(st.stale[src], Date.now()) : v == null ? "" : label(v));
 
 export const DETAILS = {
   score(st) {
@@ -91,7 +91,7 @@ export const DETAILS = {
       source: `NOAA SWPC · magnetometr satelity GOES${s.goesSat ? `-${s.goesSat}` : ""}`,
       html:
         infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
-          status: favor(st, "goes", s.goesRange, goesLevel),
+          status: status(st, "goes", s.goesRange, goesLabel),
         }) +
         chart(s.goesSeries, {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
@@ -99,7 +99,6 @@ export const DETAILS = {
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
-          ["Ocena", s.goesRange == null || "goes" in st.stale ? "—" : goesLabel(s.goesRange)],
         ]) +
         infoText(
           "Satelita GOES krąży 36 000 km nad równikiem i mierzy pole magnetyczne Ziemi. Pokazujemy składową Hp.",
@@ -116,12 +115,11 @@ export const DETAILS = {
       source: rtswSource(s.bzProbe, s.bzBackup),
       html:
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
-          status: favor(st, "bz", ref, bzLevel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
+          status: status(st, "bz", ref, bzLabel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
         chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", tz: st.tz }) +
         infoStats([
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
-          ["Ocena", ref == null || "bz" in st.stale ? "—" : bzLabel(ref)],
         ]) +
         infoText("Ujemne Bz, czyli pole skierowane na południe, pozwala energii wiatru słonecznego wejść do ziemskiej magnetosfery. Liczy się nie tylko wartość, ale i to, jak długo pozostaje ujemna. Krótki spadek nie gwarantuje widocznej zorzy."),
     };
@@ -138,12 +136,12 @@ export const DETAILS = {
       source: "NOAA SWPC · indeks Kp i prognoza 3-dniowa",
       html:
         infoHero(s.kp == null ? null : fmtNum(s.kp), "/ 9", {
-          status: favor(st, "kp", s.kp, kpLevel),
+          status: status(st, "kp", s.kp, kpLabel),
         }) +
         infoChart(
           barChart(
-            // Cała skala 0–9, a słupek tym jaśniejszy, im wyższe Kp, czyli większa szansa na zorzę.
-            blocks.map((r) => ({ t: r.t, v: r.kp, a: 0.2 + 0.8 * Math.min(1, r.kp / 9) })),
+            // Cała skala 0–9, a kolor słupka jak kropka w kafelku: poziom Kp dla zorzy (szary, jaśniejszy szary, zielony, fiolet).
+            blocks.map((r) => ({ t: r.t, v: r.kp, level: kpLevel(r.kp) })),
             {
               label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${hmIn(r.t, tz)} ${fmtNum(r.kp)}`).join(", ")}`,
               tz,
@@ -151,7 +149,6 @@ export const DETAILS = {
             },
           ),
         ) +
-        infoStats([["Ocena", s.kp == null || "kp" in st.stale ? "—" : kpLabel(s.kp)]]) +
         infoText("Kp opisuje globalną aktywność geomagnetyczną w skali 0–9. Im wyższy, tym dalej od bieguna sięga owal zorzy, ale sam indeks nie mówi, co zobaczysz w swoim miejscu."),
     };
   },
@@ -163,12 +160,11 @@ export const DETAILS = {
       source: rtswSource(s.windProbe, s.windBackup),
       html:
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
-          status: favor(st, "wind", s.wind, windLevel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
+          status: status(st, "wind", s.wind, windLabel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
         chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", tz: st.tz }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
-          ["Ocena", s.wind == null || "wind" in st.stale ? "—" : windLabel(s.wind)],
         ]) +
         infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
     };

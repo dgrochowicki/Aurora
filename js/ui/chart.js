@@ -87,8 +87,8 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y, unit)}${svg}</div>${axis}</div>`;
 }
 
-// Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, a}] od najwcześniejszego.
-// a (0–1): jasność zielonego słupka, nad słupkiem jest jego wartość, pod nim godzina początku bloku.
+// Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, level}] od najwcześniejszego.
+// level (0–3): kolor słupka i wartości nad nim, jak poziomy kafelków aktywności; pod słupkiem godzina początku bloku.
 // ticks: stała podziałka, np. cała skala Kp 0–9.
 export function barChart(items, { label, tz, ticks: fixed = null }) {
   if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
@@ -97,7 +97,7 @@ export function barChart(items, { label, tz, ticks: fixed = null }) {
   const bars = items
     .map(
       (p) =>
-        `<b><i style="height:${(H - y(p.v)).toFixed(1)}px;--a:${p.a.toFixed(2)}"><span>${fmtNum(p.v)}</span></i></b>`,
+        `<b data-level="${p.level}"><i style="height:${(H - y(p.v)).toFixed(1)}px"><span>${fmtNum(p.v)}</span></i></b>`,
     )
     .join("");
   const times = items.map((p) => `<span>${hmIn(p.t, tz)}</span>`).join("");

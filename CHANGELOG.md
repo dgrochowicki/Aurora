@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
+
+- Kafelki aktywności nie mówią już wszystkie tego samego („Neutralnie”). Każdy pomiar ma własny opis fizyczny: magnetometr „Niespokojnie”, Bz „Blisko zera”, Kp „Niespokojnie”, wiatr „Typowa prędkość”. Znaczenie dla zorzy pokazuje kolor kropki, a ocena zorzy jest raz, po prawej przy „Aktywność zorzy”. Decyzja autora: nie chce jednakowych ocen zorzy w każdym kafelku.
+- Panele magnetometru, Bz, Kp i wiatru: pod liczbą ten sam opis co w kafelku, bez bloku „Ocena”. Bz „Na południe · sprzyja” skrócone do „Na południe”, opisy GOES skrócone do jednej linii kafelka („Niespokojnie”, „Zaburzone”, „Silnie zaburzone”). `favorLabel()` usunięta.
+- Wykres Kp według makiety autora (`Research/AuroraNow/Aurora _Kp_index.png`): słupki 12 px, zaokrąglone, z gradientem; słupek i wartość w kolorze poziomu Kp (szary, zielony, fiolet), a nie żółty jak w makiecie — autor wybrał kolory poziomów. `js/ui/chart.js` (`barChart` bierze `level` zamiast `a`), `css/components.css`, `js/views/details.js`, `js/views/home.js`, `js/labels.js`, `STYL.md`.
+
 ## 20.10.2026 — zdanie główne: szansa, krótsze zdanie, strzałka
 
 - W nocy zdanie główne podaje szansę teraz, z białą liczbą: „Zorza może być widoczna **gołym okiem**, szansa **67%**. Warunki obserwacji są **dobre**.” W dzień bez procentu (decyzja: szansa w dzień nic nie mówi). Prośba autora.

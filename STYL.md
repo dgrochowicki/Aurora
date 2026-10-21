@@ -82,14 +82,14 @@ Szansa (`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 
 
 Kafelek: padding 16 px, radius 20 px. Tytuł ze strzałką `›`, zwykle 20 px przerwy, metryka z ikoną 24 × 24 (jeżeli dotyczy), wartość i status, potem wskaźnik lub tekst najbliższej zmiany. Typowe odstępy wewnętrzne 4–20 px zależnie od części.
 
-W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--text-40`), „Neutralnie” (`--text-60`), „Sprzyja zorzy” (`--green`), „Mocno sprzyja” (`--violet`). Poziom ma kropkę przy opisie i miernik/miniwykres o wysokości około 32 px pod statusem.
+W aktywności cztery poziomy z `js/labels.js`, pokazywane kolorem kropki przy opisie: nie sprzyja (`--text-40`), neutralnie (`--text-60`), sprzyja zorzy (`--green`), mocno sprzyja (`--violet`). Od 21.10.2026 (decyzja autora) opis pod liczbą jest fizyczny i własny dla każdego pomiaru, a nie wspólna ocena dla zorzy: magnetometr „Spokojnie / Niespokojnie / Zaburzone / Silnie zaburzone”, Bz „Na północ / Blisko zera / Na południe / Silnie na południe”, Kp „Spokojnie / Niespokojnie / Aktywnie / Burza G1–G5”, wiatr „Wolny / Typowa prędkość / Szybki / Bardzo szybki”. Ocena samej zorzy jest raz, po prawej przy nagłówku „Aktywność zorzy”. Opisy muszą zmieścić się w jednej linii kafelka (ok. 135 px przy 15 px). Pod statusem miernik/miniwykres o wysokości około 32 px.
 
 - Magnetometr GOES, Bz, prędkość wiatru: miniwykresy z 2 h; Bz ma linię zera i wyróżnienie ujemnych wartości, wiatr próg 500 km/s.
 - Kp: miernik segmentowy (skala /9).
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
-- Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
-- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast oceny jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów, a „Ocena” ma kreskę.
-- Bz i wiatr z zapasowej sondy: przy ocenie nazwa sondy („Neutralnie · ACE”), w panelu „zapasowa sonda ACE” pod liczbą.
+- Kolory poziomów są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
+- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast opisu jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów.
+- Bz i wiatr z zapasowej sondy: przy opisie nazwa sondy („Blisko zera · ACE”), w panelu „zapasowa sonda ACE” pod liczbą.
 - Kafelek „Zachmurzenie” bez prognozy: kreska, „Brak danych”, bez linii zmiany.
 
 ## 7. Pasek godzin
@@ -120,7 +120,7 @@ Metryka: 28/34 px, jednostka w tym samym rozmiarze, status 15 px, 4 px niżej. W
 
 `js/ui/chart.js`: co najmniej trzy linie podziałki co 53 px (`ROW`), „ładne” kroki 1, 2, 2,5, 5 × potęga 10. Przy trzech liniach wykres z osią X około 153 px. Podpisy osi Y po prawej, 24 px od krawędzi i 4 px nad linią; godziny początku, środka i końca. Linia ok. 2,3 px, przy Bz ujemny fragment innym kolorem i bez standardowego gradientu. Znany problem: w pobliżu zera podpis „0” może nachodzić na skrajny odczyt.
 
-Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki ok. 24 px, łagodne zaokrąglenie u góry, jasność zależna od Kp. Pod każdym jest początek odpowiedniego bloku, nad nim wartość.
+Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki 12 px, zaokrąglone u góry (promień 6 px), z gradientem od pełnego koloru u góry do 35% u dołu. Kolor słupka i wartości nad nim według poziomu Kp, jak kropka w kafelkach (szary, jaśniejszy szary, `--green`, `--violet`); makieta autora miała zielony i żółty, ale autor wybrał kolory poziomów (21.10.2026). Pod każdym słupkiem jest początek bloku. Pod liczbą w panelu stoi opis fizyczny („Niespokojnie”), bez osobnego bloku „Ocena”; tak samo w panelach magnetometru, Bz i wiatru.
 
 ### Zachmurzenie
 

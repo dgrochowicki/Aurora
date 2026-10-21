@@ -5,7 +5,7 @@ import { skyAt, darknessOf, magLat, phaseAt } from "../js/model/sky.js";
 import { clearSky, kpActivity, kpVisible, visWeight } from "../js/model/aurora.js";
 import { buildForecast, cloudChange, dayLabel, nightTimeline, hourGlow, glowOf, outlookText } from "../js/model/forecast.js";
 import { fmtNum } from "../js/util.js";
-import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, favorLabel, conditionsText, chancePhrase, dataLevel, conditionsParts } from "../js/labels.js";
+import { bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, windLevel, windLabel, conditionsText, chancePhrase, dataLevel, conditionsParts } from "../js/labels.js";
 
 const SZCZECIN = { lat: 53.4285, lon: 14.5528 };
 const hour = (h) => ({ cloud_cover: [h.total], cloud_cover_low: [h.low], cloud_cover_mid: [h.mid], cloud_cover_high: [h.high] });
@@ -161,9 +161,8 @@ test("poziomy pomiarów: w górę skali znaczy lepiej dla zorzy, a Bz sprzyja na
   assert.deepEqual([2, 3.3, 4.7, 6].map(kpLevel), [0, 1, 2, 3]);
   assert.deepEqual([5, 20, 45, 80].map(goesLevel), [0, 1, 2, 3]);
   assert.deepEqual([300, 420, 600, 750].map(windLevel), [0, 1, 2, 3]);
-  assert.equal(favorLabel(bzLevel(-5)), "Sprzyja zorzy");
-  // Opisy fizyczne w panelach korzystają z tych samych progów.
-  assert.equal(bzLabel(-5), "Na południe · sprzyja");
+  // Opisy fizyczne w kafelkach i panelach korzystają z tych samych progów.
+  assert.equal(bzLabel(-5), "Na południe");
   assert.equal(kpLabel(6.3), "Burza G2");
   assert.equal(windLabel(420), "Typowa prędkość");
 });
