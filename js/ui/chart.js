@@ -51,9 +51,9 @@ function gridHTML(ticks, y, unit = "") {
     .join("");
 }
 
-// series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
+// series: [{t, v}] od najstarszego. zero: pole między linią a zerem poniżej zera jest wypełnione, bo przy Bz to ona sprzyja zorzy (jak w miniwykresie).
 // tz: strefa miejsca (IANA), w której podpisujemy godziny; bez niej strefa przeglądarki. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
-// tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony).
+// tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony; level-0…level-3 to kolory poziomów aktywności).
 // unit: dopisek przy liczbach osi Y poza zerem. row: odstęp linii podziałki w px (domyślnie 53).
 // every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego początek, środek i koniec.
 export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin." }) {
@@ -71,13 +71,13 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     t1 = series[series.length - 1].t;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100;
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
-  // Gradient pod linią do dołu wykresu. Przy zero zamiast niego linia poniżej zera w drugim kolorze.
+  // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
   const area = zero ? "" : `<path class="chart-area" d="${line}L100 ${H}L0 ${H}Z"/>`;
   const below = zero
     ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
     : "";
-  const negative = zero ? `<path class="chart-line negative" clip-path="url(#chartBelowZero)" d="${line}"/>` : "";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}<path class="chart-line" d="${line}"/>${negative}</svg>`;
+  const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L100 ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Środkowy podpis to czas środkowego punktu danych, żeby przy prognozie godzinowej była pełna godzina.
   const mid = series[Math.floor((series.length - 1) / 2)].t;

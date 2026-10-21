@@ -843,6 +843,19 @@ html.sheet-open body {
 .chart.is-yellow {
   --chart: var(--yellow);
 }
+/* Kolor poziomu aktywności, jak kropka i miniwykres w kafelku (Bz). */
+.chart.is-level-0 {
+  --chart: var(--level-0);
+}
+.chart.is-level-1 {
+  --chart: var(--level-1);
+}
+.chart.is-level-2 {
+  --chart: var(--level-2);
+}
+.chart.is-level-3 {
+  --chart: var(--level-3);
+}
 .chart-plot {
   position: relative;
 }
@@ -879,8 +892,10 @@ html.sheet-open body {
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
-.chart-line.negative {
-  stroke: var(--warn);
+/* Bz poniżej zera: wypełnienie w kolorze linii, jak .spark-area w kafelku. */
+.chart-below {
+  fill: var(--chart);
+  opacity: 0.22;
 }
 .chart-area {
   fill: url(#chartFill);
@@ -894,7 +909,8 @@ html.sheet-open body {
 }
 /* Słupki (prognoza Kp): 12 px, zaokrąglone u góry (makieta autora 21.10.2026). Kolor jak kropka w kafelkach aktywności
    (poziom z data-level). Wypełnienie 70%: pełny kolor do 20% wysokości, potem gaśnie do 20% u dołu; obwódka 1 px w kolorze 50%. Każda kolumna ma szerokość swojej godziny pod spodem,
-   a kolumny są rozsunięte do krawędzi pasa 24 px, więc skrajne godziny leżą 24 px od krawędzi jak na innych wykresach. */
+   a kolumny są rozsunięte do krawędzi pasa 24 px, więc skrajne godziny leżą 24 px od krawędzi jak na innych wykresach.
+   Słupek stoi przy lewej stronie godziny (makieta autora), więc ostatni nie wchodzi pod liczby osi Y. */
 .chart.is-bars {
   /* Miejsce na godziny pod wykresem: 9 px odstępu i wiersz 18 px, jak .chart-x. */
   padding-bottom: 27px;
@@ -910,7 +926,7 @@ html.sheet-open body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: center;
+  align-items: flex-start;
   height: 100%;
   font-weight: 400;
   --bar: var(--level-0);
@@ -928,8 +944,10 @@ html.sheet-open body {
   position: relative;
   width: 12px;
   min-height: 2px;
+  margin-left: 3px;
   border-radius: 6px 6px 0 0;
   border: 1px solid color-mix(in srgb, var(--bar) 50%, transparent);
+  border-bottom: 0;
   /* 70% krycia całości: 70% u góry, 70% × 20% = 14% u dołu. */
   background: linear-gradient(color-mix(in srgb, var(--bar) 70%, transparent) 20%, color-mix(in srgb, var(--bar) 14%, transparent));
 }
@@ -942,10 +960,12 @@ html.sheet-open body {
   font-style: normal;
   color: var(--bar);
 }
-/* Godzina pod słupkiem: zerowa wysokość, żeby nie podnosiła słupka, ale nadaje kolumnie szerokość. */
+/* Godzina pod słupkiem: zerowa wysokość i przesunięcie bez zmiany układu, żeby nie podnosiła słupka nad linię 0,
+   ale nadaje kolumnie szerokość. 9 px pod linią jak .chart-x. */
 .chart-bars em {
+  position: relative;
+  top: 9px;
   height: 0;
-  margin-top: 9px;
   font-style: normal;
   line-height: 18px;
   white-space: nowrap;

@@ -3,7 +3,7 @@
 // Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, kpLabel, kpLevel, goesLabel, windLabel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, windLabel } from "../labels.js";
 import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -117,7 +117,13 @@ export const DETAILS = {
         infoHero(s.bz == null ? null : fmtNum(s.bz), "nT", {
           status: status(st, "bz", ref, bzLabel) + (s.bzBackup && s.bz != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
-        chart(s.bzSeries, { zero: true, label: "Bz w ostatnich 2 godzinach", tz: st.tz }) +
+        // Linia w kolorze poziomu, jak w kafelku; przy za starym pomiarze bez poziomu, w domyślnym kolorze.
+        chart(s.bzSeries, {
+          zero: true,
+          label: "Bz w ostatnich 2 godzinach",
+          tz: st.tz,
+          tone: ref == null || "bz" in st.stale ? "" : `level-${bzLevel(ref)}`,
+        }) +
         infoStats([
           ["Średnia z 30 min", s.bzAvg == null ? "—" : `${fmtNum(s.bzAvg)} nT`],
         ]) +
