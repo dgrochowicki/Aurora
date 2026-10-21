@@ -188,7 +188,7 @@ export const DETAILS = {
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
         ]) +
-        infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz."),
+        infoText("Szybszy i gęstszy wiatr słoneczny niesie więcej energii. Najsilniejsze zorze pojawiają się, gdy wysoka prędkość idzie w parze z długo ujemnym Bz.", "Zwykle wiatr ma 300–500 km/s. Od 500 km/s sprzyja zorzy, a przy silnych burzach przekracza 1000 km/s, w rekordowych nawet 2000."),
     };
   },
 
