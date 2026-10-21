@@ -883,6 +883,87 @@ html.sheet-open body {
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
+/* Wykres pomiaru bez osi Y (trendChart): podpisy najwyższego i najniższego punktu przy nich, kropka na ostatnim punkcie.
+   Miejsce na podpisy jest w samym wykresie, więc bez górnego odstępu na liczbę osi. */
+.chart.is-trend {
+  padding-top: 0;
+}
+.chart.is-trend .chart-y.is-left {
+  right: auto;
+  left: 24px;
+}
+.chart.is-trend .chart-plot {
+  /* Ruch w pionie przewija panel, w poziomie przesuwa podgląd. */
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+.chart-mark {
+  position: absolute;
+  z-index: 2;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--text-80);
+}
+.chart-mark.is-max {
+  margin-top: -22px;
+}
+.chart-mark.is-min {
+  margin-top: 6px;
+}
+/* Przy krawędzi podpis zaczyna się albo kończy 24 px od niej, jak inne podpisy osi. */
+.chart-mark.is-start {
+  transform: none;
+  margin-left: 24px;
+}
+.chart-mark.is-end {
+  transform: translateX(-100%);
+  margin-left: -24px;
+}
+.chart-dot {
+  position: absolute;
+  z-index: 3;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--chart) 30%, transparent);
+}
+/* Podczas podglądu podpisy skrajnych punktów i kropka końca ustępują dymkowi. */
+.chart.is-scrubbing .chart-mark,
+.chart.is-scrubbing .chart-plot > .chart-dot {
+  opacity: 0;
+}
+.chart-scrub-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-60);
+}
+.chart-tip {
+  position: absolute;
+  z-index: 4;
+  /* Na górze wykresu, gdzie podczas podglądu nie ma podpisu najwyższego punktu. */
+  top: -4px;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #3a4048;
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chart-tip.is-start {
+  transform: none;
+  margin-left: -12px;
+}
+.chart-tip.is-end {
+  transform: translateX(-100%);
+  margin-left: 12px;
+}
 /* Bz poniżej zera: wypełnienie w kolorze linii, jak .spark-area w kafelku. */
 .chart-below {
   fill: var(--chart);

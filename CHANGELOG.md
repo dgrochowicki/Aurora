@@ -4,6 +4,8 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 ## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
 
+- Wykresy magnetometru, Bz i wiatru bez osi Y, jak w Hello Aurora: podpisany najwyższy i najniższy punkt, kropka na ostatnim, linia odniesienia tylko przy zerze Bz i progu 500 km/s. Przesunięcie palcem pokazuje godzinę i wartość. Kp i zachmurzenie zostają z podziałką (autor: bez niej nie wiadomo, do ilu słupek może dojść); przy Kp pierwszy słupek ma podpis „Teraz”. Nowe `trendChart()` w `js/ui/chart.js` z testami, `js/ui/scrub.js`, `css/components.css`. Opóźnienie danych z L1 („Current”) zapisane jako propozycja w `UWAGI.md`.
+
 - Kafelki aktywności nie mówią już wszystkie tego samego („Neutralnie”). Każdy pomiar ma własny opis fizyczny: magnetometr „Niespokojnie”, Bz „Blisko zera”, Kp „Niespokojnie”, wiatr „Typowa prędkość”. Znaczenie dla zorzy pokazuje kolor kropki, a ocena zorzy jest raz, po prawej przy „Aktywność zorzy”. Decyzja autora: nie chce jednakowych ocen zorzy w każdym kafelku.
 - Panele magnetometru, Bz, Kp i wiatru: pod liczbą ten sam opis co w kafelku, bez bloku „Ocena”. Bz „Na południe · sprzyja” skrócone do „Na południe”, opisy GOES skrócone do jednej linii kafelka („Niespokojnie”, „Zaburzone”, „Silnie zaburzone”). `favorLabel()` usunięta.
 - Nowe kolory poziomów aktywności (`--level-0`…`--level-3` w `css/tokens.css`): biały 40% i 70% (na tle panelu jak `#6C7782` i `#B6B9BC` z makiety), fiolet `#C4A1FF`, zielony `#5AC369`. Fiolet przed zielonym, bo jest ciemniejszy, a szare z białego (decyzje autora). Dotyczy kropek, miniwykresów (także pola pod zerem przy Bz, wcześniej zawsze zielonego) i mierników w kafelkach oraz słupków Kp.

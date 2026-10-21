@@ -8,6 +8,7 @@ import { lookDirection } from "../model/aurora.js";
 import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, goesLabel, windLevel, windLabel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
+import { bindScrub } from "../ui/scrub.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
 import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
@@ -67,6 +68,7 @@ function openDetail(key, opener) {
   const d = DETAILS[key](state);
   els.infoTitle.textContent = d.title;
   els.infoBody.innerHTML = d.html;
+  bindScrub(els.infoBody);
   els.infoSource.textContent = d.source;
   $("#infoScroll").scrollTop = 0;
   $("#infoSheet").classList.remove("scrolled");

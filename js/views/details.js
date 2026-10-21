@@ -3,8 +3,8 @@
 // Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
-import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel, WIND_FAST } from "../labels.js";
+import { lineChart, trendChart, barChart, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
@@ -38,6 +38,8 @@ const horizonTip = (st) => {
   return place ? `Sprawdź też, czy horyzont ${place} jest odsłonięty.` : "Zorza jest prawie nad Tobą, więc liczy się całe niebo.";
 };
 const chart = (series, opts) => infoChart(lineChart(series || [], opts));
+// Pomiary z 2 godzin: bez osi Y, z podpisanym najwyższym i najniższym punktem i podglądem palcem. minSpan jak w kafelkach.
+const trend = (series, opts) => infoChart(trendChart(series || [], opts));
 // Kolor wykresu jak kropka w kafelku: poziom pomiaru, a przy za starym albo brakującym pomiarze domyślny.
 const tone = (st, src, v, level) => (v == null || src in st.stale ? "" : `level-${level(v)}`);
 // Stan pod liczbą jak w kafelku: opis fizyczny pomiaru, a przy za starym pomiarze jego wiek.
@@ -95,10 +97,12 @@ export const DETAILS = {
         infoHero(s.goes == null ? null : fmtNum(s.goes), "nT", {
           status: status(st, "goes", s.goesRange, goesLabel),
         }) +
-        chart(s.goesSeries, {
+        trend(s.goesSeries, {
           tone: tone(st, "goes", s.goesRange, goesLevel),
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
           tz: st.tz,
+          unit: "nT",
+          minSpan: 40,
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -124,11 +128,13 @@ export const DETAILS = {
             (s.bzAvg != null && !("bz" in st.stale) ? " · średnia z 30 min" : "") +
             (s.bzBackup && ref != null ? ` · zapasowa sonda ${s.bzBackup}` : ""),
         }) +
-        chart(s.bzSeries, {
+        trend(s.bzSeries, {
           zero: true,
           label: "Bz w ostatnich 2 godzinach",
           tz: st.tz,
           tone: tone(st, "bz", ref, bzLevel),
+          unit: "nT",
+          minSpan: 12,
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
@@ -158,6 +164,7 @@ export const DETAILS = {
               label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${hmIn(r.t, tz)} ${fmtNum(r.kp)}`).join(", ")}`,
               tz,
               ticks: [9, 6, 3, 0],
+              now: true,
             },
           ),
         ) +
@@ -174,7 +181,15 @@ export const DETAILS = {
         infoHero(s.wind == null ? null : Math.round(s.wind), "km/s", {
           status: status(st, "wind", s.wind, windLabel) + (s.windBackup && s.wind != null ? ` · zapasowa sonda ${s.windBackup}` : ""),
         }) +
-        chart(s.windSeries, { label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach", tz: st.tz, tone: tone(st, "wind", s.wind, windLevel) }) +
+        trend(s.windSeries, {
+          label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach",
+          tz: st.tz,
+          tone: tone(st, "wind", s.wind, windLevel),
+          unit: "km/s",
+          digits: 0,
+          threshold: WIND_FAST,
+          minSpan: 150,
+        }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
         ]) +
