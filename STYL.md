@@ -18,9 +18,9 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
-| `--bg` | `#22242A` | Tło główne (od 20.10.2026, decyzja autora) |
+| `--bg` | `#1E1F24` | Tło główne pod ciemniejszą górą (od 21.10.2026, decyzja autora; wcześniej `#22242A`) |
 | `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
-| `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color` |
+| `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color`, manifest |
 | `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--sub` `#AFC7C2` i `--muted`) |
@@ -29,7 +29,11 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--green` | `#68F7BB` | Akcent aktywności |
 | `--yellow` | `#FFC867` | Chmury/ostrzeżenia |
 | `--glow` | `#5AC369` | Poświata godzin |
-| `--violet` | `#C4A1FF` | Mocno sprzyjające warunki |
+| `--violet` | `#C4A1FF` | Fiolet (też poziom 2 aktywności) |
+| `--level-0` | `rgba(255, 255, 255, 0.40)` | Poziom aktywności 0: nie sprzyja (kropka kafelka, słupek Kp); na tle panelu ok. `#6C7782` z makiety |
+| `--level-1` | `rgba(255, 255, 255, 0.70)` | Poziom 1: neutralnie; na tle panelu ok. `#B6B9BC` |
+| `--level-2` | `#C4A1FF` | Poziom 2: sprzyja zorzy (fiolet) |
+| `--level-3` | `#5AC369` | Poziom 3: mocno sprzyja (zielony). Fiolet przed zielonym, bo jest ciemniejszy (decyzja autora 21.10.2026) |
 | `--aurora-green` | `#5AC369` | Zielona plama w tle |
 | `--aurora-violet` | `#412B5D` | Fioletowa plama w tle |
 | `--line` | `rgba(255, 255, 255, 0.09)` | Linie |
@@ -38,7 +42,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--card-soft` | `rgba(196, 221, 255, 0.04)` | Tła łagodniejsze, pigułki, karty miejsc |
 | `--track` | `rgba(255, 255, 255, 0.10)` | Tła mierników, paski, kreski |
 | `--fab` | `rgba(0, 0, 0, 0.70)` | Pływające przyciski |
-| `--sheet` | `#1E2226` | Tło paneli |
+| `--sheet` | `#1F2226` | Tło paneli (od 21.10.2026) |
 | `--surface` | `rgba(13, 32, 37, 0.78)` | Dodatkowe powierzchnie |
 | `--on-accent` | `#062117` | Tekst na akcentach |
 | `--warn` | `#FFC867` | Ostrzeżenie / Bz |
@@ -82,14 +86,15 @@ Szansa (`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 
 
 Kafelek: padding 16 px, radius 20 px. Tytuł ze strzałką `›`, zwykle 20 px przerwy, metryka z ikoną 24 × 24 (jeżeli dotyczy), wartość i status, potem wskaźnik lub tekst najbliższej zmiany. Typowe odstępy wewnętrzne 4–20 px zależnie od części.
 
-W aktywności cztery poziomy z `js/labels.js`: „Nie sprzyja” (`--text-40`), „Neutralnie” (`--text-60`), „Sprzyja zorzy” (`--green`), „Mocno sprzyja” (`--violet`). Poziom ma kropkę przy opisie i miernik/miniwykres o wysokości około 32 px pod statusem.
+W aktywności cztery poziomy z `js/labels.js`, pokazywane kolorem wskaźnika pod opisem (miniwykres, miernik) i wykresu w panelu, bez kropki przy opisie (decyzja autora 21.10.2026): nie sprzyja (`--level-0`, ciemny szary), neutralnie (`--level-1`, jasny szary), sprzyja zorzy (`--level-2`, fiolet), mocno sprzyja (`--level-3`, zielony). Od 21.10.2026 (decyzja autora) opis pod liczbą jest fizyczny i własny dla każdego pomiaru, a nie wspólna ocena dla zorzy: magnetometr „Spokojnie / Niespokojnie / Zaburzone / Silnie zaburzone”, Bz „Na północ / Blisko zera / Na południe / Silnie na południe”, Kp „Spokojnie / Niespokojnie / Aktywnie / Burza G1–G5”, wiatr „Wolny / Typowa prędkość / Szybki / Bardzo szybki”. Ocena samej zorzy jest raz, po prawej przy nagłówku „Aktywność zorzy”. Skala kolorów nie jest jeszcze przesądzona: tymczasowy wariant `?kolory=cieple` daje szary → pomarańczowy `#FFA94D` → czerwony `#FF6B6B` jak w Hello Aurora (otwarta decyzja w `UWAGI.md`). Opisy muszą zmieścić się w jednej linii kafelka (ok. 135 px przy 15 px). Pod statusem miernik/miniwykres o wysokości około 32 px.
 
 - Magnetometr GOES, Bz, prędkość wiatru: miniwykresy z 2 h; Bz ma linię zera i wyróżnienie ujemnych wartości, wiatr próg 500 km/s.
-- Kp: miernik segmentowy (skala /9).
+- Kp: miernik z 9 kółek 8 px (skala /9), od lewej z odstępem 4 px (autor: 2–4 px), wyśrodkowanych w pionie we wskaźniku 32 px, na wysokości środka miniwykresu obok (decyzja autora 21.10.2026).
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
-- Oceny „Mocno sprzyja” itd. są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
-- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez kropki, koloru poziomu i wskaźnika, a zamiast oceny jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów, a „Ocena” ma kreskę.
-- Bz i wiatr z zapasowej sondy: przy ocenie nazwa sondy („Neutralnie · ACE”), w panelu „zapasowa sonda ACE” pod liczbą.
+- Kolory poziomów są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
+- Bz: liczba w kafelku i w panelu to średnia z 30 min, z której są opis i kolor (decyzja autora 21.10.2026); w panelu pod liczbą „· średnia z 30 min”, a ostatni odczyt w danych.
+- Za stary pomiar (limity w `MODEL.md`, „Świeżość danych NOAA”): liczba zostaje, ale bez koloru poziomu i wskaźnika, a zamiast opisu jest „Pomiar sprzed N min/h”. Tak samo pod liczbą w panelu szczegółów.
+- Bz i wiatr z zapasowej sondy: przy opisie nazwa sondy („Blisko zera · ACE”), w panelu „zapasowa sonda ACE” pod liczbą.
 - Kafelek „Zachmurzenie” bez prognozy: kreska, „Brak danych”, bez linii zmiany.
 
 ## 7. Pasek godzin
@@ -110,7 +115,7 @@ Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem
 
 ## 9. Panele szczegółów
 
-Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1E2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
+Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1F2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
 
 Stopka panelu (źródła) podaje, skąd są dane: sondę RTSW przy Bz i wietrze („sonda SOLAR1”, przy zapasowej „sonda ACE (zapasowa)”), numer satelity przy magnetometrze („GOES-19”), a w „Skąd ten wynik” źródło aktywności („z modelu OVATION”, „z indeksu Kp (brak aktualnego modelu OVATION)” albo brak danych).
 
@@ -118,9 +123,11 @@ Metryka: 28/34 px, jednostka w tym samym rozmiarze, status 15 px, 4 px niżej. W
 
 ### Wykresy Bz, GOES, wiatru
 
-`js/ui/chart.js`: co najmniej trzy linie podziałki co 53 px (`ROW`), „ładne” kroki 1, 2, 2,5, 5 × potęga 10. Przy trzech liniach wykres z osią X około 153 px. Podpisy osi Y po prawej, 24 px od krawędzi i 4 px nad linią; godziny początku, środka i końca. Linia ok. 2,3 px, przy Bz ujemny fragment innym kolorem i bez standardowego gradientu. Znany problem: w pobliżu zera podpis „0” może nachodzić na skrajny odczyt.
+Wykresy pomiarów z 2 godzin (magnetometr, Bz, wiatr) mają podziałkę jak inne (próba bez osi Y z 21.10.2026 odrzucona przez autora: bez linii nie ma odniesienia). Od 21.10.2026 mają białą kropkę 8 px na ostatnim punkcie z poświatą w kolorze linii, a przesunięcie palcem albo kursorem (`lineChart(…, { scrub })`, `js/ui/scrub.js`, `touch-action: pan-y`) pokazuje pionową linię, kropkę i dymek „21:16 · 471 km/s” nad wykresem. Na wykresie Kp pierwszy słupek (bieżący blok) ma podpis „Teraz” zamiast godziny.
 
-Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki ok. 24 px, łagodne zaokrąglenie u góry, jasność zależna od Kp. Pod każdym jest początek odpowiedniego bloku, nad nim wartość.
+`js/ui/chart.js` (`lineChart`): co najmniej trzy linie podziałki co 53 px (`ROW`), „ładne” kroki 1, 2, 2,5, 5 × potęga 10. Przy trzech liniach wykres z osią X około 153 px. Podpisy osi Y po prawej, 24 px od krawędzi i 4 px nad linią; godziny początku, środka i końca. Linia ok. 2,3 px, linie magnetometru, Bz i wiatru w kolorze poziomu jak w kafelku (`.chart.is-level-N`), przy Bz, z wypełnieniem 22% między linią a zerem poniżej zera, bez standardowego gradientu (od 21.10.2026; wcześniej ujemny fragment był żółty `--warn`, co gryzło się z kafelkiem). Znany problem: w pobliżu zera podpis „0” może nachodzić na skrajny odczyt.
+
+Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki 12 px, zaokrąglone u góry (promień 6 px). Wypełnienie 70% krycia z gradientem: pełny kolor do 20% wysokości, potem do 20% u dołu; obwódka 1 px w kolorze słupka 50%. Kolor słupka i wartości nad nim według poziomu Kp, jak kropka w kafelkach (`--level-0`…`--level-3`); makieta autora miała zielony i żółty, ale autor wybrał kolory poziomów (21.10.2026). Pod każdym słupkiem jest początek bloku; skrajne godziny leżą 24 px od krawędzi jak na innych wykresach (kolumna ma szerokość podpisu, kolumny rozsunięte `space-between`). Słupek stoi przy lewej stronie godziny (3 px wcięcia, makieta autora), więc ostatni nie wchodzi pod liczby osi Y; dolnej obwódki nie ma, słupek stoi na linii 0, a godziny są 9 px pod nią. Pod liczbą w panelu stoi opis fizyczny („Niespokojnie”), bez osobnego bloku „Ocena”; tak samo w panelach magnetometru, Bz i wiatru.
 
 ### Zachmurzenie
 

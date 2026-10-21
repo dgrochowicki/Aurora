@@ -42,7 +42,8 @@ Nadal otwarte:
 - [ ] **Magnetometr naziemny.** Dziś kafelek bazuje na satelitarnym GOES Hp, nie pomiarze z lokalnej stacji. Ewentualne wprowadzenie stacji IMAGE/FMI wymaga nowego źródła.
 - [ ] **PWA / offline.** Manifest, service worker i możliwość odczytu zapisanej prognozy, zawsze z wyraźną informacją o jej wieku.
 - [ ] **Dostępność.** Fokus w panelach jest zrobiony; zostały kontrasty, alternatywne opisy wykresów i tryb ograniczonego ruchu.
-- [ ] **Wykresy.** Kolorowe strefy tła (Bz poniżej 0, wiatr 500 i 700 km/s), znacznik „teraz”, odczyt po dotknięciu, zakres 2 h / 6 h, poprawa osi i kolizji zera przy Bz.
+- [ ] **Wykresy.** Kolorowe strefy tła (Bz poniżej 0, wiatr 500 i 700 km/s), zakres 2 h / 6 h. Odczyt po dotknięciu i „Teraz” przy Kp zrobione 21.10.2026 (`STYL.md`); wykres bez osi Y odrzucony przez autora. Autor przygotowuje własną makietę wykresu wiatru (`_Research/AuroraNow/Aurora _Wiatr.png`).
+- [ ] **Opóźnienie z L1 („Current” jak w Hello Aurora, propozycja 21.10.2026, wymaga decyzji autora — zmienia znaczenie czasu danych).** Bz i wiatr z RTSW mierzy sonda w punkcie L1, ok. 1,5 mln km przed Ziemią; wiatr dolatuje stamtąd w czas ≈ 1,5·10⁶ km / prędkość (450 km/s → ok. 55 min, 700 km/s → ok. 36 min). Dziś „Bz teraz” to warunki, które dotrą za mniej więcej godzinę, czego UI nie mówi. Propozycja: na wykresach Bz i wiatru przesunąć czas pomiarów o to opóźnienie (z bieżącej prędkości), postawić pionową linię „Teraz” w miejscu, które dociera do Ziemi teraz, a część na prawo („nadlatuje”) przygasić; w kafelku i zdaniu głównym ewentualnie „za ok. 40 min dotrze…”. Do rozstrzygnięcia: czy wpływa też na model aktywności (dziś Bz/wiatr nie wchodzą do wyniku — sprawdzić `MODEL.md`), stała czy zmienna prędkość, testy granic (brak prędkości, bardzo wolny/szybki wiatr).
 - [ ] **Wyjaśnienia w panelach.** Ujednolicić: definicja, aktualne znaczenie, jak czytać wykres, skala i progi; treść naukowo spójna z `MODEL.md`.
 - [ ] **UI.** Dokończyć uzgodnienia dotyczące ekranu miejsc, mapy, przycisków i szczegółowych paneli. Nieaktualne wartości stylu nie powinny wracać z dokumentacji; punkt odniesienia `STYL.md` i `css/tokens.css`.
 
@@ -62,7 +63,7 @@ Nadal otwarte:
 - [ ] Które zmiany metodologiczne zrobić przed zebraniem historii obserwacji?
 - [ ] Które warianty wyglądu i mierników z `STYL.md` zatwierdzić?
 - [ ] Wybrać docelowy wariant wskaźników (mieszany czy `?kafelki=paski`) i zdecydować o usunięciu trybu alternatywnego.
-- [ ] Potwierdzić opisy i kolory czterech poziomów „sprzyja zorzy”.
+- [ ] **Skala kolorów poziomów aktywności (21.10.2026).** Opisy są już fizyczne i własne dla każdego pomiaru; zostaje kolor. Dziś: biały 40% → biały 70% → fiolet `#C4A1FF` → zielony `#5AC369`. Wariant do porównania `?kolory=cieple`: → pomarańczowy `#FFA94D` → czerwony `#FF6B6B`, jak Hello Aurora (autor ma obawy, że fiolet/zielony nie będzie zrozumiały). Przy wyborze ciepłej skali sprawdzić kolizje z żółtym wykresem zachmurzenia i łukiem Słońca (`--yellow`) oraz zieloną zorzą w tle; po decyzji usunąć `?kolory=cieple`.
 - [ ] Dopracować oddzielenie pływających przycisków od treści pod spodem (cień, tło, ramka).
 - [ ] Dokończyć projekt ekranu miejsc i mapy oraz szczegóły paneli, bez przywracania starej palety.
 - [ ] Potwierdzić progi nazw zachmurzenia: Brak <10, Małe <30, Umiarkowane <60, Duże <80, Bardzo duże ≥80.

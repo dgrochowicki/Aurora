@@ -2,6 +2,21 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
+
+- Tło strony: `#12151A` u góry przechodzi teraz w `#1E1F24` (wcześniej w `#22242A`), panele `#1F2226`. Miernik Kp w kafelku z kółek 8 px od lewej, z odstępem 4 px, wyśrodkowany w pionie, bo był niżej niż miniwykres obok. Decyzje autora. `css/tokens.css`, `css/components.css`, `index.html`, `manifest.webmanifest`.
+
+- Wykresy magnetometru, Bz i wiatru: kropka na ostatnim pomiarze, a przesunięcie palcem pokazuje godzinę i wartość (`lineChart(…, { scrub })`, `js/ui/scrub.js`, testy). Próbę bez osi Y z podpisanym min/maks (jak Hello Aurora) autor odrzucił: bez linii nie ma odniesienia; podziałka zostaje. Przy Kp pierwszy słupek ma podpis „Teraz”. Opóźnienie danych z L1 („Current”) zapisane jako propozycja w `UWAGI.md`.
+
+- Kafelki aktywności nie mówią już wszystkie tego samego („Neutralnie”). Każdy pomiar ma własny opis fizyczny: magnetometr „Niespokojnie”, Bz „Blisko zera”, Kp „Niespokojnie”, wiatr „Typowa prędkość”. Znaczenie dla zorzy pokazuje kolor kropki, a ocena zorzy jest raz, po prawej przy „Aktywność zorzy”. Decyzja autora: nie chce jednakowych ocen zorzy w każdym kafelku.
+- Panele magnetometru, Bz, Kp i wiatru: pod liczbą ten sam opis co w kafelku, bez bloku „Ocena”. Bz „Na południe · sprzyja” skrócone do „Na południe”, opisy GOES skrócone do jednej linii kafelka („Niespokojnie”, „Zaburzone”, „Silnie zaburzone”). `favorLabel()` usunięta.
+- Nowe kolory poziomów aktywności (`--level-0`…`--level-3` w `css/tokens.css`): biały 40% i 70% (na tle panelu jak `#6C7782` i `#B6B9BC` z makiety), fiolet `#C4A1FF`, zielony `#5AC369`. Fiolet przed zielonym, bo jest ciemniejszy, a szare z białego (decyzje autora). Dotyczy kropek, miniwykresów (także pola pod zerem przy Bz, wcześniej zawsze zielonego) i mierników w kafelkach oraz słupków Kp.
+- Bz: w kafelku i panelu duża liczba to średnia z 30 min, a nie ostatni odczyt, bo z niej są opis i kolor (autor: przy „−0,3 nT” stało „Na południe”). Ostatni odczyt jest w danych panelu. `js/views/home.js`, `js/views/details.js`, `MODEL.md`.
+- Bez kropki przy opisie w kafelkach aktywności; kolor poziomu mają miniwykres, miernik i wykres w panelu (także magnetometru i wiatru). Decyzja autora.
+- Tymczasowy wariant `?kolory=cieple` (szary → pomarańczowy → czerwony jak w Hello Aurora) do porównania ze skalą fiolet/zielony.
+- Wykres w panelu Bz w kolorze poziomu, jak kafelek, z wypełnieniem poniżej zera zamiast żółtego fragmentu linii. Autor: kafelek fioletowy, a w środku żółty — „nie może tak być”. `js/ui/chart.js` (`.chart-below`, tony `level-0`…`level-3`).
+- Wykres Kp według makiety autora (`Research/AuroraNow/Aurora _Kp_index.png`): słupki 12 px, zaokrąglone, wypełnienie 70% z gradientem i obwódka 50%; słupek i wartość w kolorze poziomu Kp, a nie żółty jak w makiecie — autor wybrał kolory poziomów. Godziny pod słupkami 24 px od krawędzi jak na innych wykresach, słupki przy lewej stronie godzin, bez dolnej obwódki, na linii 0 (prośby autora). `js/ui/chart.js` (`barChart` bierze `level` zamiast `a`), `css/components.css`, `js/views/details.js`, `js/views/home.js`, `js/labels.js`, `STYL.md`.
+
 ## 20.10.2026 — zdanie główne: szansa, krótsze zdanie, strzałka
 
 - W nocy zdanie główne podaje szansę teraz, z białą liczbą: „Zorza może być widoczna **gołym okiem**, szansa **67%**. Warunki obserwacji są **dobre**.” W dzień bez procentu (decyzja: szansa w dzień nic nie mówi). Prośba autora.

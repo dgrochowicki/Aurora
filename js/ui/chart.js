@@ -51,12 +51,14 @@ function gridHTML(ticks, y, unit = "") {
     .join("");
 }
 
-// series: [{t, v}] od najstarszego. zero: część linii poniżej zera ma osobny kolor, bo przy Bz to ona sprzyja zorzy.
+// series: [{t, v}] od najstarszego. zero: pole między linią a zerem poniżej zera jest wypełnione, bo przy Bz to ona sprzyja zorzy (jak w miniwykresie).
 // tz: strefa miejsca (IANA), w której podpisujemy godziny; bez niej strefa przeglądarki. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
-// tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony).
+// tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony; level-0…level-3 to kolory poziomów aktywności).
 // unit: dopisek przy liczbach osi Y poza zerem. row: odstęp linii podziałki w px (domyślnie 53).
 // every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego początek, środek i koniec.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin." }) {
+// scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
+// np. „21:16 · 471 km/s”.
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -71,35 +73,45 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     t1 = series[series.length - 1].t;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100;
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
-  // Gradient pod linią do dołu wykresu. Przy zero zamiast niego linia poniżej zera w drugim kolorze.
+  // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
   const area = zero ? "" : `<path class="chart-area" d="${line}L100 ${H}L0 ${H}Z"/>`;
   const below = zero
     ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
     : "";
-  const negative = zero ? `<path class="chart-line negative" clip-path="url(#chartBelowZero)" d="${line}"/>` : "";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}<path class="chart-line" d="${line}"/>${negative}</svg>`;
+  const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L100 ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Środkowy podpis to czas środkowego punktu danych, żeby przy prognozie godzinowej była pełna godzina.
   const mid = series[Math.floor((series.length - 1) / 2)].t;
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni), rozłożone równo jak początek, środek i koniec.
   const marks = every ? series.filter((_, i) => i % every === 0 || i === series.length - 1).map((p) => p.t) : [t0, mid, t1];
   const axis = `<div class="chart-x" aria-hidden="true">${marks.map((t) => `<span>${hm(t)}</span>`).join("")}</div>`;
-  return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y, unit)}${svg}</div>${axis}</div>`;
+  let extra = "",
+    data = "";
+  if (scrub) {
+    const last = series[series.length - 1];
+    const num = (v) => `${fmtNum(v, scrub.digits ?? 1)} ${scrub.unit || ""}`.trim();
+    // Punkty do podglądu: położenie i podpis.
+    const points = series.map((p) => [+x(p.t).toFixed(2), +y(p.v).toFixed(1), `${hm(p.t)} · ${num(p.v)}`]);
+    extra = `<i class="chart-dot" style="left:100%;top:${y(last.v).toFixed(1)}px"></i><div class="chart-scrub" hidden><i class="chart-scrub-line"></i><i class="chart-dot"></i><span class="chart-tip"></span></div>`;
+    data = ` data-points="${esc(JSON.stringify(points))}"`;
+  }
+  return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"${data}><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y, unit)}${svg}${extra}</div>${axis}</div>`;
 }
 
-// Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, a}] od najwcześniejszego.
-// a (0–1): jasność zielonego słupka, nad słupkiem jest jego wartość, pod nim godzina początku bloku.
-// ticks: stała podziałka, np. cała skala Kp 0–9.
-export function barChart(items, { label, tz, ticks: fixed = null }) {
+// Słupki od zera, np. prognoza Kp w blokach 3-godzinnych. items: [{t, v, level}] od najwcześniejszego.
+// level (0–3): kolor słupka i wartości nad nim, jak poziomy kafelków aktywności; pod słupkiem godzina początku bloku.
+// Godzina jest w kolumnie słupka i wyznacza jej szerokość, więc skrajne godziny są 24 px od krawędzi jak na innych wykresach.
+// ticks: stała podziałka, np. cała skala Kp 0–9. now: pierwszy słupek to bieżący blok i zamiast godziny ma podpis „Teraz”.
+export function barChart(items, { label, tz, ticks: fixed = null, now = false }) {
   if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
   const ticks = fixed || niceTicks(0, Math.max(...items.map((p) => p.v))),
     { H, y } = scale(ticks);
   const bars = items
     .map(
-      (p) =>
-        `<b><i style="height:${(H - y(p.v)).toFixed(1)}px;--a:${p.a.toFixed(2)}"><span>${fmtNum(p.v)}</span></i></b>`,
+      (p, i) =>
+        `<b data-level="${p.level}"><i style="height:${(H - y(p.v)).toFixed(1)}px"><span>${fmtNum(p.v)}</span></i><em aria-hidden="true">${now && i === 0 ? "Teraz" : hmIn(p.t, tz)}</em></b>`,
     )
     .join("");
-  const times = items.map((p) => `<span>${hmIn(p.t, tz)}</span>`).join("");
-  return `<div class="chart" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div><div class="chart-x is-bars" aria-hidden="true">${times}</div></div>`;
+  return `<div class="chart is-bars" role="img" aria-label="${esc(label)}"><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y)}<div class="chart-bars">${bars}</div></div></div>`;
 }

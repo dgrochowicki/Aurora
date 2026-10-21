@@ -5,9 +5,10 @@ import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { lookDirection } from "../model/aurora.js";
-import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, favorLabel, bzLevel, kpLevel, goesLevel, windLevel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
+import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, goesLabel, windLevel, windLabel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
+import { bindScrub } from "../ui/scrub.js";
 import { renderHours, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
 import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
@@ -46,6 +47,8 @@ const CONDITION_TILES = [
 
 // Tymczasowo, do wyboru wariantu przez autora: ?kafelki=paski pokazuje we wszystkich kafelkach ten sam miernik zamiast mini wykresów.
 const BARS_ONLY = new URLSearchParams(location.search).get("kafelki") === "paski";
+// Tymczasowo, do wyboru skali kolorów poziomów przez autora: ?kolory=cieple daje szary → pomarańczowy → czerwony zamiast fioletu i zieleni.
+if (new URLSearchParams(location.search).get("kolory") === "cieple") document.documentElement.dataset.kolory = "cieple";
 
 // Ostatnio pokazana prognoza. Z niej budujemy panele szczegółów.
 let state = null;
@@ -65,6 +68,7 @@ function openDetail(key, opener) {
   const d = DETAILS[key](state);
   els.infoTitle.textContent = d.title;
   els.infoBody.innerHTML = d.html;
+  bindScrub(els.infoBody);
   els.infoSource.textContent = d.source;
   $("#infoScroll").scrollTop = 0;
   $("#infoSheet").classList.remove("scrolled");
@@ -108,16 +112,16 @@ function showTip(text = "") {
   els.tip.hidden = !text;
 }
 
-// Kafelki aktywności. Poziom Bz liczymy ze średniej z 30 minut, a liczba to ostatni odczyt.
-// Opis mówi, co pomiar znaczy dla zorzy, a wskaźnik pod nim pokazuje to samo kolorem: miernik dla Kp, mini wykres z 2 godzin dla reszty.
+// Kafelki aktywności. Przy Bz liczba, opis i poziom pochodzą ze średniej z 30 minut (decyzja autora 21.10.2026), żeby mówiły to samo.
+// Opis jest fizyczny (np. „Niespokojnie”), a kolor kropki mówi, co pomiar znaczy dla zorzy. Wskaźnik pod nim: miernik dla Kp, mini wykres z 2 godzin dla reszty.
 // Za stary pomiar (stale z freshData) zostaje jako liczba, ale bez oceny i wskaźnika, z wiekiem zamiast opisu.
 function renderSpaceTiles(space, stale = {}, now = Date.now()) {
   const bzRef = space.bzAvg ?? space.bz;
   const tiles = [
-    { key: "mag", src: "goes", value: space.goes == null ? null : fmtNum(space.goes), level: space.goesRange == null ? null : goesLevel(space.goesRange) },
-    { key: "bz", src: "bz", value: space.bz == null ? null : fmtNum(space.bz), level: bzRef == null ? null : bzLevel(bzRef) },
-    { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), level: space.kp == null ? null : kpLevel(space.kp) },
-    { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), level: space.wind == null ? null : windLevel(space.wind) },
+    { key: "mag", src: "goes", value: space.goes == null ? null : fmtNum(space.goes), ref: space.goesRange, level: goesLevel, text: goesLabel },
+    { key: "bz", src: "bz", value: bzRef == null ? null : fmtNum(bzRef), ref: bzRef, level: bzLevel, text: bzLabel },
+    { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), ref: space.kp, level: kpLevel, text: kpLabel },
+    { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), ref: space.wind, level: windLevel, text: windLabel },
   ];
   const spark = {
     mag: () => sparkline(space.goesSeries || [], { minSpan: 40 }),
@@ -125,16 +129,17 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
     kp: () => meter(9, Math.round(space.kp)),
     wind: () => sparkline(space.windSeries || [], { threshold: WIND_FAST, minSpan: 150 }),
   };
-  for (const { key, src, value, level } of tiles) {
+  for (const { key, src, value, ref, level: toLevel, text } of tiles) {
     if (src in stale) {
       setTile(els.activityTiles, key, { value, status: ageLabel(stale[src], now) });
       continue;
     }
+    const level = ref == null ? null : toLevel(ref);
     const viz = level == null ? "" : (!BARS_ONLY && spark[key]()) || meter(4, level + 1);
-    // Bz i wiatr z zapasowej sondy mają jej nazwę przy ocenie, np. „Neutralnie · ACE”.
+    // Bz i wiatr z zapasowej sondy mają jej nazwę przy opisie, np. „Blisko zera · ACE”.
     const backup = { bz: space.bzBackup, wind: space.windBackup }[key];
     const probe = backup && level != null ? ` · ${backup}` : "";
-    setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : favorLabel(level) + probe });
+    setTile(els.activityTiles, key, { value, level, viz, status: level == null ? "Brak danych" : text(ref) + probe });
   }
 }
 

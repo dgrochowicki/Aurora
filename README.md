@@ -11,7 +11,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 - Zobaczyć heurystyczny wynik 0–99%, obliczany dla bieżącej i kolejnych godzin prognozy, z rozbiciem na aktywność, ciemność i zachmurzenie.
 - Przejrzeć najbliższe 12 godzin, wybrać godzinę i sprawdzić zachmurzenie, porę dnia oraz wpływ Księżyca.
 - Dowiedzieć się, w którą stronę patrzeć: kierunek do najsilniejszej widocznej zorzy z modelu NOAA (np. „na północny zachód”, „w górę”). Wynik uwzględnia chmury na linii wzroku w tę stronę, a nie tylko nad głową.
-- Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy.
+- Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy. Na wykresach magnetometru, Bz i wiatru przesunięcie palcem pokazuje godzinę i wartość pomiaru.
 - Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
 - Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce. Każde zapisane miejsce ma kartę z godziną miejscową, szansą teraz i zachmurzeniem, a przy szansie od 10% zieloną poświatę. Stuknięcie w pole wyszukiwania chowa karty i zostawia samo wyszukiwanie; ✕ obok pola wraca do kart.
 - Dodać stronę do ekranu początkowego iPhone'a (Safari → Udostępnij → Do ekranu początkowego). Otwiera się wtedy jak aplikacja, bez pasków Safari. Zapisane miejsca są w niej osobne niż w Safari (iOS trzyma dane aplikacji z ekranu początkowego oddzielnie).
@@ -24,7 +24,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 - Zachmurzenie pochodzi z Open-Meteo, a położenie Słońca i Księżyca jest obliczane w przeglądarce.
 - Widoczność zależy także od warunków, których model nie obejmuje wprost: zanieczyszczenia światłem, przeszkód na horyzoncie, lokalnych chmur w kierunku zorzy i cech obserwatora lub aparatu.
 
-**Braki i stare dane:** gdy nie ma aktualnych danych NOAA o aktywności zorzy (model OVATION młodszy niż godzina albo Kp młodsze niż 6 h), aplikacja zamiast procentu pokazuje „Brak danych” i wiek ostatniego pomiaru; zachmurzenie i światło nocy działają dalej. Gdy oficjalna sonda NOAA nie podaje Bz lub wiatru, aplikacja bierze dane z zapasowej (np. ACE) i to oznacza; nazwa sondy i źródło aktywności są w stopce każdego panelu. Pomiary Bz, wiatru słonecznego i magnetometru starsze niż 30 minut są pokazywane z dopiskiem „Pomiar sprzed…”, bez oceny. Godzina bez prognozy zachmurzenia nie ma wyniku. Przy całkowitym braku prognozy pogody procent nie jest wyświetlany.
+**Braki i stare dane:** gdy nie ma aktualnych danych NOAA o aktywności zorzy (model OVATION młodszy niż godzina albo Kp młodsze niż 6 h), aplikacja zamiast procentu pokazuje „Brak danych” i wiek ostatniego pomiaru; zachmurzenie i światło nocy działają dalej. Gdy oficjalna sonda NOAA nie podaje Bz lub wiatru, aplikacja bierze dane z zapasowej (np. ACE) i to oznacza; nazwa sondy i źródło aktywności są w stopce każdego panelu. Pomiary Bz, wiatru słonecznego i magnetometru starsze niż 30 minut są pokazywane z dopiskiem „Pomiar sprzed…”, bez opisu i koloru poziomu. Godzina bez prognozy zachmurzenia nie ma wyniku. Przy całkowitym braku prognozy pogody procent nie jest wyświetlany.
 
 „Teraz” to bieżące warunki (zachmurzenie z Open-Meteo co 15 minut, położenie Słońca i Księżyca w tej chwili), a kolejne godziny to prognoza na pełne godziny. Za dnia, gdy Słońce jest nad horyzontem, szansa wynosi 0%.
 

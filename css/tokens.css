@@ -1,8 +1,8 @@
 /* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  /* Tło według decyzji autora (20.10.2026): #12151A u góry przechodzi w --bg w połowie ekranu 876 px. */
-  --bg: #22242a;
+  /* Tło: #12151A u góry przechodzi w --bg w połowie ekranu 876 px (decyzja autora 20.10.2026; --bg #1E1F24 od 21.10.2026). */
+  --bg: #1e1f24;
   --bg-top: #12151a;
   /* --bg-top pod przyciemnieniem paneli (czarny 60%): kolor paska Safari, gdy otwarty jest panel szczegółów. */
   --bg-top-dim: #07080a;
@@ -21,6 +21,13 @@
   --glow: #5ac369;
   --glow-rgb: 90 195 105;
   --violet: #c4a1ff;
+  /* Poziomy pomiarów aktywności 0–3 (kropki i wskaźniki kafelków, słupki Kp): od ciemnego szarego do zielonego.
+     Fiolet przed zielonym, bo jest ciemniejszy, a szare z białego, żeby pasowały do każdego tła (decyzja autora 21.10.2026).
+     Na tle panelu odpowiadają #6C7782 i #B6B9BC z makiety. */
+  --level-0: rgba(255, 255, 255, 0.4);
+  --level-1: rgba(255, 255, 255, 0.7);
+  --level-2: #c4a1ff;
+  --level-3: #5ac369;
   /* Kolory zorzy w tle strony. */
   --aurora-green: #5ac369;
   --aurora-violet: #412b5d;
@@ -33,7 +40,7 @@
   --track: rgba(255, 255, 255, 0.1);
   --fab: rgba(0, 0, 0, 0.7);
   /* Tło panelu: biały 4% na --bg, jak pigułki godzin. */
-  --sheet: #1e2226;
+  --sheet: #1f2226;
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
   --warn: #ffc867;
@@ -54,4 +61,10 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+
+/* Tymczasowo, do wyboru przez autora (?kolory=cieple): skala „cieplna” jak w Hello Aurora, szary → pomarańczowy → czerwony. */
+:root[data-kolory="cieple"] {
+  --level-2: #ffa94d;
+  --level-3: #ff6b6b;
 }

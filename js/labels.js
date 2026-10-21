@@ -15,13 +15,12 @@ export function ageLabel(t, now) {
 export const cloudLabel = (c) => (c < 10 ? "Brak" : c < 30 ? "Małe" : c < 60 ? "Umiarkowane" : c < 80 ? "Duże" : "Bardzo duże");
 
 // Poziomy pomiarów aktywności w skali 0–3: nie sprzyja, neutralnie, sprzyja, mocno sprzyja zorzy.
-// Kafelek pokazuje znaczenie dla zorzy (favorLabel), a panel szczegółów opis fizyczny z tych samych progów.
-export const FAVOR = ["Nie sprzyja", "Neutralnie", "Sprzyja zorzy", "Mocno sprzyja"];
-export const favorLabel = (level) => FAVOR[level];
+// Kafelek i panel podają opis fizyczny pomiaru (np. „Niespokojnie”), a znaczenie dla zorzy pokazuje kolor poziomu.
+// Ocena samej zorzy jest raz, przy nagłówku „Aktywność zorzy”.
 
 // Zorzy sprzyja Bz skierowane na południe, czyli ujemne.
 export const bzLevel = (v) => (v <= -10 ? 3 : v <= -3 ? 2 : v < 3 ? 1 : 0);
-export const bzLabel = (v) => ["Na północ", "Blisko zera", "Na południe · sprzyja", "Silnie na południe"][bzLevel(v)];
+export const bzLabel = (v) => ["Na północ", "Blisko zera", "Na południe", "Silnie na południe"][bzLevel(v)];
 
 export const kpLevel = (kp) => (kp < 3 ? 0 : kp < 4 ? 1 : kp < 5 ? 2 : 3);
 export const kpLabel = (kp) =>
@@ -29,7 +28,7 @@ export const kpLabel = (kp) =>
 
 // Zakres zmian składowej Hp z GOES w ostatniej godzinie.
 export const goesLevel = (r) => (r < 10 ? 0 : r < 30 ? 1 : r < 60 ? 2 : 3);
-export const goesLabel = (r) => ["Spokojnie", "Lekkie zaburzenia", "Zaburzone pole", "Silne zaburzenia"][goesLevel(r)];
+export const goesLabel = (r) => ["Spokojnie", "Niespokojnie", "Zaburzone", "Silnie zaburzone"][goesLevel(r)];
 
 export const WIND_FAST = 500;
 export const windLevel = (v) => (v < 350 ? 0 : v < WIND_FAST ? 1 : v < 700 ? 2 : 3);

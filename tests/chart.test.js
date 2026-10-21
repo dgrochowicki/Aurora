@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks } from "../js/ui/chart.js";
+import { niceTicks, lineChart } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -19,4 +19,33 @@ test("linie idą od góry w równych krokach", () => {
   const t = niceTicks(110, 126);
   const steps = t.slice(1).map((v, i) => +(t[i] - v).toFixed(6));
   assert.ok(steps.every((s) => s === steps[0] && s > 0));
+});
+
+// Wykres pomiaru z podglądem palcem (magnetometr, Bz, wiatr).
+const series = (vals) => vals.map((v, i) => ({ t: Date.UTC(2026, 9, 21, 20, i), v }));
+const points = (html) => JSON.parse(html.match(/data-points="([^"]*)"/)[1].replace(/&quot;/g, '"'));
+
+test("wykres pomiaru: za mało punktów daje komunikat zamiast wykresu", () => {
+  assert.match(lineChart([], { label: "x", scrub: { unit: "nT" } }), /chart-empty/);
+  assert.match(lineChart(series([5]), { label: "x", scrub: { unit: "nT" } }), /chart-empty/);
+});
+
+test("wykres pomiaru: podziałka zostaje, a do tego kropka końca i punkty podglądu w strefie miejsca", () => {
+  const html = lineChart(series([1, 2]), { label: "x", tz: "Europe/Warsaw", scrub: { unit: "nT" } });
+  assert.match(html, /chart-grid/);
+  assert.match(html, /chart-dot/);
+  const p = points(html);
+  assert.equal(p.length, 2);
+  assert.equal(p[0][2], "22:00 · 1,0 nT");
+  assert.equal(p[1][0], 100);
+});
+
+test("wykres pomiaru: liczba miejsc po przecinku i płaski przebieg bez NaN", () => {
+  assert.equal(points(lineChart(series([471.4, 480]), { label: "x", tz: "UTC", scrub: { unit: "km/s", digits: 0 } }))[0][2], "20:00 · 471 km/s");
+  assert.doesNotMatch(lineChart(series([5, 5, 5]), { label: "x", tz: "UTC", scrub: { unit: "nT" } }), /NaN|Infinity/);
+});
+
+test("wykres bez podglądu (zachmurzenie) nie ma punktów ani kropki", () => {
+  const html = lineChart(series([10, 80]), { label: "x", tz: "UTC", ticks: [100, 0] });
+  assert.doesNotMatch(html, /data-points|chart-dot/);
 });

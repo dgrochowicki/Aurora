@@ -347,28 +347,19 @@
   line-height: 20px;
   color: var(--text-60);
 }
-/* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
+/* Kolor stanu kafelka aktywności (miniwykres, miernik): ciemny szary gdy nie sprzyja zorzy, jasny szary neutralnie, fiolet gdy sprzyja,
+   zielony gdy mocno sprzyja. Bez kropki przy opisie, bo kolor niesie wskaźnik (decyzja autora 21.10.2026). */
 .data-tile[data-level="0"] {
-  --state: var(--text-40);
+  --state: var(--level-0);
 }
 .data-tile[data-level="1"] {
-  --state: var(--text-60);
+  --state: var(--level-1);
 }
 .data-tile[data-level="2"] {
-  --state: var(--green);
+  --state: var(--level-2);
 }
 .data-tile[data-level="3"] {
-  --state: var(--violet);
-}
-.data-tile[data-level] .tile-status::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: var(--state);
-  vertical-align: 1px;
+  --state: var(--level-3);
 }
 /* Wskaźnik pod opisem: miernik z segmentów albo mini wykres z 2 godzin. */
 .tile-viz {
@@ -379,16 +370,19 @@
 .tile-viz:empty {
   display: none;
 }
+/* Miernik z kółek 8 px (Kp) od lewej, odstęp 4 px (autor: 2–4 px), na środku wysokości wskaźnika,
+   jak środek miniwykresu w kafelku obok (decyzja autora 21.10.2026). */
 .meter {
   display: flex;
-  align-items: flex-end;
-  gap: 3px;
+  align-items: center;
+  gap: 4px;
   height: 100%;
 }
 .meter i {
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: var(--track);
 }
 .meter i.on {
@@ -410,8 +404,9 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
+/* Pole pod zerem przy Bz w kolorze poziomu, jak linia. */
 .spark .spark-area {
-  fill: var(--green);
+  fill: var(--state);
   opacity: 0.22;
 }
 .spark-rule {
@@ -842,6 +837,19 @@ html.sheet-open body {
 .chart.is-yellow {
   --chart: var(--yellow);
 }
+/* Kolor poziomu aktywności, jak kropka i miniwykres w kafelku (Bz). */
+.chart.is-level-0 {
+  --chart: var(--level-0);
+}
+.chart.is-level-1 {
+  --chart: var(--level-1);
+}
+.chart.is-level-2 {
+  --chart: var(--level-2);
+}
+.chart.is-level-3 {
+  --chart: var(--level-3);
+}
 .chart-plot {
   position: relative;
 }
@@ -878,8 +886,58 @@ html.sheet-open body {
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
-.chart-line.negative {
-  stroke: var(--warn);
+/* Wykres pomiaru z podglądem palcem (lineChart ze scrub): kropka na ostatnim punkcie, przy podglądzie linia, kropka i dymek.
+   Ruch w pionie przewija panel, w poziomie przesuwa podgląd. */
+.chart[data-points] .chart-plot {
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+.chart-dot {
+  position: absolute;
+  z-index: 3;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--chart) 30%, transparent);
+}
+/* Podczas podglądu kropka końca ustępuje kropce podglądu. */
+.chart.is-scrubbing .chart-plot > .chart-dot {
+  opacity: 0;
+}
+.chart-scrub-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-60);
+}
+.chart-tip {
+  position: absolute;
+  z-index: 4;
+  /* Nad wykresem, na wysokości liczby przy górnej linii podziałki. */
+  top: -22px;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #3a4048;
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chart-tip.is-start {
+  transform: none;
+  margin-left: -12px;
+}
+.chart-tip.is-end {
+  transform: translateX(-100%);
+  margin-left: 12px;
+}
+/* Bz poniżej zera: wypełnienie w kolorze linii, jak .spark-area w kafelku. */
+.chart-below {
+  fill: var(--chart);
+  opacity: 0.22;
 }
 .chart-area {
   fill: url(#chartFill);
@@ -891,46 +949,68 @@ html.sheet-open body {
   margin-top: 9px;
   padding-inline: 24px;
 }
-/* Słupki (prognoza Kp): w pasie 24 px od krawędzi, szerokość 24 px, zielone o jasności zależnej od wartości. Godziny pod środkiem słupków. */
+/* Słupki (prognoza Kp): 12 px, zaokrąglone u góry (makieta autora 21.10.2026). Kolor jak kropka w kafelkach aktywności
+   (poziom z data-level). Wypełnienie 70%: pełny kolor do 20% wysokości, potem gaśnie do 20% u dołu; obwódka 1 px w kolorze 50%. Każda kolumna ma szerokość swojej godziny pod spodem,
+   a kolumny są rozsunięte do krawędzi pasa 24 px, więc skrajne godziny leżą 24 px od krawędzi jak na innych wykresach.
+   Słupek stoi przy lewej stronie godziny (makieta autora), więc ostatni nie wchodzi pod liczby osi Y. */
+.chart.is-bars {
+  /* Miejsce na godziny pod wykresem: 9 px odstępu i wiersz 18 px, jak .chart-x. */
+  padding-bottom: 27px;
+}
 .chart-bars {
   position: absolute;
   inset: 0 24px;
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  justify-content: space-between;
 }
-/* Każdy blok ma równą część szerokości, a słupek 24 px na jej środku. */
 .chart-bars b {
-  flex: 1;
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
   height: 100%;
   font-weight: 400;
+  --bar: var(--level-0);
+}
+.chart-bars b[data-level="1"] {
+  --bar: var(--level-1);
+}
+.chart-bars b[data-level="2"] {
+  --bar: var(--level-2);
+}
+.chart-bars b[data-level="3"] {
+  --bar: var(--level-3);
 }
 .chart-bars i {
   position: relative;
-  width: 24px;
+  width: 12px;
   min-height: 2px;
-  border-radius: 4px 4px 0 0;
-  /* Jasność z --a (0–1) ustawia wykres: im wyższe Kp, tym jaśniejszy zielony. */
-  background: rgb(var(--green-rgb) / var(--a, 1));
+  margin-left: 3px;
+  border-radius: 6px 6px 0 0;
+  border: 1px solid color-mix(in srgb, var(--bar) 50%, transparent);
+  border-bottom: 0;
+  /* 70% krycia całości: 70% u góry, 70% × 20% = 14% u dołu. */
+  background: linear-gradient(color-mix(in srgb, var(--bar) 70%, transparent) 20%, color-mix(in srgb, var(--bar) 14%, transparent));
 }
 .chart-bars span {
   position: absolute;
   bottom: calc(100% + 4px);
-  left: -12px;
-  right: -12px;
+  left: -18px;
+  right: -18px;
   text-align: center;
   font-style: normal;
-  color: var(--text-60);
+  color: var(--bar);
 }
-.chart-x.is-bars {
-  gap: 8px;
-}
-.chart-x.is-bars span {
-  flex: 1;
-  text-align: center;
+/* Godzina pod słupkiem: zerowa wysokość i przesunięcie bez zmiany układu, żeby nie podnosiła słupka nad linię 0,
+   ale nadaje kolumnie szerokość. 9 px pod linią jak .chart-x. */
+.chart-bars em {
+  position: relative;
+  top: 9px;
+  height: 0;
+  font-style: normal;
+  line-height: 18px;
+  white-space: nowrap;
 }
 .chart-empty {
   margin: 0;
