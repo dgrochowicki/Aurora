@@ -4,6 +4,8 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 ## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
 
+- Tło strony jednolite `#1E1F24` (wcześniej `#12151A` u góry przechodziło w `#22242A`), panele `#1F2226`; `theme-color` i manifest też `#1E1F24`. Miernik Kp w kafelku z kółek, wyśrodkowany w pionie, bo był niżej niż miniwykres obok. Decyzje autora. `css/tokens.css`, `css/components.css`, `index.html`, `manifest.webmanifest`.
+
 - Wykresy magnetometru, Bz i wiatru bez osi Y, jak w Hello Aurora: podpisany najwyższy i najniższy punkt, kropka na ostatnim, linia odniesienia tylko przy zerze Bz i progu 500 km/s. Przesunięcie palcem pokazuje godzinę i wartość. Kp i zachmurzenie zostają z podziałką (autor: bez niej nie wiadomo, do ilu słupek może dojść); przy Kp pierwszy słupek ma podpis „Teraz”. Nowe `trendChart()` w `js/ui/chart.js` z testami, `js/ui/scrub.js`, `css/components.css`. Opóźnienie danych z L1 („Current”) zapisane jako propozycja w `UWAGI.md`.
 
 - Kafelki aktywności nie mówią już wszystkie tego samego („Neutralnie”). Każdy pomiar ma własny opis fizyczny: magnetometr „Niespokojnie”, Bz „Blisko zera”, Kp „Niespokojnie”, wiatr „Typowa prędkość”. Znaczenie dla zorzy pokazuje kolor kropki, a ocena zorzy jest raz, po prawej przy „Aktywność zorzy”. Decyzja autora: nie chce jednakowych ocen zorzy w każdym kafelku.

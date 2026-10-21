@@ -370,16 +370,18 @@
 .tile-viz:empty {
   display: none;
 }
+/* Miernik z kółek (Kp), na środku wysokości wskaźnika, jak środek miniwykresu w kafelku obok (decyzja autora 21.10.2026). */
 .meter {
   display: flex;
-  align-items: flex-end;
-  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
   height: 100%;
 }
 .meter i {
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: var(--track);
 }
 .meter i.on {

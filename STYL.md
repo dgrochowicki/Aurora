@@ -18,10 +18,10 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
-| `--bg` | `#22242A` | Tło główne (od 20.10.2026, decyzja autora) |
-| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
-| `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color` |
-| `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
+| `--bg` | `#1E1F24` | Tło główne, jednolite (od 21.10.2026, decyzja autora; wcześniej `#22242A` z ciemniejszą górą) |
+| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc; od 21.10.2026 oba końce mają ten sam kolor, więc tło jest jednolite (zostawione, żeby łatwo wrócić do przejścia). Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
+| `--bg-top` | `#1E1F24` | Kolor góry tła: `html`, `theme-color`, manifest |
+| `--bg-top-dim` | `#0C0C0E` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--sub` `#AFC7C2` i `--muted`) |
 | `--text-80` | `rgba(255, 255, 255, 0.80)` | Liczby osi Y na wykresach (po prawej, nad linią i kropkami wykresu) |
@@ -42,7 +42,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--card-soft` | `rgba(196, 221, 255, 0.04)` | Tła łagodniejsze, pigułki, karty miejsc |
 | `--track` | `rgba(255, 255, 255, 0.10)` | Tła mierników, paski, kreski |
 | `--fab` | `rgba(0, 0, 0, 0.70)` | Pływające przyciski |
-| `--sheet` | `#1E2226` | Tło paneli |
+| `--sheet` | `#1F2226` | Tło paneli (od 21.10.2026) |
 | `--surface` | `rgba(13, 32, 37, 0.78)` | Dodatkowe powierzchnie |
 | `--on-accent` | `#062117` | Tekst na akcentach |
 | `--warn` | `#FFC867` | Ostrzeżenie / Bz |
@@ -89,7 +89,7 @@ Kafelek: padding 16 px, radius 20 px. Tytuł ze strzałką `›`, zwykle 20 px p
 W aktywności cztery poziomy z `js/labels.js`, pokazywane kolorem wskaźnika pod opisem (miniwykres, miernik) i wykresu w panelu, bez kropki przy opisie (decyzja autora 21.10.2026): nie sprzyja (`--level-0`, ciemny szary), neutralnie (`--level-1`, jasny szary), sprzyja zorzy (`--level-2`, fiolet), mocno sprzyja (`--level-3`, zielony). Od 21.10.2026 (decyzja autora) opis pod liczbą jest fizyczny i własny dla każdego pomiaru, a nie wspólna ocena dla zorzy: magnetometr „Spokojnie / Niespokojnie / Zaburzone / Silnie zaburzone”, Bz „Na północ / Blisko zera / Na południe / Silnie na południe”, Kp „Spokojnie / Niespokojnie / Aktywnie / Burza G1–G5”, wiatr „Wolny / Typowa prędkość / Szybki / Bardzo szybki”. Ocena samej zorzy jest raz, po prawej przy nagłówku „Aktywność zorzy”. Skala kolorów nie jest jeszcze przesądzona: tymczasowy wariant `?kolory=cieple` daje szary → pomarańczowy `#FFA94D` → czerwony `#FF6B6B` jak w Hello Aurora (otwarta decyzja w `UWAGI.md`). Opisy muszą zmieścić się w jednej linii kafelka (ok. 135 px przy 15 px). Pod statusem miernik/miniwykres o wysokości około 32 px.
 
 - Magnetometr GOES, Bz, prędkość wiatru: miniwykresy z 2 h; Bz ma linię zera i wyróżnienie ujemnych wartości, wiatr próg 500 km/s.
-- Kp: miernik segmentowy (skala /9).
+- Kp: miernik z 9 kółek 8 px (skala /9), rozłożonych na całą szerokość i wyśrodkowanych w pionie we wskaźniku 32 px, na wysokości środka miniwykresu obok (decyzja autora 21.10.2026).
 - Tymczasowy wariant alternatywny `?kafelki=paski` prezentuje jednolity miernik zamiast wykresów. Wybór docelowego wariantu jest nadal otwartą decyzją autora.
 - Kolory poziomów są opisami wartości wskaźników, **nie gwarancją lokalnej widoczności**.
 - Bz: liczba w kafelku i w panelu to średnia z 30 min, z której są opis i kolor (decyzja autora 21.10.2026); w panelu pod liczbą „· średnia z 30 min”, a ostatni odczyt w danych.
@@ -115,7 +115,7 @@ Nie ma już osobnej karty „Najlepszy moment”. Kierunek w zdaniu pod wynikiem
 
 ## 9. Panele szczegółów
 
-Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1E2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
+Wspólny system `js/ui/parts.js`: `infoHero` → opcjonalny `infoChart` → `infoStats` → wyjaśnienia (`infoText`) → źródła. Tło `--sheet` (`#1F2226`), górny radius 32 px, odstęp boczny 24 px. Uchwyt 44 × 4 px, biały 30%, w pasku wysokości 12 px. Nagłówek ma padding 20 px nad i pod, tytuł 21/27 semibold, ikona zamknięcia w przycisku 44 × 44 px. Po przewinięciu pojawia się linia pod nagłówkiem.
 
 Stopka panelu (źródła) podaje, skąd są dane: sondę RTSW przy Bz i wietrze („sonda SOLAR1”, przy zapasowej „sonda ACE (zapasowa)”), numer satelity przy magnetometrze („GOES-19”), a w „Skąd ten wynik” źródło aktywności („z modelu OVATION”, „z indeksu Kp (brak aktualnego modelu OVATION)” albo brak danych).
 

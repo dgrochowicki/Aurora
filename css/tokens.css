@@ -1,11 +1,12 @@
 /* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  /* Tło według decyzji autora (20.10.2026): #12151A u góry przechodzi w --bg w połowie ekranu 876 px. */
-  --bg: #22242a;
-  --bg-top: #12151a;
+  /* Tło jednolite #1E1F24 (decyzja autora 21.10.2026; wcześniej #12151A u góry przechodziło w #22242A).
+     Gradient i --bg-top zostają, żeby łatwo wrócić do przejścia: dziś oba końce mają ten sam kolor. */
+  --bg: #1e1f24;
+  --bg-top: #1e1f24;
   /* --bg-top pod przyciemnieniem paneli (czarny 60%): kolor paska Safari, gdy otwarty jest panel szczegółów. */
-  --bg-top-dim: #07080a;
+  --bg-top-dim: #0c0c0e;
   /* Gradient tła jako obraz. Kolorem tła (background-color) jest --bg-top, bo z niego Safari bierze kolor paska u góry;
      przy kolorze --bg pasek odcinał się od ciemnej góry gradientu. */
   --bg-gradient: linear-gradient(180deg, var(--bg-top) 0, var(--bg) 438px);
@@ -40,7 +41,7 @@
   --track: rgba(255, 255, 255, 0.1);
   --fab: rgba(0, 0, 0, 0.7);
   /* Tło panelu: biały 4% na --bg, jak pigułki godzin. */
-  --sheet: #1e2226;
+  --sheet: #1f2226;
   --surface: rgba(13, 32, 37, 0.78);
   --on-accent: #062117;
   --warn: #ffc867;
