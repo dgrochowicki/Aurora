@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 22.10.2026 — podgląd palcem na iPhonie, druga poprawka
+
+- Panel z wykresem dalej przesuwał się na iPhonie i pokazywał paski przewijania (zgłoszenie autora). Dymek podglądu przy prawej krawędzi wystawał poza wykres, a przy lekko ukośnym ruchu Safari przewijał panel zamiast przesuwać podgląd. Dymek trzyma się teraz 8 px od krawędzi (położenie liczone w `js/ui/scrub.js`), wykres przycina wszystko, co wystaje (`overflow-x: clip`), a na wykresie palec tylko przesuwa podgląd (`touch-action: none`, przechwycenie palca); panel przewija się poza wykresem. Duża liczba przy wietrze zostaje ostatnim odczytem (decyzja autora).
+
 ## 21.10.2026 — podziałka wykresu wiatru
 
 - Wykres w panelu wiatru słonecznego ma skalę dopasowaną do danych, ale nie węższą niż 100 km/s, z krokiem 20 (przy szerszym zakresie 50, 100, przy CME 200) i gęstszymi liniami co 37 px. Wahania są widoczne jak w Hello Aurora, a drobne nie wyglądają jak burza. Najpierw próbowaliśmy stałej osi od 300 co 100 (autor: zamiast „0” z makiety `_Research/AuroraNow/Aurora _Wiatr.png`), ale spłaszczała skoki; potem zakres min. 150 km/s co 50, aż autor poprosił o jeszcze bliższy (np. 400–500 co 20). `windTicks()` w `js/ui/chart.js` z testami, `js/views/details.js`.

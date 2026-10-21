@@ -1,6 +1,9 @@
 // Podgląd wartości na wykresie pomiaru (lineChart ze scrub): przesunięcie palcem albo kursorem pokazuje pionową linię,
 // kropkę i dymek z godziną i wartością najbliższego punktu. Punkty są w data-points wykresu, policzone przy rysowaniu.
-// touch-action: pan-y w CSS zostawia przewijanie panelu w pionie, a ruch w poziomie trafia do podglądu.
+// touch-action: none w CSS: na wykresie palec tylko przesuwa podgląd, a panel przewija się poza nim.
+// Dymek stoi nad punktem, ale co najmniej 8 px od krawędzi wykresu, żeby nie poszerzał panelu.
+
+const EDGE = 8;
 
 export function bindScrub(root) {
   root.querySelectorAll(".chart[data-points]").forEach((chart) => {
@@ -16,18 +19,24 @@ export function bindScrub(root) {
       let best = points[0];
       for (const p of points) if (Math.abs(p[0] - at) < Math.abs(best[0] - at)) best = p;
       const [x, y, text] = best;
-      line.style.left = dot.style.left = tip.style.left = `${x}%`;
+      line.style.left = dot.style.left = `${x}%`;
       dot.style.top = `${y}px`;
       tip.textContent = text;
-      tip.className = `chart-tip${x < 20 ? " is-start" : x > 80 ? " is-end" : ""}`;
       box.hidden = false;
+      const w = tip.offsetWidth,
+        px = (x / 100) * r.width;
+      tip.style.left = `${Math.min(r.width - w - EDGE, Math.max(EDGE, px - w / 2))}px`;
       chart.classList.add("is-scrubbing");
     };
     const hide = () => {
       box.hidden = true;
       chart.classList.remove("is-scrubbing");
     };
-    plot.addEventListener("pointerdown", show);
+    plot.addEventListener("pointerdown", (e) => {
+      // Palec zostaje przy wykresie, nawet gdy zjedzie poza niego, więc podgląd nie gaśnie w połowie ruchu.
+      plot.setPointerCapture?.(e.pointerId);
+      show(e);
+    });
     plot.addEventListener("pointermove", (e) => (e.pointerType === "mouse" || e.buttons) && show(e));
     ["pointerup", "pointercancel", "pointerleave"].forEach((t) => plot.addEventListener(t, hide));
   });
