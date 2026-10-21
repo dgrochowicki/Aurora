@@ -772,8 +772,10 @@ html.sheet-open body {
   color: var(--text-60);
 }
 /* Wykres sięga krawędzi panelu mimo paddingu 24 px. */
+/* overflow-x: clip: nic z wykresu (kropka, dymek) nie poszerza panelu, bo na iPhonie panel przesuwał się wtedy w bok. */
 .info-chart {
   margin-inline: -24px;
+  overflow-x: clip;
 }
 .info-chart .chart-empty {
   padding-inline: 24px;
@@ -889,9 +891,10 @@ html.sheet-open body {
   vector-effect: non-scaling-stroke;
 }
 /* Wykres pomiaru z podglądem palcem (lineChart ze scrub): kropka na ostatnim punkcie, przy podglądzie linia, kropka i dymek.
-   Ruch w pionie przewija panel, w poziomie przesuwa podgląd. */
+   Panel przewija się palcem poza wykresem. */
+/* touch-action: none: na wykresie palec tylko przesuwa podgląd. Przy pan-y lekko ukośny ruch na iPhonie przewijał panel. */
 .chart[data-points] .chart-plot {
-  touch-action: pan-y;
+  touch-action: none;
   cursor: crosshair;
 }
 .chart-dot {
@@ -915,26 +918,18 @@ html.sheet-open body {
   width: 1px;
   background: var(--text-60);
 }
+/* Położenie w poziomie ustawia scrub.js w px, zawsze 8 px od krawędzi wykresu, żeby dymek nie wystawał poza panel. */
 .chart-tip {
   position: absolute;
   z-index: 4;
   /* Nad wykresem, na wysokości liczby przy górnej linii podziałki. */
   top: -22px;
-  transform: translateX(-50%);
   padding: 4px 10px;
   border-radius: 8px;
   background: #3a4048;
   color: var(--text);
   font-weight: 600;
   white-space: nowrap;
-}
-.chart-tip.is-start {
-  transform: none;
-  margin-left: -12px;
-}
-.chart-tip.is-end {
-  transform: translateX(-100%);
-  margin-left: 12px;
 }
 /* Bz poniżej zera: wypełnienie w kolorze linii, jak .spark-area w kafelku. */
 .chart-below {
