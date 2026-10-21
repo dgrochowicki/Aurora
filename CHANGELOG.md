@@ -4,7 +4,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 
 ## 21.10.2026 — podziałka wykresu wiatru
 
-- Wykres w panelu wiatru słonecznego ma skalę dopasowaną do danych, ale nie węższą niż 150 km/s, z krokiem 50 (przy szerszym zakresie 100, przy CME 200). Wahania są widoczne jak w Hello Aurora, a drobne nie wyglądają jak burza. Najpierw próbowaliśmy stałej osi od 300 co 100 (autor: zamiast „0” z makiety `_Research/AuroraNow/Aurora _Wiatr.png`), ale spłaszczała skoki; autor wybrał wersję pośrednią. `windTicks()` w `js/ui/chart.js` z testami, `js/views/details.js`.
+- Wykres w panelu wiatru słonecznego ma skalę dopasowaną do danych, ale nie węższą niż 100 km/s, z krokiem 20 (przy szerszym zakresie 50, 100, przy CME 200) i gęstszymi liniami co 37 px. Wahania są widoczne jak w Hello Aurora, a drobne nie wyglądają jak burza. Najpierw próbowaliśmy stałej osi od 300 co 100 (autor: zamiast „0” z makiety `_Research/AuroraNow/Aurora _Wiatr.png`), ale spłaszczała skoki; potem zakres min. 150 km/s co 50, aż autor poprosił o jeszcze bliższy (np. 400–500 co 20). `windTicks()` w `js/ui/chart.js` z testami, `js/views/details.js`.
 - W wyjaśnieniu panelu wiatru zdanie o typowych prędkościach, żeby górnej linii osi nie brać za maksimum (obawa autora).
 
 ## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów

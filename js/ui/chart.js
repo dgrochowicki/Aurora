@@ -30,19 +30,19 @@ export function niceTicks(lo, hi, min = 3) {
 }
 
 // Podziałka wykresu wiatru słonecznego (decyzja autora 21.10.2026): dopasowana do danych jak w Hello Aurora, żeby było widać skoki,
-// ale nie węższa niż WIND_SPAN, żeby drobne wahnięcie nie wyglądało jak burza (jak minSpan miniwykresu w kafelku). Krok 50 km/s,
-// przy szerszym zakresie 100, a przy CME 200, żeby linii nie było za dużo.
-export const WIND_SPAN = 150;
+// ale nie węższa niż WIND_SPAN, żeby drobne wahnięcie nie wyglądało jak burza (jak minSpan miniwykresu w kafelku).
+// Krok 20 km/s, przy szerszym zakresie 50, 100, a przy CME 200, żeby linii nie było za dużo. Za wąską podziałkę poszerzamy
+// o krok na przemian w dół i w górę, więc dane zostają mniej więcej na środku.
+export const WIND_SPAN = 100;
 export function windTicks(vals) {
   if (!vals.length) return [600, 500, 400, 300];
-  let lo = Math.min(...vals),
-    hi = Math.max(...vals);
-  const grow = Math.max(0, WIND_SPAN - (hi - lo)) / 2;
-  lo -= grow;
-  hi += grow;
-  const step = hi - lo > 800 ? 200 : hi - lo > 300 ? 100 : 50;
-  const a = Math.floor(lo / step) * step,
+  const lo = Math.min(...vals),
+    hi = Math.max(...vals),
+    span = Math.max(WIND_SPAN, hi - lo);
+  const step = span <= 150 ? 20 : span <= 300 ? 50 : span <= 800 ? 100 : 200;
+  let a = Math.floor(lo / step) * step,
     b = Math.ceil(hi / step) * step;
+  for (let down = true; b - a < WIND_SPAN; down = !down) down ? (a -= step) : (b += step);
   return Array.from({ length: Math.round((b - a) / step) + 1 }, (_, i) => b - i * step);
 }
 

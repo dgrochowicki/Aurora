@@ -183,6 +183,8 @@ export const DETAILS = {
           tz: st.tz,
           tone: tone(st, "wind", s.wind, windLevel),
           ticks: windTicks((s.windSeries || []).map((p) => p.v)),
+          // Gęstsze linie (krok 20 km/s daje ich do 7), żeby wykres nie był wyższy od innych.
+          row: ROW_DENSE,
           scrub: { unit: "km/s", digits: 0 },
         }) +
         infoStats([

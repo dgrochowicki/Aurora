@@ -50,20 +50,22 @@ test("wykres bez podglądu (zachmurzenie) nie ma punktów ani kropki", () => {
   assert.doesNotMatch(html, /data-points|chart-dot/);
 });
 
-test("wiatr: skala dopasowana do danych, co najmniej 150 km/s, krok 50", () => {
-  // Spokojny wiatr 450–480: zakres rozszerzony do 150 km/s wokół danych.
-  assert.deepEqual(windTicks([450, 480]), [550, 500, 450, 400, 350]);
-  assert.deepEqual(windTicks([465, 465]), [550, 500, 450, 400, 350]);
+test("wiatr: skala dopasowana do danych, co najmniej 100 km/s, krok 20", () => {
+  // Spokojny wiatr 440–490: 440–500 poszerzone o krok w dół i w górę.
+  assert.deepEqual(windTicks([440, 490]), [520, 500, 480, 460, 440, 420]);
+  assert.deepEqual(windTicks([465, 465]), [520, 500, 480, 460, 440, 420]);
+  assert.deepEqual(windTicks([400, 500]), [500, 480, 460, 440, 420, 400]);
   assert.deepEqual(windTicks([]), [600, 500, 400, 300]);
 });
 
-test("wiatr: szerszy zakres krok 100, przy CME 200, a linia zawsze w zakresie", () => {
+test("wiatr: szerszy zakres krok 50 i 100, przy CME 200, a linia zawsze w zakresie", () => {
+  assert.deepEqual(windTicks([400, 600]), [600, 550, 500, 450, 400]);
   assert.deepEqual(windTicks([400, 750]), [800, 700, 600, 500, 400]);
-  const t = windTicks([500, 1400]);
-  assert.deepEqual(t, [1400, 1200, 1000, 800, 600, 400]);
-  for (const vals of [[450, 480], [260, 300], [400, 750], [500, 1400], [333, 334.5]]) {
+  assert.deepEqual(windTicks([500, 1400]), [1400, 1200, 1000, 800, 600, 400]);
+  for (const vals of [[440, 490], [260, 300], [400, 750], [500, 1400], [333, 334.5], [399.9, 400.1]]) {
     const ticks = windTicks(vals);
     assert.ok(ticks[0] >= Math.max(...vals) && ticks[ticks.length - 1] <= Math.min(...vals), `${vals}: ${ticks}`);
-    assert.ok(ticks.length >= 3, `${vals}: ${ticks}`);
+    assert.ok(ticks.length >= 3 && ticks.length <= 8, `${vals}: ${ticks}`);
+    assert.ok(ticks[0] - ticks[ticks.length - 1] >= 100, `${vals}: ${ticks}`);
   }
 });
