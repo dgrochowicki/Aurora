@@ -18,10 +18,10 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
-| `--bg` | `#1E1F24` | Tło główne, jednolite (od 21.10.2026, decyzja autora; wcześniej `#22242A` z ciemniejszą górą) |
-| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc; od 21.10.2026 oba końce mają ten sam kolor, więc tło jest jednolite (zostawione, żeby łatwo wrócić do przejścia). Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
-| `--bg-top` | `#1E1F24` | Kolor góry tła: `html`, `theme-color`, manifest |
-| `--bg-top-dim` | `#0C0C0E` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
+| `--bg` | `#1E1F24` | Tło główne pod ciemniejszą górą (od 21.10.2026, decyzja autora; wcześniej `#22242A`) |
+| `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
+| `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color`, manifest |
+| `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |
 | `--text` | `#FFFFFF` | Podstawowy tekst i liczby |
 | `--text-60` | `rgba(255, 255, 255, 0.60)` | Tytuły kart, opisy, podpisy (dawniej `--sub` `#AFC7C2` i `--muted`) |
 | `--text-80` | `rgba(255, 255, 255, 0.80)` | Liczby osi Y na wykresach (po prawej, nad linią i kropkami wykresu) |
