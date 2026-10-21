@@ -140,7 +140,7 @@ export const DETAILS = {
         }) +
         infoChart(
           barChart(
-            // Cała skala 0–9, a kolor słupka jak kropka w kafelku: poziom Kp dla zorzy (szary, jaśniejszy szary, zielony, fiolet).
+            // Cała skala 0–9, a kolor słupka jak kropka w kafelku: poziom Kp dla zorzy (ciemny szary, jasny szary, fiolet, zielony).
             blocks.map((r) => ({ t: r.t, v: r.kp, level: kpLevel(r.kp) })),
             {
               label: `Prognoza Kp w blokach 3-godzinnych: ${blocks.map((r) => `${hmIn(r.t, tz)} ${fmtNum(r.kp)}`).join(", ")}`,

@@ -21,6 +21,13 @@
   --glow: #5ac369;
   --glow-rgb: 90 195 105;
   --violet: #c4a1ff;
+  /* Poziomy pomiarów aktywności 0–3 (kropki i wskaźniki kafelków, słupki Kp): od ciemnego szarego do zielonego.
+     Fiolet przed zielonym, bo jest ciemniejszy, a szare z białego, żeby pasowały do każdego tła (decyzja autora 21.10.2026).
+     Na tle panelu odpowiadają #6C7782 i #B6B9BC z makiety. */
+  --level-0: rgba(255, 255, 255, 0.4);
+  --level-1: rgba(255, 255, 255, 0.7);
+  --level-2: #c4a1ff;
+  --level-3: #5ac369;
   /* Kolory zorzy w tle strony. */
   --aurora-green: #5ac369;
   --aurora-violet: #412b5d;

@@ -29,7 +29,11 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 | `--green` | `#68F7BB` | Akcent aktywności |
 | `--yellow` | `#FFC867` | Chmury/ostrzeżenia |
 | `--glow` | `#5AC369` | Poświata godzin |
-| `--violet` | `#C4A1FF` | Mocno sprzyjające warunki |
+| `--violet` | `#C4A1FF` | Fiolet (też poziom 2 aktywności) |
+| `--level-0` | `rgba(255, 255, 255, 0.40)` | Poziom aktywności 0: nie sprzyja (kropka kafelka, słupek Kp); na tle panelu ok. `#6C7782` z makiety |
+| `--level-1` | `rgba(255, 255, 255, 0.70)` | Poziom 1: neutralnie; na tle panelu ok. `#B6B9BC` |
+| `--level-2` | `#C4A1FF` | Poziom 2: sprzyja zorzy (fiolet) |
+| `--level-3` | `#5AC369` | Poziom 3: mocno sprzyja (zielony). Fiolet przed zielonym, bo jest ciemniejszy (decyzja autora 21.10.2026) |
 | `--aurora-green` | `#5AC369` | Zielona plama w tle |
 | `--aurora-violet` | `#412B5D` | Fioletowa plama w tle |
 | `--line` | `rgba(255, 255, 255, 0.09)` | Linie |
@@ -82,7 +86,7 @@ Szansa (`chanceLabel()` w `js/labels.js`: Brak 0–2, Bardzo mała 3–9, Mała 
 
 Kafelek: padding 16 px, radius 20 px. Tytuł ze strzałką `›`, zwykle 20 px przerwy, metryka z ikoną 24 × 24 (jeżeli dotyczy), wartość i status, potem wskaźnik lub tekst najbliższej zmiany. Typowe odstępy wewnętrzne 4–20 px zależnie od części.
 
-W aktywności cztery poziomy z `js/labels.js`, pokazywane kolorem kropki przy opisie: nie sprzyja (`--text-40`), neutralnie (`--text-60`), sprzyja zorzy (`--green`), mocno sprzyja (`--violet`). Od 21.10.2026 (decyzja autora) opis pod liczbą jest fizyczny i własny dla każdego pomiaru, a nie wspólna ocena dla zorzy: magnetometr „Spokojnie / Niespokojnie / Zaburzone / Silnie zaburzone”, Bz „Na północ / Blisko zera / Na południe / Silnie na południe”, Kp „Spokojnie / Niespokojnie / Aktywnie / Burza G1–G5”, wiatr „Wolny / Typowa prędkość / Szybki / Bardzo szybki”. Ocena samej zorzy jest raz, po prawej przy nagłówku „Aktywność zorzy”. Opisy muszą zmieścić się w jednej linii kafelka (ok. 135 px przy 15 px). Pod statusem miernik/miniwykres o wysokości około 32 px.
+W aktywności cztery poziomy z `js/labels.js`, pokazywane kolorem kropki przy opisie: nie sprzyja (`--level-0`, ciemny szary), neutralnie (`--level-1`, jasny szary), sprzyja zorzy (`--level-2`, fiolet), mocno sprzyja (`--level-3`, zielony). Od 21.10.2026 (decyzja autora) opis pod liczbą jest fizyczny i własny dla każdego pomiaru, a nie wspólna ocena dla zorzy: magnetometr „Spokojnie / Niespokojnie / Zaburzone / Silnie zaburzone”, Bz „Na północ / Blisko zera / Na południe / Silnie na południe”, Kp „Spokojnie / Niespokojnie / Aktywnie / Burza G1–G5”, wiatr „Wolny / Typowa prędkość / Szybki / Bardzo szybki”. Ocena samej zorzy jest raz, po prawej przy nagłówku „Aktywność zorzy”. Opisy muszą zmieścić się w jednej linii kafelka (ok. 135 px przy 15 px). Pod statusem miernik/miniwykres o wysokości około 32 px.
 
 - Magnetometr GOES, Bz, prędkość wiatru: miniwykresy z 2 h; Bz ma linię zera i wyróżnienie ujemnych wartości, wiatr próg 500 km/s.
 - Kp: miernik segmentowy (skala /9).
@@ -120,7 +124,7 @@ Metryka: 28/34 px, jednostka w tym samym rozmiarze, status 15 px, 4 px niżej. W
 
 `js/ui/chart.js`: co najmniej trzy linie podziałki co 53 px (`ROW`), „ładne” kroki 1, 2, 2,5, 5 × potęga 10. Przy trzech liniach wykres z osią X około 153 px. Podpisy osi Y po prawej, 24 px od krawędzi i 4 px nad linią; godziny początku, środka i końca. Linia ok. 2,3 px, przy Bz ujemny fragment innym kolorem i bez standardowego gradientu. Znany problem: w pobliżu zera podpis „0” może nachodzić na skrajny odczyt.
 
-Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki 12 px, zaokrąglone u góry (promień 6 px), z gradientem od pełnego koloru u góry do 35% u dołu. Kolor słupka i wartości nad nim według poziomu Kp, jak kropka w kafelkach (szary, jaśniejszy szary, `--green`, `--violet`); makieta autora miała zielony i żółty, ale autor wybrał kolory poziomów (21.10.2026). Pod każdym słupkiem jest początek bloku; skrajne godziny leżą 24 px od krawędzi jak na innych wykresach, a słupek stoi nad środkiem swojej godziny (kolumna ma szerokość podpisu, kolumny rozsunięte `space-between`). Pod liczbą w panelu stoi opis fizyczny („Niespokojnie”), bez osobnego bloku „Ocena”; tak samo w panelach magnetometru, Bz i wiatru.
+Wykres Kp: słupki dla 8 bloków po trzy godziny, pełna skala 0–9 i podziałka 0/3/6/9. Słupki 12 px, zaokrąglone u góry (promień 6 px). Wypełnienie 70% krycia z gradientem: pełny kolor do 20% wysokości, potem do 20% u dołu; obwódka 1 px w kolorze słupka 50%. Kolor słupka i wartości nad nim według poziomu Kp, jak kropka w kafelkach (`--level-0`…`--level-3`); makieta autora miała zielony i żółty, ale autor wybrał kolory poziomów (21.10.2026). Pod każdym słupkiem jest początek bloku; skrajne godziny leżą 24 px od krawędzi jak na innych wykresach, a słupek stoi nad środkiem swojej godziny (kolumna ma szerokość podpisu, kolumny rozsunięte `space-between`). Pod liczbą w panelu stoi opis fizyczny („Niespokojnie”), bez osobnego bloku „Ocena”; tak samo w panelach magnetometru, Bz i wiatru.
 
 ### Zachmurzenie
 

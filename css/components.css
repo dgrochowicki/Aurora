@@ -347,18 +347,18 @@
   line-height: 20px;
   color: var(--text-60);
 }
-/* Kolor stanu kafelka aktywności: szary gdy nie sprzyja zorzy, jaśniejszy neutralnie, zielony gdy sprzyja, fiolet gdy mocno sprzyja. */
+/* Kolor stanu kafelka aktywności: ciemny szary gdy nie sprzyja zorzy, jasny szary neutralnie, fiolet gdy sprzyja, zielony gdy mocno sprzyja. */
 .data-tile[data-level="0"] {
-  --state: var(--text-40);
+  --state: var(--level-0);
 }
 .data-tile[data-level="1"] {
-  --state: var(--text-60);
+  --state: var(--level-1);
 }
 .data-tile[data-level="2"] {
-  --state: var(--green);
+  --state: var(--level-2);
 }
 .data-tile[data-level="3"] {
-  --state: var(--violet);
+  --state: var(--level-3);
 }
 .data-tile[data-level] .tile-status::before {
   content: "";
@@ -410,8 +410,9 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
+/* Pole pod zerem przy Bz w kolorze poziomu, jak linia. */
 .spark .spark-area {
-  fill: var(--green);
+  fill: var(--state);
   opacity: 0.22;
 }
 .spark-rule {
@@ -892,7 +893,7 @@ html.sheet-open body {
   padding-inline: 24px;
 }
 /* Słupki (prognoza Kp): 12 px, zaokrąglone u góry (makieta autora 21.10.2026). Kolor jak kropka w kafelkach aktywności
-   (poziom z data-level), od pełnego u góry do przygaszonego u dołu. Każda kolumna ma szerokość swojej godziny pod spodem,
+   (poziom z data-level). Wypełnienie 70%: pełny kolor do 20% wysokości, potem gaśnie do 20% u dołu; obwódka 1 px w kolorze 50%. Każda kolumna ma szerokość swojej godziny pod spodem,
    a kolumny są rozsunięte do krawędzi pasa 24 px, więc skrajne godziny leżą 24 px od krawędzi jak na innych wykresach. */
 .chart.is-bars {
   /* Miejsce na godziny pod wykresem: 9 px odstępu i wiersz 18 px, jak .chart-x. */
@@ -912,23 +913,25 @@ html.sheet-open body {
   align-items: center;
   height: 100%;
   font-weight: 400;
-  --bar: var(--text-40);
+  --bar: var(--level-0);
 }
 .chart-bars b[data-level="1"] {
-  --bar: var(--text-60);
+  --bar: var(--level-1);
 }
 .chart-bars b[data-level="2"] {
-  --bar: var(--green);
+  --bar: var(--level-2);
 }
 .chart-bars b[data-level="3"] {
-  --bar: var(--violet);
+  --bar: var(--level-3);
 }
 .chart-bars i {
   position: relative;
   width: 12px;
   min-height: 2px;
   border-radius: 6px 6px 0 0;
-  background: linear-gradient(var(--bar), color-mix(in srgb, var(--bar) 35%, transparent));
+  border: 1px solid color-mix(in srgb, var(--bar) 50%, transparent);
+  /* 70% krycia całości: 70% u góry, 70% × 20% = 14% u dołu. */
+  background: linear-gradient(color-mix(in srgb, var(--bar) 70%, transparent) 20%, color-mix(in srgb, var(--bar) 14%, transparent));
 }
 .chart-bars span {
   position: absolute;
