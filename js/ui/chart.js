@@ -89,14 +89,16 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     { H, y } = scale(ticks, row);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
-  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * 100;
+  // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
+  const xEnd = scrub ? 98 : 100;
+  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * xEnd;
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
   // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
-  const area = zero ? "" : `<path class="chart-area" d="${line}L100 ${H}L0 ${H}Z"/>`;
+  const area = zero ? "" : `<path class="chart-area" d="${line}L${xEnd} ${H}L0 ${H}Z"/>`;
   const below = zero
     ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
     : "";
-  const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L100 ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
+  const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L${xEnd} ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni) albo `labels` punktów rozłożonych równo. Podpis to czas punktu danych,
@@ -113,7 +115,7 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     const num = (v) => `${fmtNum(v, scrub.digits ?? 1)} ${scrub.unit || ""}`.trim();
     // Punkty do podglądu: położenie i podpis.
     const points = series.map((p) => [+x(p.t).toFixed(2), +y(p.v).toFixed(1), `${hm(p.t)} · ${num(p.v)}`]);
-    extra = `<i class="chart-dot" style="left:100%;top:${y(last.v).toFixed(1)}px"></i><div class="chart-scrub" hidden><i class="chart-scrub-line"></i><i class="chart-dot"></i><span class="chart-tip"></span></div>`;
+    extra = `<i class="chart-dot" style="left:${xEnd}%;top:${y(last.v).toFixed(1)}px"></i><div class="chart-scrub" hidden><i class="chart-scrub-line"></i><i class="chart-dot"></i><span class="chart-tip"></span></div>`;
     data = ` data-points="${esc(JSON.stringify(points))}"`;
   }
   return `<div class="chart${tone ? ` is-${tone}` : ""}" role="img" aria-label="${esc(label)}"${data}><div class="chart-plot" style="height:${H}px">${gridHTML(ticks, y, unit)}${svg}${extra}</div>${axis}</div>`;

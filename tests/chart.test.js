@@ -37,7 +37,8 @@ test("wykres pomiaru: podziałka zostaje, a do tego kropka końca i punkty podgl
   const p = points(html);
   assert.equal(p.length, 2);
   assert.equal(p[0][2], "22:00 · 1,0 nT");
-  assert.equal(p[1][0], 100);
+  // Ostatni punkt 2% przed krawędzią, żeby kropka była cała widoczna.
+  assert.equal(p[1][0], 98);
 });
 
 test("wykres pomiaru: liczba miejsc po przecinku i płaski przebieg bez NaN", () => {
