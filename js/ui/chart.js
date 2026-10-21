@@ -72,10 +72,11 @@ function gridHTML(ticks, y, unit = "") {
 // tz: strefa miejsca (IANA), w której podpisujemy godziny; bez niej strefa przeglądarki. ticks: stała podziałka zamiast dobranej do danych (np. 0–100%).
 // tone: kolor linii i gradientu, klasa .chart.is-<tone> w CSS (domyślnie zielony; level-0…level-3 to kolory poziomów aktywności).
 // unit: dopisek przy liczbach osi Y poza zerem. row: odstęp linii podziałki w px (domyślnie 53).
-// every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego początek, środek i koniec.
+// every: godzina co every-ty punkt (np. co 3 godziny prognozy, przy 13 punktach równe odstępy); bez niego `labels` godzin
+// rozłożonych równo od początku do końca (domyślnie 3: początek, środek i koniec; przy pomiarach z 2 godzin 5, mniej więcej co 30 min).
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null }) {
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3 }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -98,10 +99,12 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L100 ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
-  // Środkowy podpis to czas środkowego punktu danych, żeby przy prognozie godzinowej była pełna godzina.
-  const mid = series[Math.floor((series.length - 1) / 2)].t;
-  // Godziny pod osią: co every-ty punkt (i zawsze ostatni), rozłożone równo jak początek, środek i koniec.
-  const marks = every ? series.filter((_, i) => i % every === 0 || i === series.length - 1).map((p) => p.t) : [t0, mid, t1];
+  // Godziny pod osią: co every-ty punkt (i zawsze ostatni) albo `labels` punktów rozłożonych równo. Podpis to czas punktu danych,
+  // żeby przy prognozie godzinowej środek był pełną godziną.
+  const n = series.length - 1;
+  const marks = every
+    ? series.filter((_, i) => i % every === 0 || i === n).map((p) => p.t)
+    : Array.from({ length: labels }, (_, k) => series[Math.floor((k * n) / (labels - 1))].t);
   const axis = `<div class="chart-x" aria-hidden="true">${marks.map((t) => `<span>${hm(t)}</span>`).join("")}</div>`;
   let extra = "",
     data = "";

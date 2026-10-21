@@ -69,3 +69,10 @@ test("wiatr: szerszy zakres krok 50 i 100, przy CME 200, a linia zawsze w zakres
     assert.ok(ticks[0] - ticks[ticks.length - 1] >= 100, `${vals}: ${ticks}`);
   }
 });
+
+test("oś godzin: domyślnie początek, środek i koniec, przy labels równo rozłożone podpisy", () => {
+  const s = series([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const hours = (html) => [...html.match(/class="chart-x"[^>]*>(.*?)<\/div>/)[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1]);
+  assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC" })), ["20:00", "20:04", "20:08"]);
+  assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC", labels: 5 })), ["20:00", "20:02", "20:04", "20:06", "20:08"]);
+});

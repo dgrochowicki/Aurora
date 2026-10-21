@@ -101,6 +101,7 @@ export const DETAILS = {
           label: "Składowa Hp pola magnetycznego z satelity GOES w ostatnich 2 godzinach",
           tz: st.tz,
           scrub: { unit: "nT" },
+          labels: 5,
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -132,6 +133,7 @@ export const DETAILS = {
           tz: st.tz,
           tone: tone(st, "bz", ref, bzLevel),
           scrub: { unit: "nT" },
+          labels: 5,
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
@@ -186,6 +188,7 @@ export const DETAILS = {
           // Gęstsze linie (krok 20 km/s daje ich do 7), żeby wykres nie był wyższy od innych.
           row: ROW_DENSE,
           scrub: { unit: "km/s", digits: 0 },
+          labels: 5,
         }) +
         infoStats([
           ["Gęstość", s.density == null ? "—" : `${fmtNum(s.density)} cm⁻³`],
