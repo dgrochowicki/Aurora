@@ -29,6 +29,17 @@ export function niceTicks(lo, hi, min = 3) {
   return Array.from({ length: n }, (_, i) => +(b - i * step).toFixed(6));
 }
 
+// Podziałka wykresu wiatru słonecznego (decyzja autora 21.10.2026): od 300 km/s co 100, z górą co najmniej 600, żeby zawsze był
+// widać próg 500. Wolniejszy wiatr obniża dół, szybszy podnosi górę; przy zakresie ponad 800 km/s krok 200, żeby linii nie było za dużo.
+export function windTicks(vals) {
+  const lo = Math.min(300, ...vals),
+    hi = Math.max(600, ...vals);
+  const step = hi - lo > 800 ? 200 : 100;
+  const a = Math.floor(lo / step) * step,
+    b = Math.ceil(hi / step) * step;
+  return Array.from({ length: Math.round((b - a) / step) + 1 }, (_, i) => b - i * step);
+}
+
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 

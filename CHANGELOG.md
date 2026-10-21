@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 21.10.2026 — podziałka wykresu wiatru
+
+- Wykres w panelu wiatru słonecznego ma oś od 300 km/s co 100, z górą co najmniej 600, więc zawsze widać próg 500, a spokojny wiatr nie wygląda jak burza. Wolniejszy wiatr obniża dół, szybszy podnosi górę; przy CME krok 200. Decyzja autora (makieta `_Research/AuroraNow/Aurora _Wiatr.png`: zamiast „0” od 300, co 100 dla zapasu). `windTicks()` w `js/ui/chart.js` z testami, `js/views/details.js`.
+
 ## 21.10.2026 — karta Kp według makiety, własne opisy pomiarów
 
 - Tło strony: `#12151A` u góry przechodzi teraz w `#1E1F24` (wcześniej w `#22242A`), panele `#1F2226`. Miernik Kp w kafelku z kółek 8 px od lewej, z odstępem 4 px, wyśrodkowany w pionie, bo był niżej niż miniwykres obok. Decyzje autora. `css/tokens.css`, `css/components.css`, `index.html`, `manifest.webmanifest`.

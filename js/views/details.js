@@ -4,7 +4,7 @@
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
 import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
-import { lineChart, barChart, ROW_DENSE } from "../ui/chart.js";
+import { lineChart, barChart, windTicks, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
 
@@ -182,6 +182,7 @@ export const DETAILS = {
           label: "Prędkość wiatru słonecznego w ostatnich 2 godzinach",
           tz: st.tz,
           tone: tone(st, "wind", s.wind, windLevel),
+          ticks: windTicks((s.windSeries || []).map((p) => p.v)),
           scrub: { unit: "km/s", digits: 0 },
         }) +
         infoStats([

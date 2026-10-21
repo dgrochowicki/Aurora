@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, lineChart } from "../js/ui/chart.js";
+import { niceTicks, lineChart, windTicks } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -48,4 +48,22 @@ test("wykres pomiaru: liczba miejsc po przecinku i płaski przebieg bez NaN", ()
 test("wykres bez podglądu (zachmurzenie) nie ma punktów ani kropki", () => {
   const html = lineChart(series([10, 80]), { label: "x", tz: "UTC", ticks: [100, 0] });
   assert.doesNotMatch(html, /data-points|chart-dot/);
+});
+
+test("wiatr: od 300 co 100, góra co najmniej 600", () => {
+  assert.deepEqual(windTicks([450, 480]), [600, 500, 400, 300]);
+  assert.deepEqual(windTicks([]), [600, 500, 400, 300]);
+  // Granica dokładnie na linii nie dokłada kolejnej.
+  assert.deepEqual(windTicks([300, 600]), [600, 500, 400, 300]);
+});
+
+test("wiatr: wolniejszy obniża dół, szybszy podnosi górę", () => {
+  assert.deepEqual(windTicks([260, 400]), [600, 500, 400, 300, 200]);
+  assert.deepEqual(windTicks([550, 720]), [800, 700, 600, 500, 400, 300]);
+});
+
+test("wiatr: przy CME krok 200, a linia zawsze w zakresie", () => {
+  const t = windTicks([700, 1350]);
+  assert.deepEqual(t, [1400, 1200, 1000, 800, 600, 400, 200]);
+  assert.ok(t[0] >= 1350 && t[t.length - 1] <= 300);
 });
