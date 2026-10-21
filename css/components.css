@@ -370,11 +370,12 @@
 .tile-viz:empty {
   display: none;
 }
-/* Miernik z kółek (Kp), na środku wysokości wskaźnika, jak środek miniwykresu w kafelku obok (decyzja autora 21.10.2026). */
+/* Miernik z kółek 8 px (Kp) od lewej, odstęp 4 px (autor: 2–4 px), na środku wysokości wskaźnika,
+   jak środek miniwykresu w kafelku obok (decyzja autora 21.10.2026). */
 .meter {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
   height: 100%;
 }
 .meter i {
