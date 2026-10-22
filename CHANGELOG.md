@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 22.10.2026 — mapa mówi, że pokazuje samą aktywność
+
+- Autor zobaczył na mapie żółtą zorzę nad Tromsø, a po wybraniu miejsca szansa wynosiła 7%. Obliczenia były poprawne: aktywność OVATION 38 × ciemność 0,75 (Księżyc 87% wysoko) × czyste niebo 0,19 (niskie chmury 100%). Mapa pokazuje sam model NOAA, a procent uwzględnia też chmury i Księżyc, czego mapa nie mówiła.
+- Nad legendą jest teraz tytuł „Aktywność NOAA, bez chmur i Księżyca”, a pod nią linijka o bieżącym miejscu: „Tromsø: aktywność 38, szansa teraz 7% (81% chmur, jasny Księżyc).” Powody podawane są tylko wtedy, gdy szansa jest niższa niż aktywność: za jasno, chmury od 30% (w stronę zorzy, gdy wyraźnie inne niż nad głową) i jasny Księżyc wysoko. `mapPlaceText()` w `js/labels.js` z testami, `nowRow()` w `js/views/home.js`, `js/views/map.js`, `index.html`, `css/components.css`.
+- Wariant A wybrał autor jako rozwiązanie na teraz. Docelowo chce przełączać warstwę chmur na mapie, jak w Hello Aurora; zadanie wpisano do `UWAGI.md`.
+
 ## 22.10.2026 — podgląd palcem na iPhonie, druga poprawka
 
 - Panel z wykresem dalej przesuwał się na iPhonie i pokazywał paski przewijania (zgłoszenie autora). Dymek podglądu przy prawej krawędzi wystawał poza wykres, a przy lekko ukośnym ruchu Safari przewijał panel zamiast przesuwać podgląd. Dymek trzyma się teraz 8 px od krawędzi (położenie liczone w `js/ui/scrub.js`), wykres przycina wszystko, co wystaje (`overflow-x: clip`), a na wykresie palec tylko przesuwa podgląd (`touch-action: none`, przechwycenie palca); panel przewija się poza wykresem. Duża liczba przy wietrze zostaje ostatnim odczytem (decyzja autora).

@@ -4,6 +4,8 @@ import { getAuroraGrid } from "../data/noaa.js";
 import { ovationField } from "../model/aurora.js";
 import { createSheet } from "../ui/sheet.js";
 import { icon } from "../ui/icons.js";
+import { mapPlaceText } from "../labels.js";
+import { nowRow } from "./home.js";
 
 const note = $("#mapNote");
 let map, auroraLayer, locationMarker, field = null, justOpened = false, getCurrent = () => null;
@@ -185,7 +187,12 @@ async function showMap(current) {
     auroraLayer.addTo(map);
   } else auroraLayer.redraw();
   const shown = grid.coords.some((p) => Number(p[2]) >= 10);
-  note.textContent = shown
-    ? `Model NOAA OVATION • aktualizacja ${grid.time ? new Date(grid.time).toLocaleString("pl-PL") : "bieżąca"}`
-    : "Aktualnie model nie pokazuje wyraźnej aktywności.";
+  // Kolor mapy to sama aktywność, więc pod nią linijka, ile z tego zostaje w bieżącym miejscu po chmurach i Księżycu.
+  const place = current && mapPlaceText(current.name, nowRow(current));
+  note.textContent = [
+    place,
+    shown ? `Model NOAA OVATION • aktualizacja ${grid.time ? new Date(grid.time).toLocaleString("pl-PL") : "bieżąca"}` : "Aktualnie model nie pokazuje wyraźnej aktywności.",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
