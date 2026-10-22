@@ -97,6 +97,9 @@ function clearPlaceTime() {
   els.today.textContent = "";
 }
 
+// Wiersz „Teraz” bieżącego miejsca dla linijki pod mapą. null przed pierwszą prognozą albo bez pogody.
+export const nowRow = (loc) => (state?.loc === loc ? state.first : null);
+
 export const showLoading = () => showHeadline([["Sprawdzam…"]]);
 
 // Zdanie główne z odcinków [tekst, wyróżniony]: wyróżnione jako <strong> (białe), reszta szara. Na końcu strzałka jak

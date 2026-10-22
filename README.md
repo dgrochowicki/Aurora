@@ -12,7 +12,7 @@ Po uruchomieniu aplikacja próbuje ustalić bieżącą lokalizację. Jeśli nie 
 - Przejrzeć najbliższe 12 godzin, wybrać godzinę i sprawdzić zachmurzenie, porę dnia oraz wpływ Księżyca.
 - Dowiedzieć się, w którą stronę patrzeć: kierunek do najsilniejszej widocznej zorzy z modelu NOAA (np. „na północny zachód”, „w górę”). Wynik uwzględnia chmury na linii wzroku w tę stronę, a nie tylko nad głową.
 - Zobaczyć kafelki i wykresy: magnetometr GOES (Hp), Bz, Kp, wiatr słoneczny, chmury oraz światło w nocy. Na wykresach magnetometru, Bz i wiatru przesunięcie palcem pokazuje godzinę i wartość pomiaru.
-- Otworzyć pełnoekranową mapę zorzy NOAA OVATION.
+- Otworzyć pełnoekranową mapę zorzy NOAA OVATION. Kolor mapy to sama aktywność, bez chmur i Księżyca; linijka pod legendą mówi, jaka jest szansa w wybranym miejscu i co ją obniża.
 - Wyszukać miejscowość, wrócić do geolokalizacji albo używać zapisanych miejsc. Lista miejsc jest przechowywana lokalnie w przeglądarce. Każde zapisane miejsce ma kartę z godziną miejscową, szansą teraz i zachmurzeniem, a przy szansie od 10% zieloną poświatę. Stuknięcie w pole wyszukiwania chowa karty i zostawia samo wyszukiwanie; ✕ obok pola wraca do kart.
 - Dodać stronę do ekranu początkowego iPhone'a (Safari → Udostępnij → Do ekranu początkowego). Otwiera się wtedy jak aplikacja, bez pasków Safari. Zapisane miejsca są w niej osobne niż w Safari (iOS trzyma dane aplikacji z ekranu początkowego oddzielnie).
 

@@ -75,6 +75,17 @@ export function conditionsText(r) {
   return `Warunki obserwacji są ${obsQuality(r)}, ${cloud}${brightMoonUp(r) ? ", jasny Księżyc" : ""}.`;
 }
 
+// Linijka pod mapą: dlaczego szansa w miejscu jest niższa niż aktywność, którą pokazuje kolor mapy (sam model NOAA,
+// bez chmur i Księżyca). r: wiersz prognozy na teraz. null, gdy nie ma aktywności do porównania.
+export function mapPlaceText(name, r) {
+  if (r?.act == null) return null;
+  const head = `${name}: aktywność ${Math.round(r.act)}`;
+  if (r.score == null) return `${head}, brak prognozy chmur, więc bez szansy.`;
+  const sky = towardAurora(r) ? r.cover : r.cloud,
+    why = [!r.night && "za jasno", sky >= 30 && `${Math.round(sky)}% chmur`, r.night && brightMoonUp(r) && "jasny Księżyc"].filter(Boolean);
+  return `${head}, szansa teraz ${r.score}%${why.length && r.score < r.act ? ` (${why.join(", ")})` : ""}.`;
+}
+
 // Krótkie zdanie o warunkach teraz do zdania głównego strony (bez szczegółów chmur, które są w kafelkach): odcinki
 // [tekst, wyróżniony], wyróżniona ocena jest biała. r: wiersz prognozy na teraz.
 export function conditionsParts(r) {

@@ -369,3 +369,23 @@ test("skrót warunków dla karty miejsca: godzina miejscowa, chmury i szansa ter
   assert.equal(s.night, true);
   assert.ok(Number.isInteger(s.score));
 });
+
+test("linijka pod mapą tłumaczy, dlaczego szansa jest niższa niż aktywność na mapie", async () => {
+  const { mapPlaceText } = await import("../js/labels.js");
+  const night = { night: true, sky: { moonAlt: -5, moonIllum: 0 } };
+  // Tromsø 22.10.2026: mocna zorza nad głową, niskie chmury i jasny Księżyc wysoko.
+  assert.equal(mapPlaceText("Tromsø", { night: true, sky: { moonAlt: 17, moonIllum: 0.87 }, act: 38.1, cloud: 81, score: 7 }), "Tromsø: aktywność 38, szansa teraz 7% (81% chmur, jasny Księżyc).");
+  // Liczą się chmury w stronę zorzy, gdy wyraźnie różnią się od nieba nad głową.
+  assert.equal(mapPlaceText("Szczecin", { ...night, act: 20, cloud: 5, cover: 80, ray: {}, score: 4 }), "Szczecin: aktywność 20, szansa teraz 4% (80% chmur).");
+  // Czyste niebo: bez nawiasu.
+  assert.equal(mapPlaceText("Abisko", { ...night, act: 30, cloud: 10, score: 29 }), "Abisko: aktywność 30, szansa teraz 29%.");
+  // Granica 30% chmur jest powodem, 29% już nie.
+  assert.equal(mapPlaceText("A", { ...night, act: 30, cloud: 30, score: 20 }), "A: aktywność 30, szansa teraz 20% (30% chmur).");
+  assert.equal(mapPlaceText("A", { ...night, act: 30, cloud: 29, score: 20 }), "A: aktywność 30, szansa teraz 20%.");
+  // W dzień: za jasno, Księżyc się nie liczy.
+  assert.equal(mapPlaceText("A", { night: false, sky: { moonAlt: 40, moonIllum: 1 }, act: 30, cloud: 0, score: 0 }), "A: aktywność 30, szansa teraz 0% (za jasno).");
+  // Braki: bez prognozy chmur nie ma szansy, bez aktywności nie ma linijki.
+  assert.equal(mapPlaceText("A", { ...night, act: 30, cloud: null, score: null }), "A: aktywność 30, brak prognozy chmur, więc bez szansy.");
+  assert.equal(mapPlaceText("A", { ...night, act: null, cloud: 0, score: null }), null);
+  assert.equal(mapPlaceText("A", null), null);
+});

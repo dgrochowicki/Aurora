@@ -1228,7 +1228,14 @@ html.page-open .aurora-sky {
   border-radius: 6px;
   background: linear-gradient(90deg, #52d9ba, #b4ff63, #ffe45b, #ff6d5a);
 }
+.map-title {
+  margin-bottom: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-80);
+}
 .map-note {
+  /* Dwie linijki: miejsce i czas modelu. */
+  white-space: pre-line;
   margin-top: 8px;
   font-size: 0.8125rem;
   line-height: 1.4;
