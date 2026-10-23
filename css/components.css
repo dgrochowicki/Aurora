@@ -874,17 +874,8 @@ html.sheet-open body {
   line-height: 16px;
   transform: translateY(calc(-100% - 4px));
 }
-/* Pod linią ta sama linia w kolorze tła panelu: półprzezroczysty kolor poziomu (np. biały 40%) wygląda wtedy jednakowo,
-   a nie jaśniej nad gradientem i ciemniej nad tłem. */
+.chart-line,
 .chart-line-under {
-  fill: none;
-  stroke: var(--sheet);
-  stroke-width: 3px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-.chart-line {
   fill: none;
   stroke: var(--chart);
   /* 3 px od 23.10.2026 (prośba autora; wcześniej 2,3 px jak linia starego wykresu). */
@@ -892,6 +883,11 @@ html.sheet-open body {
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+/* Pod linią ta sama linia w kolorze tła panelu: półprzezroczysty kolor poziomu (np. biały 40%) wygląda wtedy jednakowo,
+   a nie jaśniej nad gradientem i ciemniej nad tłem. */
+.chart-line-under {
+  stroke: var(--sheet);
 }
 /* Wykres pomiaru z podglądem palcem (lineChart ze scrub): kropka na ostatnim punkcie, przy podglądzie linia, kropka i dymek.
    Panel przewija się palcem poza wykresem. */

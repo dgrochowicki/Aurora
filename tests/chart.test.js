@@ -66,7 +66,7 @@ test("podziałka dopasowana do danych: zawsze 6 linii, najmniejszy krok 1, 2, 3,
   // Przykład autora, Bz od −5 do 1: co 2, brakującą linię dokładamy w dół.
   assert.deepEqual(fitTicks(-5.1, 1), [2, 0, -2, -4, -6, -8]);
   // Magnetometr 103–111 nT: co 2.
-  assert.deepEqual(fitTicks(103.4, 111.6), [114, 112, 110, 108, 106, 104].map((v) => v - 2));
+  assert.deepEqual(fitTicks(103.4, 111.6), [112, 110, 108, 106, 104, 102]);
   // Krok 4 i 30: Bz od −12 do 4,5, wiatr 330–470.
   assert.deepEqual(fitTicks(-12, 4.5), [8, 4, 0, -4, -8, -12]);
   assert.deepEqual(fitTicks(330, 470), [480, 450, 420, 390, 360, 330]);
