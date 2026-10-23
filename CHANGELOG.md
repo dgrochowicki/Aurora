@@ -5,6 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 23.10.2026 — szkielet ładowania strony głównej
 
 - Zanim przyjdą dane (ok. 1–1,5 s), strona pokazywała „Sprawdzam…”, puste godziny i kreski „—” w kafelkach, a potem zdanie rosło z 1 do 3 linii i wszystko zjeżdżało o ok. 300 px (autor: „całość średnio wygląda”). Teraz w tym czasie jest szkielet: szare paski w miejscu tekstów i wartości, puste pigułki godzin, delikatny połysk. Rozmiary jak gotowej treści, więc po wczytaniu nic nie skacze; treść wchodzi z wyciszeniem.
+- Paski w kolorze kafelków 4% (`--card-soft`) zamiast białego 10% i wszystkie zaokrąglone, także w polach z kilkoma liniami (prośby autora).
 - Szkielet tylko przy starcie i zmianie miejsca, nie przy odświeżaniu co 5 minut. Gdy danych nie ma, znika i zostają kreski z opisem braku (bez udawania danych).
 - `index.html` (`body.is-loading`, szkielet zdania), `showLoading()`/`endLoading()` w `js/views/home.js`, `renderHourSkeleton()` w `js/ui/hours.js`, `css/components.css`, `.sr-only` i stała wysokość wiersza daty w `css/base.css`.
 

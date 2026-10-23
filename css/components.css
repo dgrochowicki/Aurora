@@ -1428,7 +1428,7 @@ html.page-open .aurora-sky {
 }
 
 /* Szkielet ładowania (prośba autora 23.10.2026): body.is-loading do pierwszego wyrysowania danych miejsca (showLoading
-   i endLoading w home.js). Szare paski 12 px w miejscu tekstów, w rozmiarze zbliżonym do docelowego, żeby strona nie skakała,
+   i endLoading w home.js). Paski 12 px w kolorze kafelków 4% (--card-soft) w miejscu tekstów, w rozmiarze zbliżonym do docelowego, żeby strona nie skakała,
    i pigułki godzin bez treści. Delikatny połysk przesuwa się po paskach; przy ograniczonym ruchu stoją. Potem treść wchodzi
    z wyciszeniem 0,3 s. */
 @keyframes skel-shine {
@@ -1451,7 +1451,8 @@ html.page-open .aurora-sky {
 .hour.is-skel {
   background-image: linear-gradient(90deg, transparent 35%, rgba(255, 255, 255, 0.06) 50%, transparent 65%);
   background-size: 300% 100%;
-  background-color: var(--track);
+  /* Kolor kafelków w 4% kryciu (prośba autora 23.10.2026; wcześniej --track, biały 10%). */
+  background-color: var(--card-soft);
   animation: skel-shine 1.6s linear infinite;
 }
 .skel,
