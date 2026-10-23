@@ -1468,7 +1468,8 @@ html.page-open .aurora-sky {
   box-sizing: border-box;
   height: 27px;
   padding-block: 7.5px;
-  border-radius: 13.5px / 6px;
+  /* Promień pionowy 6 + 7,5 px odstępu, żeby pasek wewnątrz miał zaokrąglone końce. */
+  border-radius: 6px / 13.5px;
   background-clip: content-box;
   width: 92%;
 }
@@ -1481,7 +1482,8 @@ html.page-open .aurora-sky {
 .is-loading .headline i {
   display: none;
 }
-/* Wskazówki i zapowiedź w kafelku: kilka linii po 18 px jednym polem z pasami 12 px (bez połysku). */
+/* Wskazówki i zapowiedź w kafelku: kilka linii po 18 px jednym polem, pocięte maską na zaokrąglone paski 12 px
+   (tak jak pojedyncze paski, prośba autora). */
 .is-loading .tips {
   display: block;
   height: 54px;
@@ -1489,10 +1491,8 @@ html.page-open .aurora-sky {
 .is-loading .tips::before,
 .is-loading .next-change:empty {
   border-radius: 0;
-  background-color: transparent;
-  background-image: repeating-linear-gradient(var(--track) 0 12px, transparent 12px 18px);
-  background-size: auto;
-  animation: none;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='18'%3E%3Crect width='100%25' height='12' rx='6'/%3E%3C/svg%3E") 0 0 / 100% 18px repeat-y content-box;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='18'%3E%3Crect width='100%25' height='12' rx='6'/%3E%3C/svg%3E") 0 0 / 100% 18px repeat-y content-box;
 }
 .is-loading .tips::before {
   height: 48px;
@@ -1518,18 +1518,20 @@ html.page-open .aurora-sky {
 .is-loading .tile-number,
 .is-loading .tile-status {
   color: transparent;
-  border-radius: 6px;
   background-clip: content-box;
 }
 .is-loading .tile-number {
   width: 88px;
   padding-block: 7.5px;
+  /* Promień pionowy z odstępem, żeby pasek wewnątrz był zaokrąglony jak pozostałe. */
+  border-radius: 6px / 13.5px;
   height: 27px;
   box-sizing: border-box;
 }
 .is-loading .tile-status {
   width: 64px;
   padding-block: 4px;
+  border-radius: 6px / 10px;
   height: 20px;
   box-sizing: border-box;
 }
