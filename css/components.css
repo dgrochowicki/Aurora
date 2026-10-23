@@ -404,18 +404,6 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-/* Pole pod zerem przy Bz w kolorze poziomu, jak linia. */
-.spark .spark-area {
-  fill: var(--state);
-  opacity: 0.22;
-}
-.spark-rule {
-  stroke: rgba(255, 255, 255, 0.16);
-  stroke-width: 1;
-}
-.spark-rule.dashed {
-  stroke-dasharray: 3 3;
-}
 .next-change {
   margin-top: auto;
   padding-top: 20px;

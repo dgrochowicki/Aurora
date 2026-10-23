@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — miniwykresy na stronie głównej bez linii i wypełnień
+
+- Miniwykresy w kafelkach magnetometru, Bz i wiatru to sama linia 1,5 px w kolorze poziomu: bez linii zera i pola pod zerem przy Bz oraz bez przerywanego progu 500 km/s przy wietrze (prośba autora). Skala Bz dalej obejmuje zero. `sparkline()` w `js/ui/spark.js` (bez opcji `threshold`), `js/views/home.js`, `css/components.css`.
+
 ## 23.10.2026 — ciągła linia zera na wykresach
 
 - Na wykresach z wartością 0 na osi (Bz, Kp, zachmurzenie) linia zera jest ciągła, a pozostałe linie podziałki zostają przerywane; kolor bez zmian (`--track`, prośba autora). `gridHTML()` w `js/ui/chart.js` (klasa `.chart-grid.is-zero`), `css/components.css`.

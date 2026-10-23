@@ -5,7 +5,7 @@ import { moonPhaseIcon } from "../ui/sky-chart.js";
 import { buildForecast, nowActivity, activitySource, cloudChange, outlookText, hourGlow, dayLabel, nightTimeline } from "../model/forecast.js";
 import { freshData } from "../model/fresh.js";
 import { lookDirection } from "../model/aurora.js";
-import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, goesLabel, windLevel, windLabel, WIND_FAST, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
+import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, cloudLabel, bzLevel, bzLabel, kpLevel, kpLabel, goesLevel, goesLabel, windLevel, windLabel, moonLabel, moonTileLabel, viewLabel, dataLevel } from "../labels.js";
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { bindScrub } from "../ui/scrub.js";
@@ -130,7 +130,7 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
     mag: () => sparkline(space.goesSeries || [], { minSpan: 40 }),
     bz: () => sparkline(space.bzSeries || [], { zero: true, minSpan: 12 }),
     kp: () => meter(9, Math.round(space.kp)),
-    wind: () => sparkline(space.windSeries || [], { threshold: WIND_FAST, minSpan: 150 }),
+    wind: () => sparkline(space.windSeries || [], { minSpan: 150 }),
   };
   for (const { key, src, value, ref, level: toLevel, text } of tiles) {
     if (src in stale) {
