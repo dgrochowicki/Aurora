@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, lineChart, windTicks } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, windTicks } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -76,4 +76,44 @@ test("oś godzin: domyślnie początek, środek i koniec, przy labels równo roz
   const hours = (html) => [...html.match(/class="chart-x"[^>]*>(.*?)<\/div>/)[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1]);
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC" })), ["20:00", "20:04", "20:08"]);
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC", labels: 5 })), ["20:00", "20:02", "20:04", "20:06", "20:08"]);
+});
+
+test("podziałka dopasowana do danych: najmniejszy ładny krok w najwyżej 5 albo 6 liniach", () => {
+  // Przykład autora: Bz od −5 do 1 (z zerem) to −6…2 co 2, a nie 5…−10 co 5.
+  assert.deepEqual(fitTicks(-5.1, 1), [2, 0, -2, -4, -6]);
+  // Magnetometr 96–105 nT: co 5 od 95 do 105 (bez kroku 2,5), linia wypełnia prawie cały wykres.
+  assert.deepEqual(fitTicks(96.2, 104.8), [105, 100, 95]);
+  // Krok 2,5 pomijamy: zakres 0–9 to co 5 (0, 5, 10), a nie co 2,5.
+  assert.ok(!fitTicks(0.1, 9).some((v) => v % 1));
+  // Wartość dokładnie na linii nie dokłada kolejnej linii.
+  assert.deepEqual(fitTicks(-6, 2), [2, 0, -2, -4, -6]);
+  // Bz od −5,6 do 2,3: przy 5 liniach skok do co 5 (5…−10), przy 6 co 2 (4…−6), jak w panelu.
+  assert.deepEqual(fitTicks(-5.6, 2.3), [5, 0, -5, -10]);
+  assert.deepEqual(fitTicks(-5.6, 2.3, { max: 6 }), [4, 2, 0, -2, -4, -6]);
+  // Najwyżej 5 linii przy każdym zakresie i zakres zawsze objęty.
+  for (const [lo, hi] of [[0.3, 0.9], [-12.4, 3.1], [97, 131], [-0.2, 0], [1000, 1003]]) {
+    for (const max of [5, 6]) {
+      const t = fitTicks(lo, hi, { max });
+      assert.ok(t.length >= 3 && t.length <= max, `${lo}–${hi}: ${t}`);
+      assert.ok(t[0] >= hi && t.at(-1) <= lo, `${lo}–${hi}: ${t}`);
+    }
+  }
+});
+
+test("podziałka dopasowana do danych nie powiększa szumu poniżej minSpan", () => {
+  // Spokojne Bz od −0,3 do 0,2 przy minSpan 4: co najmniej 4 nT na osi, dane na środku.
+  const t = fitTicks(-0.3, 0.2, { minSpan: 4 });
+  assert.ok(t[0] - t.at(-1) >= 4, `${t}`);
+  assert.ok(t[0] >= 0.2 && t.at(-1) <= -0.3);
+  // Stała wartość też dostaje zakres, a nie dzielenie przez zero.
+  const flat = fitTicks(100, 100, { minSpan: 4 });
+  assert.ok(flat[0] >= 102 && flat.at(-1) <= 98, `${flat}`);
+  assert.ok(fitTicks(5, 5).length >= 3);
+});
+
+test("wykres z fit ma stałą wysokość niezależnie od liczby linii", () => {
+  const series = (vals) => vals.map((v, i) => ({ t: i * 60000, v }));
+  const height = (html) => html.match(/viewBox="0 0 100 ([\d.]+)"/)[1];
+  assert.equal(height(lineChart(series([-5, 1]), { zero: true, fit: { max: 5 } })), height(lineChart(series([0, 9]), { fit: { max: 5 } })));
+  assert.equal(height(lineChart(series([-5, 1]), { zero: true, fit: { max: 5 } })), "185");
 });

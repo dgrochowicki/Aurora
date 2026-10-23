@@ -102,6 +102,7 @@ export const DETAILS = {
           tz: st.tz,
           scrub: { unit: "nT" },
           labels: 5,
+          fit: { max: 6, minSpan: 4 },
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -134,6 +135,7 @@ export const DETAILS = {
           tone: tone(st, "bz", ref, bzLevel),
           scrub: { unit: "nT" },
           labels: 5,
+          fit: { max: 6, minSpan: 4 },
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],

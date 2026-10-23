@@ -29,6 +29,29 @@ export function niceTicks(lo, hi, min = 3) {
   return Array.from({ length: n }, (_, i) => +(b - i * step).toFixed(6));
 }
 
+// Podziałka dopasowana do danych (pomysł autora 23.10.2026): najmniejszy „ładny” krok, przy którym zakres lo–hi mieści się
+// w co najwyżej max liniach. Bz od −5 do 1 daje −6, −4, −2, 0, 2 zamiast 5, 0, −5, −10, więc wykres nie jest płaski.
+// minSpan: najmniejszy pokazywany zakres, żeby drobny szum nie wyglądał jak burza; za wąski zakres poszerzamy po równo w obie strony.
+export function fitTicks(lo, hi, { max = 5, minSpan = 0 } = {}) {
+  if (hi - lo < minSpan) {
+    const mid = (lo + hi) / 2;
+    lo = mid - minSpan / 2;
+    hi = mid + minSpan / 2;
+  }
+  if (!(hi > lo)) return niceTicks(lo, hi);
+  // Kroki 1, 2, 5 razy potęga dziesięciu, bez 2,5, żeby podpisy osi były krótkie (100, 105, a nie 102,5).
+  const fitStep = (raw) => {
+    const st = niceStep(raw);
+    return st / 10 ** Math.floor(Math.log10(st)) === 2.5 ? niceStep(st * 1.01) : st;
+  };
+  for (let step = fitStep((hi - lo) / (max - 1)); ; step = fitStep(step * 1.01)) {
+    const a = Math.floor(+(lo / step).toFixed(9)) * step,
+      b = Math.ceil(+(hi / step).toFixed(9)) * step,
+      n = Math.round((b - a) / step) + 1;
+    if (n <= max) return Array.from({ length: Math.max(n, 3) }, (_, i) => +(Math.max(b, a + 2 * step) - i * step).toFixed(6));
+  }
+}
+
 // Podziałka wykresu wiatru słonecznego (decyzja autora 21.10.2026): dopasowana do danych jak w Hello Aurora, żeby było widać skoki,
 // ale nie węższa niż WIND_SPAN, żeby drobne wahnięcie nie wyglądało jak burza (jak minSpan miniwykresu w kafelku).
 // Krok 20 km/s, przy szerszym zakresie 50, 100, a przy CME 200, żeby linii nie było za dużo. Za wąską podziałkę poszerzamy
@@ -76,7 +99,9 @@ function gridHTML(ticks, y, unit = "") {
 // rozłożonych równo od początku do końca (domyślnie 3: początek, środek i koniec; przy pomiarach z 2 godzin 5, mniej więcej co 30 min).
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3 }) {
+// fit: {max, minSpan} z fitTicks() zamiast niceTicks(). Wysokość stała jak w makiecie autora (5 odstępów ROW_DENSE, 185 px),
+// a linie rozkładają się w niej równo, więc przy 6 liniach odstęp to 37 px, a przy mniejszej liczbie większy.
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -85,8 +110,9 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     lo = Math.min(lo, 0);
     hi = Math.max(hi, 0);
   }
-  const ticks = fixed || niceTicks(lo, hi),
-    { H, y } = scale(ticks, row);
+  const ticks = fixed || (fit ? fitTicks(lo, hi, fit) : niceTicks(lo, hi));
+  if (fit && !fixed) row = (5 * ROW_DENSE) / (ticks.length - 1);
+  const { H, y } = scale(ticks, row);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
   // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
