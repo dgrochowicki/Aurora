@@ -2,6 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — szkielet ładowania strony głównej
+
+- Zanim przyjdą dane (ok. 1–1,5 s), strona pokazywała „Sprawdzam…”, puste godziny i kreski „—” w kafelkach, a potem zdanie rosło z 1 do 3 linii i wszystko zjeżdżało o ok. 300 px (autor: „całość średnio wygląda”). Teraz w tym czasie jest szkielet: szare paski w miejscu tekstów i wartości, puste pigułki godzin, delikatny połysk. Rozmiary jak gotowej treści, więc po wczytaniu nic nie skacze; treść wchodzi z wyciszeniem.
+- Szkielet tylko przy starcie i zmianie miejsca, nie przy odświeżaniu co 5 minut. Gdy danych nie ma, znika i zostają kreski z opisem braku (bez udawania danych).
+- `index.html` (`body.is-loading`, szkielet zdania), `showLoading()`/`endLoading()` w `js/views/home.js`, `renderHourSkeleton()` w `js/ui/hours.js`, `css/components.css`, `.sr-only` i stała wysokość wiersza daty w `css/base.css`.
+
 ## 23.10.2026 — drobniejsze kroki skali wykresów
 
 - Wykresy magnetometru, Bz i wiatru mają dalej 6 linii od krańca do krańca, ale krok podziałki może być też 3 albo 4 (× potęga 10), nie tylko 1, 2, 5. Wcześniej krok skakał z 2 na 5 i dane zajmowały ułamek wykresu, np. Bz od −6 do 4 na osi od 15 do −10; teraz od 6 do −9 co 3 (autor: większość skali pusta). Zakres z linii ze średniej z 5 minut, bo to ją widać. Najmniejsze zakresy bez zmian (4 nT, 100 km/s). `fitTicks()` w `js/ui/chart.js` z testami; wiatr przez `lineChart(…, { fit })` zamiast `windTicks()`.

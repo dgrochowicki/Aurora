@@ -11,6 +11,11 @@ export function renderHours(container, rows, glow = []) {
     .join("");
 }
 
+// Puste pigułki na czas ładowania, w rozmiarze prawdziwych (szkielet, showLoading w home.js).
+export function renderHourSkeleton(container, count = 6) {
+  container.innerHTML = '<span class="hour is-skel" aria-hidden="true"></span>'.repeat(count);
+}
+
 export function markHour(container, i) {
   container.querySelectorAll("[data-i]").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.i === i)));
 }

@@ -1426,3 +1426,158 @@ html.page-open .aurora-sky {
 .search-results:not(:empty) {
   margin-top: 4px;
 }
+
+/* Szkielet ładowania (prośba autora 23.10.2026): body.is-loading do pierwszego wyrysowania danych miejsca (showLoading
+   i endLoading w home.js). Szare paski 12 px w miejscu tekstów, w rozmiarze zbliżonym do docelowego, żeby strona nie skakała,
+   i pigułki godzin bez treści. Delikatny połysk przesuwa się po paskach; przy ograniczonym ruchu stoją. Potem treść wchodzi
+   z wyciszeniem 0,3 s. */
+@keyframes skel-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+.skel,
+.is-loading .tile-number,
+.is-loading .tile-status,
+.is-loading .tile-viz,
+.is-loading .tile-icon,
+.is-loading .next-change,
+.is-loading .hour-detail::before,
+.is-loading .tips::before,
+.is-loading .topbar-meta::before,
+.hour.is-skel {
+  background-image: linear-gradient(90deg, transparent 35%, rgba(255, 255, 255, 0.06) 50%, transparent 65%);
+  background-size: 300% 100%;
+  background-color: var(--track);
+  animation: skel-shine 1.6s linear infinite;
+}
+.skel,
+.is-loading .hour-detail::before,
+.is-loading .tips::before,
+.is-loading .topbar-meta::before {
+  content: "";
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+/* Zdanie główne: trzy linie po 27 px jak gotowe zdanie (pasek 12 px w środku linii, bez marginesów, które by się zsumowały). */
+.headline .skel {
+  box-sizing: border-box;
+  height: 27px;
+  padding-block: 7.5px;
+  /* Promień pionowy 6 + 7,5 px odstępu, żeby pasek wewnątrz miał zaokrąglone końce. */
+  border-radius: 6px / 13.5px;
+  background-clip: content-box;
+  width: 92%;
+}
+.headline .skel:nth-of-type(2) {
+  width: 80%;
+}
+.headline .skel:nth-of-type(3) {
+  width: 55%;
+}
+.is-loading .headline i {
+  display: none;
+}
+/* Wskazówki i zapowiedź w kafelku: kilka linii po 18 px jednym polem, pocięte maską na zaokrąglone paski 12 px
+   (tak jak pojedyncze paski, prośba autora). */
+.is-loading .tips {
+  display: block;
+  height: 54px;
+}
+.is-loading .tips::before,
+.is-loading .next-change:empty {
+  border-radius: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='18'%3E%3Crect width='100%25' height='12' rx='6'/%3E%3C/svg%3E") 0 0 / 100% 18px repeat-y content-box;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='18'%3E%3Crect width='100%25' height='12' rx='6'/%3E%3C/svg%3E") 0 0 / 100% 18px repeat-y content-box;
+}
+.is-loading .tips::before {
+  height: 48px;
+  width: 85%;
+  margin-top: 3px;
+}
+.is-loading .tips > * {
+  display: none;
+}
+.is-loading .topbar-meta::before {
+  width: 45%;
+  margin-top: 4px;
+}
+.is-loading .hour-detail {
+  box-sizing: border-box;
+  height: 18px;
+  padding-top: 3px;
+}
+.is-loading .hour-detail::before {
+  width: 70%;
+}
+/* Kafelki: liczba i opis jako paski w wysokości linii, ikona i wskaźnik jako jaśniejsze pola. Kreska „—” znika. */
+.is-loading .tile-number,
+.is-loading .tile-status {
+  color: transparent;
+  background-clip: content-box;
+}
+.is-loading .tile-number {
+  width: 88px;
+  padding-block: 7.5px;
+  /* Promień pionowy z odstępem, żeby pasek wewnątrz był zaokrąglony jak pozostałe. */
+  border-radius: 6px / 13.5px;
+  height: 27px;
+  box-sizing: border-box;
+}
+.is-loading .tile-status {
+  width: 64px;
+  padding-block: 4px;
+  border-radius: 6px / 10px;
+  height: 20px;
+  box-sizing: border-box;
+}
+.is-loading .tile-number > *,
+.is-loading .tile-status > * {
+  visibility: hidden;
+}
+.is-loading .tile-icon:empty {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.is-loading .tile-viz:empty {
+  display: block;
+  border-radius: 8px;
+  opacity: 0.6;
+}
+/* Dwie linie pod 20 px odstępu, jak gotowa zapowiedź zmiany. */
+.is-loading .next-change:empty {
+  display: block;
+  box-sizing: border-box;
+  width: 80%;
+  height: 56px;
+  padding-top: 23px;
+  background-clip: content-box;
+}
+/* Pigułka godziny w tle prawdziwej pigułki, z samym połyskiem. */
+.hour.is-skel {
+  border: 0;
+  background-color: var(--card-soft);
+}
+@keyframes skel-in {
+  from {
+    opacity: 0;
+  }
+}
+body:not(.is-loading) :is(.chance, .hourly, .hour-detail, .tile-metric, .tile-viz, .next-change) {
+  animation: skel-in 0.3s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel,
+  .is-loading *,
+  .is-loading *::before,
+  .hour.is-skel,
+  body:not(.is-loading) :is(.chance, .hourly, .hour-detail, .tile-metric, .tile-viz, .next-change) {
+    animation: none;
+  }
+}
