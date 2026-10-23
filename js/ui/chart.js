@@ -144,10 +144,11 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
 // level (0–3): kolor słupka i wartości nad nim, jak poziomy kafelków aktywności; pod słupkiem godzina początku bloku.
 // Godzina jest w kolumnie słupka i wyznacza jej szerokość, więc skrajne godziny są 24 px od krawędzi jak na innych wykresach.
 // ticks: stała podziałka, np. cała skala Kp 0–9. now: pierwszy słupek to bieżący blok i zamiast godziny ma podpis „Teraz”.
+// Wysokość 185 px jak wykresy liniowe z 6 liniami (decyzja autora 23.10.2026), więc przy Kp 0/3/6/9 linie są co ok. 62 px.
 export function barChart(items, { label, tz, ticks: fixed = null, now = false }) {
   if (!items.length) return '<p class="chart-empty">Brak prognozy.</p>';
   const ticks = fixed || niceTicks(0, Math.max(...items.map((p) => p.v))),
-    { H, y } = scale(ticks);
+    { H, y } = scale(ticks, (5 * ROW_DENSE) / (ticks.length - 1));
   const bars = items
     .map(
       (p, i) =>

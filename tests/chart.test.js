@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, fitTicks, lineChart, windTicks } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, barChart, windTicks } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -129,4 +129,11 @@ test("Bz: jedna barwa linii, pod zerem gradient od przezroczystego przy zerze", 
   assert.doesNotMatch(html, /chartBand/);
   // Bez zero nie ma wypełnienia pod zerem.
   assert.doesNotMatch(lineChart(series([3, 12]), { fit: {} }), /chartBelowFill/);
+});
+
+test("słupki Kp mają tę samą wysokość co wykresy liniowe: 185 px", () => {
+  const html = barChart([{ t: 0, v: 3, level: 1 }, { t: 3 * 3600000, v: 5, level: 3 }], { label: "Kp", tz: "UTC", ticks: [9, 6, 3, 0] });
+  assert.match(html, /class="chart-plot" style="height:185px"/);
+  // Kp 3 to jedna trzecia wysokości.
+  assert.match(html, /height:61\.7px/);
 });
