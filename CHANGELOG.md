@@ -5,7 +5,7 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 23.10.2026 — wykresy magnetometru i Bz w większej skali
 
 - Wykresy były płaskie, bo oś miała duży zapas (autor: Bz od −5 do 1 nT na osi od −10 do 5). Teraz skala jest dopasowana do danych: najmniejszy krok 1, 2 albo 5 (razy potęga 10), przy którym dane mieszczą się w najwyżej 6 liniach, np. Bz 4…−6 co 2, magnetometr 100…108 co 2. Nie węższa niż 4 nT, żeby szum nie wyglądał jak burza. Wysokość wykresu stała, 185 px, jak w makiecie autora z 22.10.2026. `fitTicks()` i `lineChart(…, { fit })` w `js/ui/chart.js` z testami, `js/views/details.js`.
-- Wiatr słoneczny bez zmian: skala zostaje przy `windTicks()` z najmniejszym zakresem 100 km/s (decyzja autora z 21.10.2026). Krok 2,5 pominięty na prośbę estetyczną (krótsze podpisy).
+- Wiatr słoneczny bez zmian: skala zostaje przy `windTicks()` z najmniejszym zakresem 100 km/s (decyzja autora z 21.10.2026). Krok 2,5 pominięty, żeby podpisy osi były krótkie (100, 105 zamiast 102,5); propozycja do potwierdzenia przez autora.
 
 ## 23.10.2026 — boczny margines 24 px
 
