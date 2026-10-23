@@ -2,6 +2,13 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — grubsze i gładkie linie wykresów
+
+- Linie wykresów w panelach (magnetometr, Bz, wiatr, zachmurzenie, łuki Słońca i Księżyca) mają 3 px zamiast 2,3 px, a miniwykresy na stronie głównej 2 px zamiast 1,5 px (prośba autora).
+- Półprzezroczysta linia (np. magnetometr, biały 40%) miała dwa odcienie: nad gradientem jaśniejszy, nad tłem ciemniejszy (zauważył autor na powiększeniu). Pod linią rysujemy teraz tę samą linię w kolorze tła panelu (`.chart-line-under`), więc kolor jest jednolity.
+- Linie magnetometru, Bz i wiatru w panelach i kafelkach ze średniej kroczącej z 5 minut (`meanSeries()`, decyzja autora po teście): spokojniejsze, bez zębów od szumu minutowego. Skala i dymek podglądu z surowych pomiarów, kropka na linii średniej. Próba miniwykresu 16 px zamiast 32 px odrzucona przez autora (32 px wyglądało lepiej).
+- Linie nie są łamane w punktach, tylko gładkie: krzywe Béziera przez każdy pomiar, z nachyleniem ze średniej harmonicznej sąsiednich odcinków (jak interpolacja monotoniczna), więc linia nie przekracza szczytów i dołków danych, a w nich jest pozioma. Dane się nie zmieniają, podgląd palcem pokazuje te same punkty. `smoothPath()` w `js/ui/chart.js` z testami, `lineChart()`, `sparkline()` w `js/ui/spark.js`, `css/components.css`.
+
 ## 23.10.2026 — miniwykresy na stronie głównej bez linii i wypełnień
 
 - Miniwykresy w kafelkach magnetometru, Bz i wiatru to sama linia 1,5 px w kolorze poziomu: bez linii zera i pola pod zerem przy Bz oraz bez przerywanego progu 500 km/s przy wietrze (prośba autora). Skala Bz dalej obejmuje zero. `sparkline()` w `js/ui/spark.js` (bez opcji `threshold`), `js/views/home.js`, `css/components.css`.

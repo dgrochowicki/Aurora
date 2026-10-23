@@ -400,7 +400,8 @@
 }
 .spark-line {
   stroke: var(--state);
-  stroke-width: 1.5;
+  /* 2 px, w panelach 3 px (prośba autora 23.10.2026; wcześniej 1,5 i 2,3). */
+  stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -873,11 +874,21 @@ html.sheet-open body {
   line-height: 16px;
   transform: translateY(calc(-100% - 4px));
 }
+/* Pod linią ta sama linia w kolorze tła panelu: półprzezroczysty kolor poziomu (np. biały 40%) wygląda wtedy jednakowo,
+   a nie jaśniej nad gradientem i ciemniej nad tłem. */
+.chart-line-under {
+  fill: none;
+  stroke: var(--sheet);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
 .chart-line {
   fill: none;
   stroke: var(--chart);
-  /* Tyle, ile miała linia starego wykresu (2 jednostki przy skali ok. 1,15). */
-  stroke-width: 2.3px;
+  /* 3 px od 23.10.2026 (prośba autora; wcześniej 2,3 px jak linia starego wykresu). */
+  stroke-width: 3px;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -1022,7 +1033,7 @@ html.sheet-open body {
 .sky-arc {
   fill: none;
   /* Grubość jak linia pozostałych wykresów (.chart-line). */
-  stroke-width: 2.3px;
+  stroke-width: 3px;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
