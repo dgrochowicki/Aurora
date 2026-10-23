@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — boczny margines 24 px
+
+- Karty i kafelki stoją 24 px od krawędzi zamiast 20 px, tak jak panele szczegółów i pływające przyciski. Tekst leżący na tle (nazwa miejsca, zdanie główne, tytuły sekcji) jest dalej wcięty o 4 px, więc stoi 28 px od krawędzi. Autor: bez wcięcia tekst optycznie jest za mocno przy krawędzi. Zmienia się też ekran miejsc, rząd godzin i panel legendy mapy, bo wszystkie biorą `--gutter` z `css/tokens.css`.
+
 ## 22.10.2026 — mapa mówi, że pokazuje samą aktywność
 
 - Autor zobaczył na mapie żółtą zorzę nad Tromsø, a po wybraniu miejsca szansa wynosiła 7%. Obliczenia były poprawne: aktywność OVATION 38 × ciemność 0,75 (Księżyc 87% wysoko) × czyste niebo 0,19 (niskie chmury 100%). Mapa pokazuje sam model NOAA, a procent uwzględnia też chmury i Księżyc, czego mapa nie mówiła.

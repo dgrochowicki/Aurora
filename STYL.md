@@ -6,8 +6,8 @@
 
 ## 1. Układ i odstępy
 
-- Gutter kart i kafelków: **20 px** (`--gutter`).
-- Tekst bezpośrednio na tle (nazwa miejsca, tytuły sekcji, notki): o dodatkowe **4 px** wcięcia (`--text-inset`), razem 24 px od krawędzi.
+- Gutter kart i kafelków: **24 px** (`--gutter`, od 23.10.2026, wcześniej 20 px; decyzja autora), tak jak odstęp boczny paneli i pływających przycisków.
+- Tekst bezpośrednio na tle (nazwa miejsca, tytuły sekcji, notki): o dodatkowe **4 px** wcięcia (`--text-inset`), razem 28 px od krawędzi. Wcięcie zostaje, bo bez niego tekst optycznie stoi za blisko krawędzi (autor).
 - Odstęp między kafelkami: **12 px** (`--gap`) w pionie i poziomie.
 - Odstęp między godzinami: **8 px**; pasek pigułek przewijany poziomo do krawędzi ekranu.
 - Wersja na desktop zachowuje ograniczenie szerokości do **560 px** i prezentację w ramce.
