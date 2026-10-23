@@ -10,12 +10,12 @@ export function meter(count, lit) {
 
 // Mini wykres: sama linia, bez osi, linii poziomych i wypełnienia (prośba autora 23.10.2026). series: [{t, v}] od najstarszego.
 // zero: zakres obejmuje zero, jak przy Bz. minSpan: najmniejszy zakres osi, żeby spokojny przebieg był płaski.
-// avg: linia ze średniej kroczącej z tylu minut (meanSeries).
+// avg: linia ze średniej kroczącej z tylu minut (meanSeries), żeby szum minutowy nie dawał zębów.
 export function sparkline(series, { zero = false, minSpan = 0, avg = 0 } = {}) {
   if (series.length < 2) return "";
   if (avg) series = meanSeries(series, avg);
   const W = 100,
-    H = 16;
+    H = 32;
   let lo = Math.min(...series.map((p) => p.v)),
     hi = Math.max(...series.map((p) => p.v));
   if (zero) {

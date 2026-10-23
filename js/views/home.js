@@ -126,7 +126,7 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
     { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), ref: space.kp, level: kpLevel, text: kpLabel },
     { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), ref: space.wind, level: windLevel, text: windLabel },
   ];
-  // TEST (gałąź wykresy-gladkie): linie ze średniej z 5 minut.
+  // Linie ze średniej z 5 minut (decyzja autora 23.10.2026).
   const AVG = 5;
   const spark = {
     mag: () => sparkline(space.goesSeries || [], { minSpan: 40, avg: AVG }),

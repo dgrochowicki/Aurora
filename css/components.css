@@ -364,8 +364,7 @@
 /* Wskaźnik pod opisem: miernik z segmentów albo mini wykres z 2 godzin. */
 .tile-viz {
   display: block;
-  /* 16 px jak u autora (TEST na gałęzi wykresy-gladkie; wcześniej 32 px). */
-  height: 16px;
+  height: 32px;
   margin-top: 16px;
 }
 .tile-viz:empty {

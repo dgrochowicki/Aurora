@@ -27,8 +27,8 @@ export function smoothPath(pts) {
   return path;
 }
 
-// Średnia krocząca do rysowania linii: każdy punkt to średnia pomiarów w oknie `minutes` wokół niego (TEST na gałęzi
-// wykresy-gladkie, 23.10.2026). Czas i liczba punktów bez zmian, więc podgląd palcem pokazuje dalej każdą minutę.
+// Średnia krocząca do rysowania linii: każdy punkt to średnia pomiarów w oknie `minutes` wokół niego (prośba autora
+// 23.10.2026). Czas i liczba punktów bez zmian, więc podgląd palcem pokazuje dalej każdą minutę.
 export function meanSeries(series, minutes) {
   const half = (minutes * 60000) / 2;
   let a = 0,
