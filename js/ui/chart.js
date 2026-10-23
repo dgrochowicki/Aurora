@@ -58,33 +58,6 @@ export function fitTicks(lo, hi, { lines = 6, minSpan = 0 } = {}) {
 export const WIND_SPAN = 100;
 export const windTicks = (vals) => (vals.length ? fitTicks(Math.min(...vals), Math.max(...vals), { minSpan: WIND_SPAN }) : [550, 500, 450, 400, 350, 300]);
 
-// Kolor pasm wartości (Bz): linia i wypełnienie mają kolor poziomu tej wartości, przez którą przechodzą, a nie jeden kolor.
-// bands: [{min, level}] od góry; wartość ≥ min dostaje level. Gradient pionowy w jednostkach wykresu (userSpaceOnUse, bo poziomy
-// odcinek linii ma zerową wysokość i gradient względem kształtu by zniknął). Wypełnienie między linią a zerem wygasa przy zerze.
-const FILL_MAX = 0.35;
-function bandGradients(bands, ticks, y, H) {
-  const top = ticks[0],
-    bottom = ticks.at(-1),
-    at = (yy) => top - (yy / H) * (top - bottom),
-    level = (v) => bands.find((b) => v >= b.min).level,
-    y0 = clamp01(y(0) / H) * H,
-    fade = (yy) => (FILL_MAX * Math.abs(yy - y0)) / Math.max(y0, H - y0, 1e-9);
-  const cuts = [...new Set([0, y0, ...bands.filter((b) => b.min > bottom && b.min < top).map((b) => y(b.min)), H])].sort((p, q) => p - q);
-  let stroke = "",
-    fill = "";
-  for (let i = 0; i < cuts.length - 1; i++) {
-    const c = `var(--level-${level(at((cuts[i] + cuts[i + 1]) / 2))})`;
-    for (const yy of [cuts[i], cuts[i + 1]]) {
-      const off = (yy / H).toFixed(4);
-      stroke += `<stop offset="${off}" style="stop-color:${c}"/>`;
-      fill += `<stop offset="${off}" style="stop-color:${c};stop-opacity:${fade(yy).toFixed(3)}"/>`;
-    }
-  }
-  const g = (id, stops) => `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${H}">${stops}</linearGradient>`;
-  return g("chartBandLine", stroke) + g("chartBandFill", fill);
-}
-const clamp01 = (v) => Math.min(1, Math.max(0, v));
-
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 
@@ -116,8 +89,7 @@ function gridHTML(ticks, y, unit = "") {
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
 // fit: {lines, minSpan} z fitTicks() zamiast niceTicks(), linie co 37 px (ROW_DENSE): przy 6 liniach 185 px jak w makiecie autora.
-// bands: kolory pasm wartości (bandGradients), razem z zero zastępują jeden kolor linii i wypełnienie pod zerem.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null, bands = null }) {
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -140,11 +112,13 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   const below = zero
     ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
     : "";
-  // Z pasmami (Bz): całe pole między linią a zerem, kolor według wartości, wygasa przy zerze; linia też w kolorach pasm.
-  const zeroArea = (cls, extra = "") => `<path class="${cls}"${extra} d="${line}L${xEnd} ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>`;
-  const negative = !zero ? "" : bands ? zeroArea("chart-band-area") : zeroArea("chart-below", ' clip-path="url(#chartBelowZero)"');
-  const lineCls = bands ? "chart-line chart-band-line" : "chart-line";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}${bands ? bandGradients(bands, ticks, y, H) : ""}</defs>${area}${negative}<path class="${lineCls}" d="${line}"/></svg>`;
+  const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L${xEnd} ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
+  // Pod zerem gradient w kolorze linii: przezroczysty przy zerze, najmocniejszy przy dolnej krawędzi (prośba autora 23.10.2026).
+  // userSpaceOnUse, żeby gradient zaczynał się na zerze, a nie na górze wypełnionego kształtu.
+  const belowFill = zero
+    ? `<linearGradient id="chartBelowFill" gradientUnits="userSpaceOnUse" x1="0" y1="${y(0).toFixed(1)}" x2="0" y2="${H}"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0.35"/></linearGradient>`
+    : "";
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}${belowFill}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni) albo `labels` punktów rozłożonych równo. Podpis to czas punktu danych,
   // żeby przy prognozie godzinowej środek był pełną godziną.

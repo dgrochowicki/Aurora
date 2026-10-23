@@ -115,22 +115,18 @@ test("wykresy z fit i wiatr mają tę samą wysokość co zachmurzenie: 185 px",
   assert.equal(height(lineChart(series([10, 80]), { ticks: [100, 80, 60, 40, 20, 0], row: 37 })), "185");
 });
 
-test("Bz w kolorach pasm: nad zerem poziom 0, pod zerem poziomy według progów, wypełnienie wygasa przy zerze", async () => {
-  const { BZ_BANDS } = await import("../js/labels.js");
+test("Bz: jedna barwa linii, pod zerem gradient od przezroczystego przy zerze", () => {
   const series = (vals) => vals.map((v, i) => ({ t: i * 60000, v }));
-  const html = lineChart(series([3, -12]), { zero: true, fit: {}, bands: BZ_BANDS });
-  assert.match(html, /chart-band-line/);
-  assert.match(html, /chart-band-area/);
-  assert.doesNotMatch(html, /chart-below/);
-  const stops = (id) => [...html.match(new RegExp(`id="${id}"[^]*?</linearGradient>`))[0].matchAll(/offset="([\d.]+)" style="stop-color:var\(--level-(\d)\)(?:;stop-opacity:([\d.]+))?/g)].map((m) => ({ off: +m[1], level: +m[2], a: m[3] == null ? null : +m[3] }));
-  const line = stops("chartBandLine"),
-    fill = stops("chartBandFill");
-  // Oś 4…−16 co 4: zero na 0,2, −3 na 0,35, −10 na 0,7. Kolory od góry: 0, 1, 2, 3.
-  assert.deepEqual([...new Set(line.map((s) => s.level))], [0, 1, 2, 3]);
-  const zero = fill.filter((s) => s.off === 0.2);
-  assert.ok(zero.length && zero.every((s) => s.a === 0), JSON.stringify(zero));
-  // Im dalej od zera, tym mocniej; najmocniej przy dolnej krawędzi.
-  assert.ok(fill.at(-1).a > fill.find((s) => s.level === 2).a);
-  // Bez pasm zwykłe wypełnienie pod zerem.
-  assert.match(lineChart(series([3, -12]), { zero: true, fit: {} }), /chart-below/);
+  const html = lineChart(series([3, -12]), { zero: true, fit: {}, tone: "level-2" });
+  assert.match(html, /is-level-2/);
+  assert.match(html, /class="chart-below" clip-path="url\(#chartBelowZero\)"/);
+  // Oś 4…−16 co 4, 185 px: zero na 37 px. Gradient zaczyna się na zerze z kryciem 0.
+  const g = html.match(/<linearGradient id="chartBelowFill"[^>]*y1="([\d.]+)"[^>]*y2="([\d.]+)">(.*?)<\/linearGradient>/);
+  assert.ok(g, html);
+  assert.equal(+g[1], 37);
+  assert.equal(+g[2], 185);
+  assert.match(g[3], /offset="0" style="stop-color:var\(--chart\);stop-opacity:0"/);
+  assert.doesNotMatch(html, /chartBand/);
+  // Bez zero nie ma wypełnienia pod zerem.
+  assert.doesNotMatch(lineChart(series([3, 12]), { fit: {} }), /chartBelowFill/);
 });

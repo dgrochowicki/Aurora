@@ -3,7 +3,7 @@
 // Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, BZ_BANDS, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, windTicks, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -136,7 +136,6 @@ export const DETAILS = {
           scrub: { unit: "nT" },
           labels: 5,
           fit: { minSpan: 4 },
-          bands: BZ_BANDS,
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
