@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, fitTicks, lineChart, barChart, windTicks, smoothPath, meanSeries } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, barChart, smoothPath, meanSeries } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -51,26 +51,6 @@ test("wykres bez podglądu (zachmurzenie) nie ma punktów ani kropki", () => {
   assert.doesNotMatch(html, /data-points|chart-dot/);
 });
 
-test("wiatr: skala dopasowana do danych, co najmniej 100 km/s, 6 linii co 20", () => {
-  // Spokojny wiatr 440–490: 440–500 poszerzone o krok w dół i w górę.
-  assert.deepEqual(windTicks([440, 490]), [520, 500, 480, 460, 440, 420]);
-  assert.deepEqual(windTicks([465, 465]), [520, 500, 480, 460, 440, 420]);
-  assert.deepEqual(windTicks([400, 500]), [500, 480, 460, 440, 420, 400]);
-  assert.equal(windTicks([]).length, 6);
-});
-
-test("wiatr: szerszy zakres krok 50 i 100, przy CME 200, zawsze 6 linii i linia w zakresie", () => {
-  assert.deepEqual(windTicks([400, 600]), [600, 550, 500, 450, 400, 350]);
-  assert.deepEqual(windTicks([400, 750]), [800, 700, 600, 500, 400, 300]);
-  assert.deepEqual(windTicks([500, 1400]), [1400, 1200, 1000, 800, 600, 400]);
-  for (const vals of [[440, 490], [260, 300], [400, 750], [500, 1400], [333, 334.5], [399.9, 400.1]]) {
-    const ticks = windTicks(vals);
-    assert.ok(ticks[0] >= Math.max(...vals) && ticks[ticks.length - 1] <= Math.min(...vals), `${vals}: ${ticks}`);
-    assert.equal(ticks.length, 6, `${vals}: ${ticks}`);
-    assert.ok(ticks[0] - ticks[ticks.length - 1] >= 100, `${vals}: ${ticks}`);
-  }
-});
-
 test("oś godzin: domyślnie początek, środek i koniec, przy labels równo rozłożone podpisy", () => {
   const s = series([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   const hours = (html) => [...html.match(/class="chart-x"[^>]*>(.*?)<\/div>/)[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1]);
@@ -78,40 +58,48 @@ test("oś godzin: domyślnie początek, środek i koniec, przy labels równo roz
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC", labels: 5 })), ["20:00", "20:02", "20:04", "20:06", "20:08"]);
 });
 
-test("podziałka dopasowana do danych: zawsze 6 linii, najmniejszy krok 1, 2 albo 5", () => {
-  // Bz od −5,6 do 2,3: co 2 (4…−6) zamiast co 5 (5…−10).
+test("podziałka dopasowana do danych: zawsze 6 linii, najmniejszy krok 1, 2, 3, 4 albo 5", () => {
+  // Bz od −6,2 do 4,1: co 3 (6…−9), a nie co 5 (15…−10) jak przy samych krokach 1, 2, 5.
+  assert.deepEqual(fitTicks(-6.2, 4.1), [6, 3, 0, -3, -6, -9]);
+  // Bz od −5,6 do 2,3: dalej co 2.
   assert.deepEqual(fitTicks(-5.6, 2.3), [4, 2, 0, -2, -4, -6]);
   // Przykład autora, Bz od −5 do 1: co 2, brakującą linię dokładamy w dół.
   assert.deepEqual(fitTicks(-5.1, 1), [2, 0, -2, -4, -6, -8]);
-  // Magnetometr 96–105 nT: co 2, a nie 2,5 (krótkie podpisy).
-  assert.deepEqual(fitTicks(96.2, 104.8), [106, 104, 102, 100, 98, 96]);
-  assert.ok(!fitTicks(0.1, 9).some((v) => v % 1));
+  // Magnetometr 103–111 nT: co 2.
+  assert.deepEqual(fitTicks(103.4, 111.6), [114, 112, 110, 108, 106, 104].map((v) => v - 2));
+  // Krok 4 i 30: Bz od −12 do 4,5, wiatr 330–470.
+  assert.deepEqual(fitTicks(-12, 4.5), [8, 4, 0, -4, -8, -12]);
+  assert.deepEqual(fitTicks(330, 470), [480, 450, 420, 390, 360, 330]);
   // Wartość dokładnie na linii nie dokłada kolejnej linii ponad 6.
   assert.deepEqual(fitTicks(-8, 2), [2, 0, -2, -4, -6, -8]);
-  for (const [lo, hi] of [[0.3, 0.9], [-12.4, 3.1], [97, 131], [-0.2, 0], [1000, 1003], [-30.5, 12]]) {
+  for (const [lo, hi] of [[0.3, 0.9], [-12.4, 3.1], [97, 131], [-0.2, 0], [1000, 1003], [-30.5, 12], [96.2, 104.8], [500, 1400]]) {
     const t = fitTicks(lo, hi);
     assert.equal(t.length, 6, `${lo}–${hi}: ${t}`);
     assert.ok(t[0] >= hi && t.at(-1) <= lo, `${lo}–${hi}: ${t}`);
+    const step = t[0] - t[1];
+    assert.ok([1, 2, 3, 4, 5].includes(+(step / 10 ** Math.floor(Math.log10(step))).toFixed(6)), `${lo}–${hi}: ${t}`);
+    // Dane zajmują co najmniej 40% wysokości (najmniej przy skoku kroku z 10 na 20, np. −30,5…12).
+    assert.ok((hi - lo) / (t[0] - t.at(-1)) >= 0.4, `${lo}–${hi}: ${t}`);
   }
 });
 
 test("podziałka dopasowana do danych nie powiększa szumu poniżej minSpan", () => {
-  // Spokojne Bz od −0,3 do 0,2 przy minSpan 4: co najmniej 4 nT na osi, dane w środku.
   const t = fitTicks(-0.3, 0.2, { minSpan: 4 });
   assert.ok(t[0] - t.at(-1) >= 4, `${t}`);
   assert.ok(t[0] >= 0.2 && t.at(-1) <= -0.3);
-  // Stała wartość też dostaje zakres, a nie dzielenie przez zero.
   const flat = fitTicks(100, 100, { minSpan: 4 });
   assert.ok(flat[0] >= 102 && flat.at(-1) <= 98, `${flat}`);
   assert.equal(fitTicks(5, 5).length, 6);
+  // Wiatr 418–436 km/s przy minSpan 100: krok 20, dane na środku.
+  assert.deepEqual(fitTicks(418, 436, { minSpan: 100 }), [460, 440, 420, 400, 380, 360]);
 });
 
-test("wykresy z fit i wiatr mają tę samą wysokość co zachmurzenie: 185 px", () => {
+test("wykresy z fit mają tę samą wysokość co zachmurzenie: 185 px", () => {
   const series = (vals) => vals.map((v, i) => ({ t: i * 60000, v }));
   const height = (html) => html.match(/viewBox="0 0 100 ([\d.]+)"/)[1];
   assert.equal(height(lineChart(series([-5, 1]), { zero: true, fit: {} })), "185");
   assert.equal(height(lineChart(series([0, 9]), { fit: { minSpan: 4 } })), "185");
-  assert.equal(height(lineChart(series([440, 490]), { ticks: windTicks([440, 490]), row: 37 })), "185");
+  assert.equal(height(lineChart(series([440, 490]), { fit: { minSpan: 100 } })), "185");
   assert.equal(height(lineChart(series([10, 80]), { ticks: [100, 80, 60, 40, 20, 0], row: 37 })), "185");
 });
 
