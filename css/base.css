@@ -54,7 +54,18 @@ button,
   text-align: left;
   cursor: pointer;
 }
+/* Tekst tylko dla czytnika ekranu. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* min-height: wiersz daty ma wysokość także przed pierwszym wczytaniem, więc strona nie skacze. */
 .topbar-meta {
+  min-height: 20px;
   display: flex;
   justify-content: space-between;
   gap: 12px;

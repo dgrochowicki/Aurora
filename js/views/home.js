@@ -9,7 +9,7 @@ import { directionLabel, ageLabel, activityLabel, chanceLevel, conditionsParts, 
 import { renderTiles, setTile } from "../ui/tile.js";
 import { meter, sparkline } from "../ui/spark.js";
 import { bindScrub } from "../ui/scrub.js";
-import { renderHours, markHour, onHourClick } from "../ui/hours.js";
+import { renderHours, renderHourSkeleton, markHour, onHourClick } from "../ui/hours.js";
 import { createSheet } from "../ui/sheet.js";
 import { icon, weatherIcon, phaseIcon } from "../ui/icons.js";
 import { DETAILS } from "./details.js";
@@ -100,7 +100,16 @@ function clearPlaceTime() {
 // Wiersz „Teraz” bieżącego miejsca dla linijki pod mapą. null przed pierwszą prognozą albo bez pogody.
 export const nowRow = (loc) => (state?.loc === loc ? state.first : null);
 
-export const showLoading = () => showHeadline([["Sprawdzam…"]]);
+// Szkielet na czas ładowania miejsca (prośba autora 23.10.2026): szare paski w miejscu zdania, wskazówek, godzin i wartości
+// kafelków, mniej więcej w ich docelowym rozmiarze, żeby po wczytaniu danych strona nie skakała. Klasa body.is-loading
+// steruje CSS; zdejmuje ją pierwsze wyrysowanie danych (endLoading). Przy cichym odświeżaniu szkieletu nie ma.
+// Po nieudanym pobraniu zostają kreski i opisy braków, a nie szkielet.
+export function showLoading() {
+  document.body.classList.add("is-loading");
+  els.summary.innerHTML = '<span class="sr-only">Sprawdzam…</span>' + '<span class="skel" aria-hidden="true"></span>'.repeat(3);
+  renderHourSkeleton(els.hourly);
+}
+const endLoading = () => document.body.classList.remove("is-loading");
 
 // Zdanie główne z odcinków [tekst, wyróżniony]: wyróżnione jako <strong> (białe), reszta szara. Na końcu strzałka jak
 // na kafelkach, bo całe zdanie otwiera panel „Skąd ten wynik”.
@@ -150,6 +159,7 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
 
 // Do modelu trafiają tylko świeże dane NOAA (freshData). Kafelki i panele dostają wszystkie, razem z wiekiem starych pomiarów.
 export function renderForecast(loc, w, grid, space) {
+  endLoading();
   const now = Date.now();
   const live = freshData(grid, space, now);
   const fc = buildForecast(loc, w, live.grid, live.space, now);
@@ -226,6 +236,7 @@ function applyTest(fc, pct) {
 
 // Bez prognozy pogody nie policzymy szansy, ale nadal pokazujemy aktywność, Kp i Bz z NOAA.
 export function renderSpaceOnly(loc, grid, space) {
+  endLoading();
   const now = Date.now();
   const live = freshData(grid, space, now);
   const act = nowActivity(loc, live.grid, live.space);

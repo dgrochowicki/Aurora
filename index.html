@@ -18,10 +18,10 @@
   <!-- Leaflet z CDN z sumą kontrolną (SRI) z leafletjs.com: przeglądarka nie uruchomi podmienionego pliku. -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="./css/tokens.css?v=42" />
-  <link rel="stylesheet" href="./css/base.css?v=26" />
-  <link rel="stylesheet" href="./css/components.css?v=103" />
+  <link rel="stylesheet" href="./css/base.css?v=27" />
+  <link rel="stylesheet" href="./css/components.css?v=104" />
 </head>
-<body>
+<body class="is-loading">
   <main class="app-shell">
     <div class="aurora-sky" id="auroraSky" aria-hidden="true"><i class="aurora-green"></i><i class="aurora-green-2"></i><i class="aurora-violet"></i></div>
     <header class="topbar">
@@ -30,7 +30,7 @@
     </header>
 
     <section class="chance" aria-live="polite">
-      <button type="button" class="headline chance-link" id="summary" data-detail="score" aria-haspopup="dialog">Sprawdzam…</button>
+      <button type="button" class="headline chance-link" id="summary" data-detail="score" aria-haspopup="dialog"><span class="sr-only">Sprawdzam…</span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></button>
       <p class="tips"><span id="tip" hidden></span><span id="outlook" hidden></span></p>
     </section>
 
@@ -97,6 +97,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script type="module" src="./js/main.js?v=108"></script>
+  <script type="module" src="./js/main.js?v=109"></script>
 </body>
 </html>
