@@ -3,7 +3,7 @@
 // Pod liczbą stoi ten sam opis fizyczny co w kafelku (np. „Niespokojnie”).
 import { fmtNum, hmIn } from "../util.js";
 import { skyAt, magLat, phaseAt, moonLitRight } from "../model/sky.js";
-import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
+import { directionPlace, ageLabel, activityLabel, cloudLabel, moonLabel, bzLabel, bzLevel, BZ_BANDS, kpLabel, kpLevel, goesLabel, goesLevel, windLabel, windLevel } from "../labels.js";
 import { lineChart, barChart, windTicks, ROW_DENSE } from "../ui/chart.js";
 import { skyChart, moonPhaseIcon } from "../ui/sky-chart.js";
 import { infoHero, infoChart, infoStats, infoCard, infoText, factorBar } from "../ui/parts.js";
@@ -102,7 +102,7 @@ export const DETAILS = {
           tz: st.tz,
           scrub: { unit: "nT" },
           labels: 5,
-          fit: { max: 6, minSpan: 4 },
+          fit: { minSpan: 4 },
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -135,7 +135,8 @@ export const DETAILS = {
           tone: tone(st, "bz", ref, bzLevel),
           scrub: { unit: "nT" },
           labels: 5,
-          fit: { max: 6, minSpan: 4 },
+          fit: { minSpan: 4 },
+          bands: BZ_BANDS,
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
@@ -187,7 +188,7 @@ export const DETAILS = {
           tz: st.tz,
           tone: tone(st, "wind", s.wind, windLevel),
           ticks: windTicks((s.windSeries || []).map((p) => p.v)),
-          // Gęstsze linie (krok 20 km/s daje ich do 7), żeby wykres nie był wyższy od innych.
+          // 6 linii co 37 px, jak inne wykresy.
           row: ROW_DENSE,
           scrub: { unit: "km/s", digits: 0 },
           labels: 5,

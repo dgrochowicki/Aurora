@@ -939,6 +939,13 @@ html.sheet-open body {
 .chart-area {
   fill: url(#chartFill);
 }
+/* Bz w kolorach pasm wartości (bandGradients w chart.js): nad zerem szaro, pod zerem kolor poziomu. */
+.chart-band-line {
+  stroke: url(#chartBandLine);
+}
+.chart-band-area {
+  fill: url(#chartBandFill);
+}
 /* 8 px pod dolną linią podziałki, która ma 1 px i wystaje pod wykres. */
 .chart-x {
   display: flex;

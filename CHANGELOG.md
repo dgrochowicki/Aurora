@@ -2,10 +2,12 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 23.10.2026 — wykresy magnetometru i Bz w większej skali
+## 23.10.2026 — wykresy w większej skali, 6 linii, Bz w kolorach pasm
 
-- Wykresy były płaskie, bo oś miała duży zapas (autor: Bz od −5 do 1 nT na osi od −10 do 5). Teraz skala jest dopasowana do danych: najmniejszy krok 1, 2 albo 5 (razy potęga 10), przy którym dane mieszczą się w najwyżej 6 liniach, np. Bz 4…−6 co 2, magnetometr 100…108 co 2. Nie węższa niż 4 nT, żeby szum nie wyglądał jak burza. Wysokość wykresu stała, 185 px, jak w makiecie autora z 22.10.2026. `fitTicks()` i `lineChart(…, { fit })` w `js/ui/chart.js` z testami, `js/views/details.js`.
-- Wiatr słoneczny bez zmian: skala zostaje przy `windTicks()` z najmniejszym zakresem 100 km/s (decyzja autora z 21.10.2026). Krok 2,5 pominięty, żeby podpisy osi były krótkie (100, 105 zamiast 102,5); propozycja do potwierdzenia przez autora.
+- Wykresy były płaskie, bo oś miała duży zapas (autor: Bz od −5 do 1 nT na osi od −10 do 5). Teraz skala jest dopasowana do danych: najmniejszy krok 1, 2 albo 5 (razy potęga 10), przy którym dane się mieszczą, np. Bz 4…−6 co 2. Najmniejszy zakres 4 nT (magnetometr, Bz), żeby szum nie wyglądał jak burza. `fitTicks()` i `lineChart(…, { fit })` w `js/ui/chart.js` z testami, `js/views/details.js`.
+- Magnetometr, Bz, wiatr i zachmurzenie mają zawsze 6 linii co 37 px, więc są równej wysokości, 185 px, jak w makiecie autora z 22.10.2026 (prośba autora). Wiatr: dalej najmniejszy zakres 100 km/s (decyzja z 21.10.2026), ale zamiast 4–9 linii zawsze 6, więc krok 20, 50, 100 albo 200 km/s; `windTicks()` liczy teraz przez `fitTicks()`.
+- Bz w panelu w kolorach pasm (prośba autora): nad zerem szaro, bo północne Bz nie sprzyja zorzy, a pod zerem kolor poziomu według wartości: do −3 nT biały 70%, do −10 nT fiolet, niżej zieleń. Wypełnienie między linią a zerem wygasa przy zerze. `BZ_BANDS` w `js/labels.js`, `bandGradients()` w `js/ui/chart.js`, `css/components.css`. Miniwykres w kafelku bez zmian.
+- Krok 2,5 pominięty, żeby podpisy osi były krótkie (100, 105 zamiast 102,5); propozycja do potwierdzenia przez autora.
 
 ## 23.10.2026 — boczny margines 24 px
 

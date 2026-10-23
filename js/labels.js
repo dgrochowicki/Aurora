@@ -20,6 +20,14 @@ export const cloudLabel = (c) => (c < 10 ? "Brak" : c < 30 ? "Małe" : c < 60 ? 
 
 // Zorzy sprzyja Bz skierowane na południe, czyli ujemne.
 export const bzLevel = (v) => (v <= -10 ? 3 : v <= -3 ? 2 : v < 3 ? 1 : 0);
+// Pasma kolorów wykresu Bz w panelu (decyzja autora 23.10.2026): nad zerem szaro (poziom 0), bo północne Bz nie sprzyja zorzy,
+// pod zerem kolory poziomów jak w bzLevel(): do −3 nT biały 70%, do −10 nT poziom 2, niżej poziom 3.
+export const BZ_BANDS = [
+  { min: 0, level: 0 },
+  { min: -3, level: 1 },
+  { min: -10, level: 2 },
+  { min: -Infinity, level: 3 },
+];
 export const bzLabel = (v) => ["Na północ", "Blisko zera", "Na południe", "Silnie na południe"][bzLevel(v)];
 
 export const kpLevel = (kp) => (kp < 3 ? 0 : kp < 4 ? 1 : kp < 5 ? 2 : 3);
