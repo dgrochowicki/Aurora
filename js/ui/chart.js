@@ -7,6 +7,26 @@ const ROW = 53;
 // Gęstsza podziałka (np. zachmurzenie co 20%): 16 px zamiast 32 od linii do liczby nad następną, przy 6 liniach wykres ma 232 px.
 export const ROW_DENSE = 37;
 
+// Gładka linia przez punkty [[x, y]] (prośba autora 23.10.2026): krzywe Béziera z nachyleniem ze średniej harmonicznej
+// sąsiednich odcinków, jak monotoniczna interpolacja. Linia przechodzi przez każdy pomiar, nie wychodzi ponad szczyty
+// ani pod dołki, a w szczycie i dołku jest pozioma, więc nie ma ostrych zębów.
+export function smoothPath(pts) {
+  const f = (n) => +n.toFixed(2);
+  if (pts.length < 3) return pts.map(([x, y], i) => `${i ? "L" : "M"}${f(x)} ${f(y)}`).join("");
+  const d = pts.slice(1).map(([x, y], i) => (y - pts[i][1]) / (x - pts[i][0] || 1));
+  const m = pts.map((_, i) =>
+    i === 0 ? d[0] : i === pts.length - 1 ? d[i - 1] : d[i - 1] * d[i] <= 0 ? 0 : 2 / (1 / d[i - 1] + 1 / d[i]),
+  );
+  let path = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1],
+      [x1, y1] = pts[i],
+      h = (x1 - x0) / 3;
+    path += `C${f(x0 + h)} ${f(y0 + m[i - 1] * h)} ${f(x1 - h)} ${f(y1 - m[i] * h)} ${f(x1)} ${f(y1)}`;
+  }
+  return path;
+}
+
 // „Ładny” krok podziałki: 1, 2, 2,5 albo 5 razy potęga dziesięciu, nie mniejszy niż raw.
 const niceStep = (raw) => {
   const p = 10 ** Math.floor(Math.log10(raw)),
@@ -107,7 +127,7 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
   const xEnd = scrub ? 98 : 100;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * xEnd;
-  const line = series.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(2)} ${y(p.v).toFixed(1)}`).join("");
+  const line = smoothPath(series.map((p) => [x(p.t), y(p.v)]));
   // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
   const area = zero ? "" : `<path class="chart-area" d="${line}L${xEnd} ${H}L0 ${H}Z"/>`;
   const below = zero

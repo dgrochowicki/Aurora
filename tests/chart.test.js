@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, fitTicks, lineChart, barChart, windTicks } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, barChart, windTicks, smoothPath } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -143,4 +143,32 @@ test("podziałka: tylko linia zera jest ciągła (is-zero)", () => {
   assert.equal(html.match(/chart-grid is-zero/g)?.length, 1);
   assert.ok(html.match(/class="chart-grid"/g).length >= 4);
   assert.doesNotMatch(lineChart(series([300, 400]), { label: "x" }), /is-zero/);
+});
+
+// Punkty krzywych C: kontrolne i końcowe, z pierwszym punktem z M.
+const curve = (path) => path.match(/-?\d+(\.\d+)?/g).map(Number).reduce((a, n, i, all) => (i % 2 ? a : [...a, [n, all[i + 1]]]), []);
+
+test("gładka linia: przechodzi przez każdy punkt i nie wychodzi ponad szczyt ani pod dołek", () => {
+  const pts = [[0, 10], [10, 2], [20, 8], [30, 8], [40, 0]];
+  const path = smoothPath(pts);
+  assert.match(path, /^M0 10C/);
+  const c = curve(path);
+  // Co trzeci punkt po M to punkt pomiaru.
+  pts.forEach((p, i) => assert.deepEqual(c[i * 3], p));
+  const ys = c.map((p) => p[1]);
+  assert.ok(Math.min(...ys) >= 0 && Math.max(...ys) <= 10);
+  // W szczycie (10, 2) obie kontrolne leżą poziomo.
+  assert.equal(c[2][1], 2);
+  assert.equal(c[4][1], 2);
+  // Płaski odcinek zostaje płaski.
+  assert.equal(c[7][1], 8);
+  assert.equal(c[8][1], 8);
+});
+
+test("gładka linia: dwa punkty to prosty odcinek, jeden punkt sam M, pusty zbiór pusty napis", () => {
+  assert.equal(smoothPath([[0, 1], [100, 3]]), "M0 1L100 3");
+  assert.equal(smoothPath([[5, 5]]), "M5 5");
+  assert.equal(smoothPath([]), "");
+  // Dwa punkty w tym samym czasie nie dają NaN.
+  assert.doesNotMatch(smoothPath([[0, 1], [0, 3], [10, 2]]), /NaN|Infinity/);
 });

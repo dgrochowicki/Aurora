@@ -1,4 +1,5 @@
 // Małe wskaźniki w kafelkach aktywności: miernik z segmentów i mini wykres z 2 godzin. Kolor bierze z --state kafelka.
+import { smoothPath } from "./chart.js";
 
 // Miernik: „lit” z „count” segmentów zapalonych od lewej. W prawo znaczy lepiej dla zorzy.
 export function meter(count, lit) {
@@ -27,8 +28,8 @@ export function sparkline(series, { zero = false, minSpan = 0 } = {}) {
   hi += pad;
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
-  const x = (t) => (((t - t0) / (t1 - t0 || 1)) * W).toFixed(1),
-    y = (v) => (H - ((v - lo) / (hi - lo)) * H).toFixed(1);
-  const d = series.map((p, i) => `${i ? "L" : "M"}${x(p.t)} ${y(p.v)}`).join("");
+  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * W,
+    y = (v) => H - ((v - lo) / (hi - lo)) * H;
+  const d = smoothPath(series.map((p) => [x(p.t), y(p.v)]));
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="spark-line" d="${d}"/></svg>`;
 }
