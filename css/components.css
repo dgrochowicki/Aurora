@@ -871,6 +871,10 @@ html.sheet-open body {
   height: 1px;
   background: repeating-linear-gradient(90deg, var(--track) 0 4px, transparent 4px 8px);
 }
+/* Zero ciągłą linią w tym samym kolorze. */
+.chart-grid.is-zero {
+  background: var(--track);
+}
 /* Liczby osi Y leżą nad wykresem (także nad kropkami łuków) i mogą zachodzić na linię. Jaśniejsze niż reszta podpisów
    (biały 80%, decyzja autora 20.10.2026). */
 .chart-y {

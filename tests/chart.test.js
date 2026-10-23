@@ -137,3 +137,10 @@ test("słupki Kp mają tę samą wysokość co wykresy liniowe: 185 px", () => {
   // Kp 3 to jedna trzecia wysokości.
   assert.match(html, /height:61\.7px/);
 });
+
+test("podziałka: tylko linia zera jest ciągła (is-zero)", () => {
+  const html = lineChart(series([-3, 2]), { label: "x", zero: true, fit: { minSpan: 4 } });
+  assert.equal(html.match(/chart-grid is-zero/g)?.length, 1);
+  assert.ok(html.match(/class="chart-grid"/g).length >= 4);
+  assert.doesNotMatch(lineChart(series([300, 400]), { label: "x" }), /is-zero/);
+});

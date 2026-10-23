@@ -75,7 +75,8 @@ function gridHTML(ticks, y, unit = "") {
   return ticks
     .map((v) => {
       const pos = `top:${y(v).toFixed(1)}px`;
-      return `<i class="chart-grid" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}${v ? unit : ""}</span>`;
+      // Linia zera ciągła, pozostałe przerywane (prośba autora 23.10.2026).
+      return `<i class="chart-grid${v ? "" : " is-zero"}" style="${pos}"></i><span class="chart-y" style="${pos}">${fmtNum(v, d)}${v ? unit : ""}</span>`;
     })
     .join("");
 }

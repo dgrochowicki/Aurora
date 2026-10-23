@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — ciągła linia zera na wykresach
+
+- Na wykresach z wartością 0 na osi (Bz, Kp, zachmurzenie) linia zera jest ciągła, a pozostałe linie podziałki zostają przerywane; kolor bez zmian (`--track`, prośba autora). `gridHTML()` w `js/ui/chart.js` (klasa `.chart-grid.is-zero`), `css/components.css`.
+
 ## 23.10.2026 — ciemniejsze tło dołu strony
 
 - Tło strony od połowy ekranu w dół `#1A1C21` zamiast `#1E1F24` (`--bg` w `css/tokens.css`, decyzja autora). Góra `#12151A` i panele `#1F2226` bez zmian.
