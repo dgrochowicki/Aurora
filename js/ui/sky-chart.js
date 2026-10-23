@@ -5,7 +5,8 @@
 import { clamp, esc, hmIn } from "../util.js";
 import { ROW_DENSE } from "./chart.js";
 
-const STEP = 18;
+const STEP = 18,
+  PAD = 4;
 // Kolory łuków: Słońce żółte jak --yellow na innych wykresach (decyzja autora 20.10.2026), Księżyc jak --moon w tokens.css.
 // Wpisane wprost, bo Safari nie zawsze bierze zmienne CSS w SVG.
 const SUN = "#ffc867",
@@ -14,11 +15,12 @@ const SUN = "#ffc867",
 // n: wynik nightTimeline(), tz: strefa miejsca (IANA).
 export function skyChart(n, { tz, now = Date.now(), label }) {
   const alts = n.arcs.flatMap((a) => [a.sun, a.moon]);
-  // 6 linii co 18° jak inne wykresy (prośba autora 23.10.2026; wcześniej tyle, ile obejmowały łuki, często 7): od najwyższej
-  // potrzebnej nad łukami w dół. Zawsze z horyzontem i −18°; niżej łuki i tak gasną, więc część pod dolną linią jest ucięta.
-  const hi = Math.max(STEP, Math.ceil(Math.max(...alts) / STEP) * STEP),
-    lo = Math.min(-STEP, hi - 5 * STEP);
-  const H = ((hi - lo) / STEP) * ROW_DENSE;
+  // Wysokość 185 px jak inne wykresy, a oś od najniższego do najwyższego punktu łuków z zapasem PAD (decyzja autora 23.10.2026;
+  // wcześniej linie co 18° obejmujące łuki, często 7, i wykres wyższy). Łuki nigdy nie są ucięte. Linie co 18° w środku zakresu,
+  // zawsze z horyzontem i −18° (oś sięga co najmniej 6° pod −18°, żeby podpis się zmieścił).
+  const hi = Math.max(STEP, Math.max(...alts) + PAD),
+    lo = Math.min(-STEP - 6, Math.min(...alts) - PAD);
+  const H = 5 * ROW_DENSE;
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
   const path = (key) => n.arcs.map((a, i) => `${i ? "L" : "M"}${x(a.t).toFixed(2)} ${y(a[key]).toFixed(1)}`).join("");
@@ -36,13 +38,12 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
 <clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
 <mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${(H - y0).toFixed(1)}"><rect x="-1" y="${y0}" width="102" height="${(H - y0).toFixed(1)}" fill="url(#skyFade)"/></mask></defs>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
   const lines = [];
-  for (let a = hi; a >= lo; a -= STEP) {
+  for (let a = Math.floor(hi / STEP) * STEP; a >= lo; a -= STEP) {
     const pos = `top:${y(a).toFixed(1)}px`;
     lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);
     if (a === 0 || a === -STEP) lines.push(`<span class="chart-y" style="${pos}">${a ? "−18°" : "Horyzont"}</span>`);
   }
-  // Kropka łuku pod dolną linią zostaje na dolnej krawędzi, a nie na godzinach pod wykresem.
-  const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(Math.max(alt, lo)).toFixed(1)}px"></b>`;
+  const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
   // Kropki „teraz” w miejscu najbliższej próbki.
   let dots = "";
   if (now > n.start && now < n.end) {

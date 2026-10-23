@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, fitRange, lineChart, barChart, smoothPath, meanSeries } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, barChart, smoothPath, meanSeries } from "../js/ui/chart.js";
 import { skyChart } from "../js/ui/sky-chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
@@ -59,34 +59,40 @@ test("oś godzin: domyślnie początek, środek i koniec, przy labels równo roz
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC", labels: 5 })), ["20:00", "20:02", "20:04", "20:06", "20:08"]);
 });
 
-test("skala dopasowana do danych: zakres to dane z zapasem 6%, linie na okrągłych wartościach w środku", () => {
-  // Bz od −6,2 do 4,1: dawniej co 5 od 15 do −10, teraz oś ok. 4,7…−6,8 i linie co 2.
-  const r = fitRange(-6.2, 4.1);
-  assert.ok(Math.abs(r.top - 4.718) < 0.001 && Math.abs(r.bottom + 6.818) < 0.001, `${r.top} ${r.bottom}`);
-  assert.deepEqual(r.ticks, [4, 2, 0, -2, -4, -6]);
-  // Magnetometr 103–111 nT: co 2 w środku zakresu.
-  assert.deepEqual(fitRange(103, 111).ticks, [110, 108, 106, 104]);
-  // Wiatr 418–436 km/s przy minSpan 100: zakres 100 km/s z zapasem, dane na środku, co 20.
-  const w = fitRange(418, 436, { minSpan: 100 });
-  assert.ok(w.top - w.bottom >= 100 && (w.top + w.bottom) / 2 === 427);
-  assert.deepEqual(w.ticks, [480, 460, 440, 420, 400, 380]);
-  // Bez kroku 2,5 i nigdy więcej niż 6 linii, wszystkie w zakresie.
+test("podziałka dopasowana do danych: zawsze 6 linii, najmniejszy krok 1, 2, 3, 4 albo 5", () => {
+  // Bz od −6,2 do 4,1: co 3 (6…−9), a nie co 5 (15…−10) jak przy samych krokach 1, 2, 5.
+  assert.deepEqual(fitTicks(-6.2, 4.1), [6, 3, 0, -3, -6, -9]);
+  // Bz od −5,6 do 2,3: dalej co 2.
+  assert.deepEqual(fitTicks(-5.6, 2.3), [4, 2, 0, -2, -4, -6]);
+  // Przykład autora, Bz od −5 do 1: co 2, brakującą linię dokładamy w dół.
+  assert.deepEqual(fitTicks(-5.1, 1), [2, 0, -2, -4, -6, -8]);
+  // Magnetometr 103–111 nT: co 2.
+  assert.deepEqual(fitTicks(103.4, 111.6), [114, 112, 110, 108, 106, 104].map((v) => v - 2));
+  // Krok 4 i 30: Bz od −12 do 4,5, wiatr 330–470.
+  assert.deepEqual(fitTicks(-12, 4.5), [8, 4, 0, -4, -8, -12]);
+  assert.deepEqual(fitTicks(330, 470), [480, 450, 420, 390, 360, 330]);
+  // Wartość dokładnie na linii nie dokłada kolejnej linii ponad 6.
+  assert.deepEqual(fitTicks(-8, 2), [2, 0, -2, -4, -6, -8]);
   for (const [lo, hi] of [[0.3, 0.9], [-12.4, 3.1], [97, 131], [-0.2, 0], [1000, 1003], [-30.5, 12], [96.2, 104.8], [500, 1400]]) {
-    const { top, bottom, ticks } = fitRange(lo, hi);
-    assert.ok(ticks.length >= 2 && ticks.length <= 6, `${lo}–${hi}: ${ticks}`);
-    assert.ok(ticks[0] <= top && ticks.at(-1) >= bottom && top > hi && bottom < lo, `${lo}–${hi}: ${ticks}`);
-    const step = ticks[0] - ticks[1];
-    assert.ok([1, 2, 5].includes(+(step / 10 ** Math.floor(Math.log10(step))).toFixed(6)), `${lo}–${hi}: ${ticks}`);
+    const t = fitTicks(lo, hi);
+    assert.equal(t.length, 6, `${lo}–${hi}: ${t}`);
+    assert.ok(t[0] >= hi && t.at(-1) <= lo, `${lo}–${hi}: ${t}`);
+    const step = t[0] - t[1];
+    assert.ok([1, 2, 3, 4, 5].includes(+(step / 10 ** Math.floor(Math.log10(step))).toFixed(6)), `${lo}–${hi}: ${t}`);
+    // Dane zajmują co najmniej 40% wysokości (najmniej przy skoku kroku z 10 na 20, np. −30,5…12).
+    assert.ok((hi - lo) / (t[0] - t.at(-1)) >= 0.4, `${lo}–${hi}: ${t}`);
   }
 });
 
-test("skala dopasowana do danych nie powiększa szumu poniżej minSpan i nie dzieli przez zero", () => {
-  const r = fitRange(-0.3, 0.2, { minSpan: 4 });
-  assert.ok(r.top - r.bottom >= 4 && r.top > 0.2 && r.bottom < -0.3);
-  const flat = fitRange(100, 100, { minSpan: 4 });
-  assert.ok(flat.top >= 102 && flat.bottom <= 98 && flat.ticks.length >= 2, `${flat.ticks}`);
-  const zero = fitRange(5, 5);
-  assert.ok(zero.top > 5 && zero.bottom < 5 && zero.ticks.every(Number.isFinite));
+test("podziałka dopasowana do danych nie powiększa szumu poniżej minSpan", () => {
+  const t = fitTicks(-0.3, 0.2, { minSpan: 4 });
+  assert.ok(t[0] - t.at(-1) >= 4, `${t}`);
+  assert.ok(t[0] >= 0.2 && t.at(-1) <= -0.3);
+  const flat = fitTicks(100, 100, { minSpan: 4 });
+  assert.ok(flat[0] >= 102 && flat.at(-1) <= 98, `${flat}`);
+  assert.equal(fitTicks(5, 5).length, 6);
+  // Wiatr 418–436 km/s przy minSpan 100: krok 20, dane na środku.
+  assert.deepEqual(fitTicks(418, 436, { minSpan: 100 }), [460, 440, 420, 400, 380, 360]);
 });
 
 test("wykresy z fit mają tę samą wysokość co zachmurzenie: 185 px", () => {
@@ -103,10 +109,10 @@ test("Bz: jedna barwa linii, pod zerem gradient od przezroczystego przy zerze", 
   const html = lineChart(series([3, -12]), { zero: true, fit: {}, tone: "level-2" });
   assert.match(html, /is-level-2/);
   assert.match(html, /class="chart-below" clip-path="url\(#chartBelowZero\)"/);
-  // Oś 3,9…−12,9 (dane z zapasem 6%), 185 px: zero na 42,9 px. Gradient zaczyna się na zerze z kryciem 0.
+  // Oś 4…−16 co 4, 185 px: zero na 37 px. Gradient zaczyna się na zerze z kryciem 0.
   const g = html.match(/<linearGradient id="chartBelowFill"[^>]*y1="([\d.]+)"[^>]*y2="([\d.]+)">(.*?)<\/linearGradient>/);
   assert.ok(g, html);
-  assert.equal(+g[1], 42.9);
+  assert.equal(+g[1], 37);
   assert.equal(+g[2], 185);
   assert.match(g[3], /offset="0" style="stop-color:var\(--chart\);stop-opacity:0"/);
   assert.doesNotMatch(html, /chartBand/);
@@ -175,17 +181,22 @@ test("wykres z avg: dymek podaje surowy pomiar, a linia i kropka idą po średni
   assert.match(html, /chart-line-under/);
 });
 
-test("jasność nieba: zawsze 6 linii co 18°, z horyzontem i −18°, kropka pod dolną linią na krawędzi", () => {
+test("jasność nieba: 185 px, oś od łuków z zapasem, nic nie jest ucięte, horyzont i −18° zawsze", () => {
   const h = 3600000;
-  // Księżyc wysoko (50°), Słońce nisko (−50°): dawniej 7 linii (54…−54), teraz 54…−36.
-  const arcs = Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -50 + i, moon: 50 - i }));
-  const html = skyChart({ start: 0, end: 24 * h, arcs }, { tz: "UTC", now: h, label: "x" });
-  assert.equal((html.match(/class="(chart-grid|sky-horizon)"/g) || []).length, 6);
-  assert.match(html, /Horyzont/);
-  assert.match(html, /−18°/);
-  const sunTop = +html.match(/sky-dot is-sun[^"]*" style="[^"]*top:([\d.]+)px/)[1];
-  assert.equal(sunTop, 185);
-  // Łuki nisko: od 18° do −72°, też 6 linii.
-  const low = Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -60 + i, moon: -20 }));
-  assert.equal((skyChart({ start: 0, end: 24 * h, arcs: low }, { tz: "UTC", now: h, label: "x" }).match(/class="(chart-grid|sky-horizon)"/g) || []).length, 6);
+  const draw = (arcs) => skyChart({ start: 0, end: 24 * h, arcs }, { tz: "UTC", now: h, label: "x" });
+  const tops = (html) => [...html.matchAll(/class="(?:chart-grid|sky-horizon)" style="top:([\d.]+)px/g)].map((m) => +m[1]);
+  // Księżyc do 60°, Słońce do −60°: oś 64…−64, linie co 18° w środku, każda w wykresie.
+  const high = draw(Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -60 + i, moon: 60 - i })));
+  assert.match(high, /viewBox="0 0 100 185"/);
+  assert.equal(tops(high).length, 7);
+  assert.ok(tops(high).every((t) => t >= 0 && t <= 185));
+  assert.match(high, /Horyzont/);
+  assert.match(high, /−18°/);
+  // Kropki „teraz” w wykresie, nawet nisko pod horyzontem.
+  for (const m of high.matchAll(/sky-dot[^"]*" style="[^"]*top:([\d.]+)px/g)) assert.ok(+m[1] >= 0 && +m[1] <= 185);
+  // Łuki nisko: oś i tak sięga 18° i −24°, żeby było widać horyzont i −18°.
+  const low = draw(Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -10, moon: 5 })));
+  assert.match(low, /Horyzont/);
+  assert.match(low, /−18°/);
+  assert.equal(tops(low).length, 3);
 });

@@ -2,10 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 23.10.2026 — skala wykresów dopasowana do danych, jasność nieba z 6 liniami
+## 23.10.2026 — drobniejsze kroki skali wykresów, jasność nieba w 185 px
 
-- Wykresy magnetometru, Bz i wiatru wypełniają wysokość jak w Hello Aurora: oś od najniższej do najwyższej wartości linii z zapasem 6%, a linie podziałki na okrągłych wartościach w środku (najwyżej 6). Wcześniej zawsze 6 linii od krańca do krańca, więc przy skoku kroku z 2 na 5 (np. Bz od −6 do 4 na osi od 15 do −10) większość wykresu była pusta (autor). Zakres liczony z linii ze średniej z 5 minut, bo to ją widać. Najmniejsze zakresy bez zmian (4 nT, 100 km/s). `fitRange()` zamiast `fitTicks()` i `windTicks()` w `js/ui/chart.js`, z testami; `js/views/details.js`.
-- Wykres jasności nieba ma zawsze 6 linii co 18° jak inne wykresy, zamiast 7 przy wysokim Księżycu (prośba autora); łuki pod dolną linią ucięte, kropka „teraz” na krawędzi. `js/ui/sky-chart.js`, test.
+- Wykresy magnetometru, Bz i wiatru mają dalej 6 linii od krańca do krańca, ale krok podziałki może być też 3 albo 4 (× potęga 10), nie tylko 1, 2, 5. Wcześniej krok skakał z 2 na 5 i dane zajmowały ułamek wykresu, np. Bz od −6 do 4 na osi od 15 do −10; teraz od 6 do −9 co 3 (autor: większość skali pusta). Zakres z linii ze średniej z 5 minut, bo to ją widać. Najmniejsze zakresy bez zmian (4 nT, 100 km/s). `fitTicks()` w `js/ui/chart.js` z testami; wiatr przez `lineChart(…, { fit })` zamiast `windTicks()`.
+- Decyzja autora po porównaniu trzech wariantów (wariant C, za rekomendacją): skala jak w Hello Aurora (oś od danych, linie w środku, bez linii przy krawędziach) i dane w paśmie 2 linii z zapasem na skoki odrzucone. Kp zostaje ze stałą skalą 0–9.
+- Wykres jasności nieba ma 185 px jak inne: oś od łuków z zapasem 4° (co najmniej 18°…−24°), linie co 18° w środku, zawsze horyzont i −18°. Łuki nie są ucinane; próba z 6 liniami i uciętym dołem odrzucona przez autora. `js/ui/sky-chart.js`, test.
 
 ## 23.10.2026 — grubsze i gładkie linie wykresów
 
