@@ -14,9 +14,10 @@ const SUN = "#ffc867",
 // n: wynik nightTimeline(), tz: strefa miejsca (IANA).
 export function skyChart(n, { tz, now = Date.now(), label }) {
   const alts = n.arcs.flatMap((a) => [a.sun, a.moon]);
-  // Linie co 18° obejmujące oba łuki; zawsze co najmniej od +18° do −36°, żeby było widać horyzont i −18°.
+  // 6 linii co 18° jak inne wykresy (prośba autora 23.10.2026; wcześniej tyle, ile obejmowały łuki, często 7): od najwyższej
+  // potrzebnej nad łukami w dół. Zawsze z horyzontem i −18°; niżej łuki i tak gasną, więc część pod dolną linią jest ucięta.
   const hi = Math.max(STEP, Math.ceil(Math.max(...alts) / STEP) * STEP),
-    lo = Math.min(-2 * STEP, Math.floor(Math.min(...alts) / STEP) * STEP);
+    lo = Math.min(-STEP, hi - 5 * STEP);
   const H = ((hi - lo) / STEP) * ROW_DENSE;
   const x = (t) => ((t - n.start) / (n.end - n.start)) * 100,
     y = (a) => ((hi - a) / (hi - lo)) * H;
@@ -33,14 +34,15 @@ export function skyChart(n, { tz, now = Date.now(), label }) {
   const sun = path("sun");
   const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs>${fade}
 <clipPath id="skyAbove"><rect x="-1" y="-10" width="102" height="${(+y0 + 10).toFixed(1)}"/></clipPath>
-<mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${H + 10}"><rect x="-1" y="${y0}" width="102" height="${H + 10}" fill="url(#skyFade)"/></mask></defs>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
+<mask id="skyBelow" maskUnits="userSpaceOnUse" x="-1" y="${y0}" width="102" height="${(H - y0).toFixed(1)}"><rect x="-1" y="${y0}" width="102" height="${(H - y0).toFixed(1)}" fill="url(#skyFade)"/></mask></defs>${arc(path("moon"), MOON)}${arc(sun, SUN)}</svg>`;
   const lines = [];
   for (let a = hi; a >= lo; a -= STEP) {
     const pos = `top:${y(a).toFixed(1)}px`;
     lines.push(`<i class="${a ? "chart-grid" : "sky-horizon"}" style="${pos}"></i>`);
     if (a === 0 || a === -STEP) lines.push(`<span class="chart-y" style="${pos}">${a ? "−18°" : "Horyzont"}</span>`);
   }
-  const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(alt).toFixed(1)}px"></b>`;
+  // Kropka łuku pod dolną linią zostaje na dolnej krawędzi, a nie na godzinach pod wykresem.
+  const dot = (t, alt, cls) => `<b class="sky-dot ${cls}" style="left:${x(t).toFixed(2)}%;top:${y(Math.max(alt, lo)).toFixed(1)}px"></b>`;
   // Kropki „teraz” w miejscu najbliższej próbki.
   let dots = "";
   if (now > n.start && now < n.end) {

@@ -63,43 +63,46 @@ export function niceTicks(lo, hi, min = 3) {
   return Array.from({ length: n }, (_, i) => +(b - i * step).toFixed(6));
 }
 
-// Podziałka dopasowana do danych (pomysł autora 23.10.2026): zawsze `lines` linii (domyślnie 6, jak zachmurzenie, więc wszystkie
-// wykresy mają tę samą wysokość) i najmniejszy krok 1, 2 albo 5 razy potęga dziesięciu, przy którym zakres lo–hi się mieści.
-// Bz od −5,6 do 2,3 daje 4…−6 co 2 zamiast 5…−10 co 5, więc wykres nie jest płaski. Bez kroku 2,5, żeby podpisy były krótkie.
-// minSpan: najmniejszy pokazywany zakres, żeby drobny szum nie wyglądał jak burza. Brakujące linie dokładamy na przemian w dół
-// i w górę, więc dane zostają mniej więcej na środku.
-export function fitTicks(lo, hi, { lines = 6, minSpan = 0 } = {}) {
+// Skala dopasowana do danych jak w Hello Aurora (prośba autora 23.10.2026): zakres osi to najniższa i najwyższa wartość
+// z niewielkim zapasem, więc linia wypełnia całą wysokość wykresu (185 px, jak zachmurzenie). Linie podziałki leżą na okrągłych
+// wartościach w środku zakresu: najmniejszy krok 1, 2 albo 5 razy potęga dziesięciu, przy którym jest ich najwyżej `lines`
+// (zwykle 3–6). Bez kroku 2,5, żeby podpisy były krótkie. Wcześniej (od 23.10.2026) zawsze 6 linii od krańca do krańca, co przy
+// skoku kroku z 2 na 5 zostawiało większość wykresu pustą.
+// minSpan: najmniejszy pokazywany zakres, żeby drobny szum nie wyglądał jak burza; dane są wtedy na środku.
+// pad: zapas nad i pod danymi jako część zakresu, żeby linia nie dotykała krawędzi.
+export function fitRange(lo, hi, { lines = 6, minSpan = 0, pad = 0.06 } = {}) {
+  const grow = Math.max(0, minSpan - (hi - lo)) / 2;
+  lo -= grow;
+  hi += grow;
   if (!(hi > lo)) {
     lo -= 0.5;
     hi += 0.5;
   }
+  const extra = (hi - lo) * pad;
+  lo -= extra;
+  hi += extra;
   const fitStep = (raw) => {
     const st = niceStep(raw);
     return st / 10 ** Math.floor(Math.log10(st)) === 2.5 ? niceStep(st * 1.01) : st;
   };
-  for (let step = fitStep(Math.max(hi - lo, minSpan) / (lines - 1)); ; step = fitStep(step * 1.01)) {
-    let a = Math.floor(+(lo / step).toFixed(9)),
-      b = Math.ceil(+(hi / step).toFixed(9));
-    if (b - a + 1 > lines) continue;
-    for (let down = true; b - a + 1 < lines; down = !down) down ? a-- : b++;
-    return Array.from({ length: lines }, (_, i) => +((b - i) * step).toFixed(6));
+  for (let step = fitStep((hi - lo) / lines); ; step = fitStep(step * 1.01)) {
+    const a = Math.ceil(+(lo / step).toFixed(9)),
+      b = Math.floor(+(hi / step).toFixed(9));
+    if (b - a + 1 <= lines) return { top: hi, bottom: lo, ticks: Array.from({ length: b - a + 1 }, (_, i) => +((b - i) * step).toFixed(6)) };
   }
 }
 
-// Podziałka wykresu wiatru słonecznego (decyzja autora 21.10.2026): dopasowana do danych jak w Hello Aurora, żeby było widać skoki,
-// ale nie węższa niż WIND_SPAN, żeby drobne wahnięcie nie wyglądało jak burza (jak minSpan miniwykresu w kafelku).
-// Od 23.10.2026 zawsze 6 linii jak inne wykresy (fitTicks), więc krok to 20, 50, 100 albo 200 km/s zależnie od zakresu.
-export const WIND_SPAN = 100;
-export const windTicks = (vals) => (vals.length ? fitTicks(Math.min(...vals), Math.max(...vals), { minSpan: WIND_SPAN }) : [550, 500, 450, 400, 350, 300]);
+// Wysokość wykresu ze skalą dopasowaną do danych: 5 odstępów po 37 px jak 6 linii zachmurzenia.
+const FIT_H = 5 * ROW_DENSE;
 
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
 
-// Skala pionowa z podziałki: wysokość w px i położenie wartości od góry.
-function scale(ticks, row = ROW) {
-  const top = ticks[0],
-    bottom = ticks[ticks.length - 1],
-    H = (ticks.length - 1) * row;
+// Skala pionowa z podziałki: wysokość w px i położenie wartości od góry. range: {top, bottom} z fitRange() i stała wysokość H.
+function scale(ticks, row = ROW, range = null) {
+  const top = range ? range.top : ticks[0],
+    bottom = range ? range.bottom : ticks[ticks.length - 1],
+    H = range ? FIT_H : (ticks.length - 1) * row;
   return { H, y: (v) => ((top - v) / (top - bottom)) * H };
 }
 
@@ -123,26 +126,26 @@ function gridHTML(ticks, y, unit = "") {
 // rozłożonych równo od początku do końca (domyślnie 3: początek, środek i koniec; przy pomiarach z 2 godzin 5, mniej więcej co 30 min).
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
-// fit: {lines, minSpan} z fitTicks() zamiast niceTicks(), linie co 37 px (ROW_DENSE): przy 6 liniach 185 px jak w makiecie autora.
-// avg: linia ze średniej kroczącej z tylu minut (meanSeries); skala z surowych pomiarów, a dymek podglądu podaje surowy pomiar.
+// fit: {lines, minSpan, pad} ze skalą dopasowaną do danych (fitRange) zamiast niceTicks(), zawsze 185 px wysokości.
+// avg: linia ze średniej kroczącej z tylu minut (meanSeries); skala z niej, bo to ją widać, a dymek podglądu podaje surowy pomiar.
 export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null, avg = 0 }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
-  const vals = series.map((p) => p.v);
+  const drawn = avg ? meanSeries(series, avg) : series;
+  const vals = drawn.map((p) => p.v);
   let lo = Math.min(...vals),
     hi = Math.max(...vals);
   if (zero) {
     lo = Math.min(lo, 0);
     hi = Math.max(hi, 0);
   }
-  const ticks = fixed || (fit ? fitTicks(lo, hi, fit) : niceTicks(lo, hi));
-  if (fit && !fixed) row = ROW_DENSE;
-  const { H, y } = scale(ticks, row);
+  const range = fit && !fixed ? fitRange(lo, hi, fit) : null;
+  const ticks = fixed || (range ? range.ticks : niceTicks(lo, hi));
+  const { H, y } = scale(ticks, row, range);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
   // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
   const xEnd = scrub ? 98 : 100;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * xEnd;
-  const drawn = avg ? meanSeries(series, avg) : series;
   const line = smoothPath(drawn.map((p) => [x(p.t), y(p.v)]));
   // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
   const area = zero ? "" : `<path class="chart-area" d="${line}L${xEnd} ${H}L0 ${H}Z"/>`;

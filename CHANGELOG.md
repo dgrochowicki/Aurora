@@ -2,6 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — skala wykresów dopasowana do danych, jasność nieba z 6 liniami
+
+- Wykresy magnetometru, Bz i wiatru wypełniają wysokość jak w Hello Aurora: oś od najniższej do najwyższej wartości linii z zapasem 6%, a linie podziałki na okrągłych wartościach w środku (najwyżej 6). Wcześniej zawsze 6 linii od krańca do krańca, więc przy skoku kroku z 2 na 5 (np. Bz od −6 do 4 na osi od 15 do −10) większość wykresu była pusta (autor). Zakres liczony z linii ze średniej z 5 minut, bo to ją widać. Najmniejsze zakresy bez zmian (4 nT, 100 km/s). `fitRange()` zamiast `fitTicks()` i `windTicks()` w `js/ui/chart.js`, z testami; `js/views/details.js`.
+- Wykres jasności nieba ma zawsze 6 linii co 18° jak inne wykresy, zamiast 7 przy wysokim Księżycu (prośba autora); łuki pod dolną linią ucięte, kropka „teraz” na krawędzi. `js/ui/sky-chart.js`, test.
+
 ## 23.10.2026 — grubsze i gładkie linie wykresów
 
 - Linie wykresów w panelach (magnetometr, Bz, wiatr, zachmurzenie, łuki Słońca i Księżyca) mają 3 px zamiast 2,3 px, a miniwykresy na stronie głównej 2 px zamiast 1,5 px (prośba autora).
