@@ -18,7 +18,7 @@ Poprzednie wartości `#091216`, `#002F2B`, zielonkawe tła kart i zielony `--fab
 
 | Token | Wartość w `css/tokens.css` | Zastosowanie |
 |---|---|---|
-| `--bg` | `#1E1F24` | Tło główne pod ciemniejszą górą (od 21.10.2026, decyzja autora; wcześniej `#22242A`) |
+| `--bg` | `#1A1C21` | Tło główne pod ciemniejszą górą (od 23.10.2026, decyzja autora; wcześniej `#1E1F24`, a przed 21.10.2026 `#22242A`) |
 | `--bg-gradient` | `linear-gradient(180deg, --bg-top 0, --bg 438px)` | Obraz tła strony i ekranu miejsc: `#12151A` u góry przechodzi w `--bg` w połowie ekranu 876 px. Kolorem tła `body` jest `--bg-top`, bo z niego Safari bierze kolor paska u góry. Ekran miejsc (warstwa przypięta, Safari bierze jej kolor tła do obu pasków) ma kolor `--bg-top`: górny pasek bez odcięcia, pod dolnym płaski ciemny kolor (decyzja autora 20.10.2026; dodatkowe przypięte pasy u góry Safari pomijał) |
 | `--bg-top` | `#12151A` | Kolor góry tła: `html`, `theme-color`, manifest |
 | `--bg-top-dim` | `#07080A` | `--bg-top` pod przyciemnieniem paneli: kolor tła strony przy otwartym panelu (pasek Safari) |

@@ -2,6 +2,10 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
+## 23.10.2026 — ciemniejsze tło dołu strony
+
+- Tło strony od połowy ekranu w dół `#1A1C21` zamiast `#1E1F24` (`--bg` w `css/tokens.css`, decyzja autora). Góra `#12151A` i panele `#1F2226` bez zmian.
+
 ## 23.10.2026 — wykresy w większej skali, 6 linii, gradient Bz pod zerem
 
 - Wykresy były płaskie, bo oś miała duży zapas (autor: Bz od −5 do 1 nT na osi od −10 do 5). Teraz skala jest dopasowana do danych: najmniejszy krok 1, 2 albo 5 (razy potęga 10), przy którym dane się mieszczą, np. Bz 4…−6 co 2. Najmniejszy zakres 4 nT (magnetometr, Bz), żeby szum nie wyglądał jak burza. `fitTicks()` i `lineChart(…, { fit })` w `js/ui/chart.js` z testami, `js/views/details.js`.

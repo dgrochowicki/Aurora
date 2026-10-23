@@ -1,8 +1,8 @@
 /* Tokeny: kolory, odstępy i czcionka. Wartości z makiety autora (Research/Aurora_main_00.png, ekran 402 px). */
 :root {
   color-scheme: dark;
-  /* Tło: #12151A u góry przechodzi w --bg w połowie ekranu 876 px (decyzja autora 20.10.2026; --bg #1E1F24 od 21.10.2026). */
-  --bg: #1e1f24;
+  /* Tło: #12151A u góry przechodzi w --bg w połowie ekranu 876 px (decyzja autora 20.10.2026; --bg #1A1C21 od 23.10.2026, wcześniej #1E1F24). */
+  --bg: #1a1c21;
   --bg-top: #12151a;
   /* --bg-top pod przyciemnieniem paneli (czarny 60%): kolor paska Safari, gdy otwarty jest panel szczegółów. */
   --bg-top-dim: #07080a;
