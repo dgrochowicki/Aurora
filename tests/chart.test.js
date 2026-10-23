@@ -2,7 +2,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { niceTicks, fitTicks, lineChart, barChart, smoothPath, meanSeries } from "../js/ui/chart.js";
-import { skyChart } from "../js/ui/sky-chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -179,24 +178,4 @@ test("wykres z avg: dymek podaje surowy pomiar, a linia i kropka idą po średni
   const raw = points(lineChart(series([0, 10, 0, 10, 0]), { label: "x", scrub: { unit: "nT" } }));
   assert.notEqual(p[1][1], raw[1][1]);
   assert.match(html, /chart-line-under/);
-});
-
-test("jasność nieba: 185 px, oś od łuków z zapasem, nic nie jest ucięte, horyzont i −18° zawsze", () => {
-  const h = 3600000;
-  const draw = (arcs) => skyChart({ start: 0, end: 24 * h, arcs }, { tz: "UTC", now: h, label: "x" });
-  const tops = (html) => [...html.matchAll(/class="(?:chart-grid|sky-horizon)" style="top:([\d.]+)px/g)].map((m) => +m[1]);
-  // Księżyc do 60°, Słońce do −60°: oś 64…−64, linie co 18° w środku, każda w wykresie.
-  const high = draw(Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -60 + i, moon: 60 - i })));
-  assert.match(high, /viewBox="0 0 100 185"/);
-  assert.equal(tops(high).length, 7);
-  assert.ok(tops(high).every((t) => t >= 0 && t <= 185));
-  assert.match(high, /Horyzont/);
-  assert.match(high, /−18°/);
-  // Kropki „teraz” w wykresie, nawet nisko pod horyzontem.
-  for (const m of high.matchAll(/sky-dot[^"]*" style="[^"]*top:([\d.]+)px/g)) assert.ok(+m[1] >= 0 && +m[1] <= 185);
-  // Łuki nisko: oś i tak sięga 18° i −24°, żeby było widać horyzont i −18°.
-  const low = draw(Array.from({ length: 25 }, (_, i) => ({ t: i * h, sun: -10, moon: 5 })));
-  assert.match(low, /Horyzont/);
-  assert.match(low, /−18°/);
-  assert.equal(tops(low).length, 3);
 });

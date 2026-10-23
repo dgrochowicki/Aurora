@@ -2,11 +2,11 @@
 
 Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `CLAUDE.md`. **Wpisy historyczne opisują ówczesny stan projektu i nie zastępują aktualnych wzorów (`MODEL.md`) ani tokenów (`STYL.md`).**
 
-## 23.10.2026 — drobniejsze kroki skali wykresów, jasność nieba w 185 px
+## 23.10.2026 — drobniejsze kroki skali wykresów
 
 - Wykresy magnetometru, Bz i wiatru mają dalej 6 linii od krańca do krańca, ale krok podziałki może być też 3 albo 4 (× potęga 10), nie tylko 1, 2, 5. Wcześniej krok skakał z 2 na 5 i dane zajmowały ułamek wykresu, np. Bz od −6 do 4 na osi od 15 do −10; teraz od 6 do −9 co 3 (autor: większość skali pusta). Zakres z linii ze średniej z 5 minut, bo to ją widać. Najmniejsze zakresy bez zmian (4 nT, 100 km/s). `fitTicks()` w `js/ui/chart.js` z testami; wiatr przez `lineChart(…, { fit })` zamiast `windTicks()`.
 - Decyzja autora po porównaniu trzech wariantów (wariant C, za rekomendacją): skala jak w Hello Aurora (oś od danych, linie w środku, bez linii przy krawędziach) i dane w paśmie 2 linii z zapasem na skoki odrzucone. Kp zostaje ze stałą skalą 0–9.
-- Wykres jasności nieba ma 185 px jak inne: oś od łuków z zapasem 4° (co najmniej 18°…−24°), linie co 18° w środku, zawsze horyzont i −18°. Łuki nie są ucinane; próba z 6 liniami i uciętym dołem odrzucona przez autora. `js/ui/sky-chart.js`, test.
+- Wykres jasności nieba bez zmian (linie co 18° obejmujące łuki, czasem 7). Dwie próby na gałęzi odrzucone przez autora: 6 linii z uciętym dołem łuków oraz 185 px z osią od łuków (łuki wychodziły poza skrajne linie, a godziny odjeżdżały pod wykres).
 
 ## 23.10.2026 — grubsze i gładkie linie wykresów
 
