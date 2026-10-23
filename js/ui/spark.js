@@ -1,5 +1,5 @@
 // Małe wskaźniki w kafelkach aktywności: miernik z segmentów i mini wykres z 2 godzin. Kolor bierze z --state kafelka.
-import { smoothPath } from "./chart.js";
+import { smoothPath, meanSeries } from "./chart.js";
 
 // Miernik: „lit” z „count” segmentów zapalonych od lewej. W prawo znaczy lepiej dla zorzy.
 export function meter(count, lit) {
@@ -10,10 +10,12 @@ export function meter(count, lit) {
 
 // Mini wykres: sama linia, bez osi, linii poziomych i wypełnienia (prośba autora 23.10.2026). series: [{t, v}] od najstarszego.
 // zero: zakres obejmuje zero, jak przy Bz. minSpan: najmniejszy zakres osi, żeby spokojny przebieg był płaski.
-export function sparkline(series, { zero = false, minSpan = 0 } = {}) {
+// avg: linia ze średniej kroczącej z tylu minut (meanSeries).
+export function sparkline(series, { zero = false, minSpan = 0, avg = 0 } = {}) {
   if (series.length < 2) return "";
+  if (avg) series = meanSeries(series, avg);
   const W = 100,
-    H = 32;
+    H = 16;
   let lo = Math.min(...series.map((p) => p.v)),
     hi = Math.max(...series.map((p) => p.v));
   if (zero) {

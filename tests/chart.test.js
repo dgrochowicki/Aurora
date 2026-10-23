@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, fitTicks, lineChart, barChart, windTicks, smoothPath } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, barChart, windTicks, smoothPath, meanSeries } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -171,4 +171,23 @@ test("gładka linia: dwa punkty to prosty odcinek, jeden punkt sam M, pusty zbi�
   assert.equal(smoothPath([]), "");
   // Dwa punkty w tym samym czasie nie dają NaN.
   assert.doesNotMatch(smoothPath([[0, 1], [0, 3], [10, 2]]), /NaN|Infinity/);
+});
+
+test("średnia krocząca: okno wokół punktu, brzegi z mniejszej liczby pomiarów, czas bez zmian", () => {
+  const s = series([0, 10, 0, 10, 0]);
+  const m = meanSeries(s, 3); // ±1,5 min, czyli sąsiedzi co minutę
+  assert.deepEqual(m.map((p) => p.t), s.map((p) => p.t));
+  assert.deepEqual(m.map((p) => +p.v.toFixed(3)), [5, 3.333, 6.667, 3.333, 5]);
+  // Luka w danych: daleki pomiar nie wchodzi do średniej.
+  const gap = [{ t: 0, v: 1 }, { t: 60000, v: 3 }, { t: 3600000, v: 100 }];
+  assert.deepEqual(meanSeries(gap, 5).map((p) => p.v), [2, 2, 100]);
+});
+
+test("wykres z avg: dymek podaje surowy pomiar, a linia i kropka idą po średniej", () => {
+  const html = lineChart(series([0, 10, 0, 10, 0]), { label: "x", scrub: { unit: "nT" }, avg: 3 });
+  const p = points(html);
+  assert.match(p[1][2], /10,0 nT$/);
+  const raw = points(lineChart(series([0, 10, 0, 10, 0]), { label: "x", scrub: { unit: "nT" } }));
+  assert.notEqual(p[1][1], raw[1][1]);
+  assert.match(html, /chart-line-under/);
 });

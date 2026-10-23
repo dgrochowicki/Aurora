@@ -126,11 +126,13 @@ function renderSpaceTiles(space, stale = {}, now = Date.now()) {
     { key: "kp", src: "kp", value: space.kp == null ? null : fmtNum(space.kp), ref: space.kp, level: kpLevel, text: kpLabel },
     { key: "wind", src: "wind", value: space.wind == null ? null : String(Math.round(space.wind)), ref: space.wind, level: windLevel, text: windLabel },
   ];
+  // TEST (gałąź wykresy-gladkie): linie ze średniej z 5 minut.
+  const AVG = 5;
   const spark = {
-    mag: () => sparkline(space.goesSeries || [], { minSpan: 40 }),
-    bz: () => sparkline(space.bzSeries || [], { zero: true, minSpan: 12 }),
+    mag: () => sparkline(space.goesSeries || [], { minSpan: 40, avg: AVG }),
+    bz: () => sparkline(space.bzSeries || [], { zero: true, minSpan: 12, avg: AVG }),
     kp: () => meter(9, Math.round(space.kp)),
-    wind: () => sparkline(space.windSeries || [], { minSpan: 150 }),
+    wind: () => sparkline(space.windSeries || [], { minSpan: 150, avg: AVG }),
   };
   for (const { key, src, value, ref, level: toLevel, text } of tiles) {
     if (src in stale) {

@@ -27,6 +27,20 @@ export function smoothPath(pts) {
   return path;
 }
 
+// Średnia krocząca do rysowania linii: każdy punkt to średnia pomiarów w oknie `minutes` wokół niego (TEST na gałęzi
+// wykresy-gladkie, 23.10.2026). Czas i liczba punktów bez zmian, więc podgląd palcem pokazuje dalej każdą minutę.
+export function meanSeries(series, minutes) {
+  const half = (minutes * 60000) / 2;
+  let a = 0,
+    b = 0,
+    sum = 0;
+  return series.map((p) => {
+    while (b < series.length && series[b].t <= p.t + half) sum += series[b++].v;
+    while (series[a].t < p.t - half) sum -= series[a++].v;
+    return { t: p.t, v: sum / (b - a) };
+  });
+}
+
 // „Ładny” krok podziałki: 1, 2, 2,5 albo 5 razy potęga dziesięciu, nie mniejszy niż raw.
 const niceStep = (raw) => {
   const p = 10 ** Math.floor(Math.log10(raw)),
@@ -110,7 +124,8 @@ function gridHTML(ticks, y, unit = "") {
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
 // fit: {lines, minSpan} z fitTicks() zamiast niceTicks(), linie co 37 px (ROW_DENSE): przy 6 liniach 185 px jak w makiecie autora.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null }) {
+// avg: linia ze średniej kroczącej z tylu minut (meanSeries); skala z surowych pomiarów, a dymek podglądu podaje surowy pomiar.
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null, avg = 0 }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -127,7 +142,8 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
   const xEnd = scrub ? 98 : 100;
   const x = (t) => ((t - t0) / (t1 - t0 || 1)) * xEnd;
-  const line = smoothPath(series.map((p) => [x(p.t), y(p.v)]));
+  const drawn = avg ? meanSeries(series, avg) : series;
+  const line = smoothPath(drawn.map((p) => [x(p.t), y(p.v)]));
   // Gradient pod linią do dołu wykresu. Przy zero zamiast niego wypełnienie między linią a zerem tam, gdzie linia jest poniżej zera.
   const area = zero ? "" : `<path class="chart-area" d="${line}L${xEnd} ${H}L0 ${H}Z"/>`;
   const below = zero
@@ -139,7 +155,7 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   const belowFill = zero
     ? `<linearGradient id="chartBelowFill" gradientUnits="userSpaceOnUse" x1="0" y1="${y(0).toFixed(1)}" x2="0" y2="${H}"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0.35"/></linearGradient>`
     : "";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}${belowFill}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}${belowFill}</defs>${area}${negative}<path class="chart-line-under" d="${line}"/><path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni) albo `labels` punktów rozłożonych równo. Podpis to czas punktu danych,
   // żeby przy prognozie godzinowej środek był pełną godziną.
@@ -151,10 +167,10 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
   let extra = "",
     data = "";
   if (scrub) {
-    const last = series[series.length - 1];
+    const last = drawn[drawn.length - 1];
     const num = (v) => `${fmtNum(v, scrub.digits ?? 1)} ${scrub.unit || ""}`.trim();
     // Punkty do podglądu: położenie i podpis.
-    const points = series.map((p) => [+x(p.t).toFixed(2), +y(p.v).toFixed(1), `${hm(p.t)} · ${num(p.v)}`]);
+    const points = series.map((p, i) => [+x(p.t).toFixed(2), +y(drawn[i].v).toFixed(1), `${hm(p.t)} · ${num(p.v)}`]);
     extra = `<i class="chart-dot" style="left:${xEnd}%;top:${y(last.v).toFixed(1)}px"></i><div class="chart-scrub" hidden><i class="chart-scrub-line"></i><i class="chart-dot"></i><span class="chart-tip"></span></div>`;
     data = ` data-points="${esc(JSON.stringify(points))}"`;
   }

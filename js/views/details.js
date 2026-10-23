@@ -37,7 +37,8 @@ const horizonTip = (st) => {
   const place = directionPlace(st.dir, st.loc.lat);
   return place ? `Sprawdź też, czy horyzont ${place} jest odsłonięty.` : "Zorza jest prawie nad Tobą, więc liczy się całe niebo.";
 };
-const chart = (series, opts) => infoChart(lineChart(series || [], opts));
+// TEST (gałąź wykresy-gladkie): pomiary z 2 godzin rysowane ze średniej z 5 minut; zachmurzenie co godzinę bez średniej.
+const chart = (series, opts) => infoChart(lineChart(series || [], opts.scrub ? { avg: 5, ...opts } : opts));
 
 // Kolor wykresu jak kropka w kafelku: poziom pomiaru, a przy za starym albo brakującym pomiarze domyślny.
 const tone = (st, src, v, level) => (v == null || src in st.stale ? "" : `level-${level(v)}`);

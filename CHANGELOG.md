@@ -5,6 +5,8 @@ Ten plik przejmuje chronologiczną historię zmian przechowywaną wcześniej w `
 ## 23.10.2026 — grubsze i gładkie linie wykresów
 
 - Linie wykresów w panelach (magnetometr, Bz, wiatr, zachmurzenie, łuki Słońca i Księżyca) mają 3 px zamiast 2,3 px, a miniwykresy na stronie głównej 2 px zamiast 1,5 px (prośba autora).
+- Półprzezroczysta linia (np. magnetometr, biały 40%) miała dwa odcienie: nad gradientem jaśniejszy, nad tłem ciemniejszy (zauważył autor na powiększeniu). Pod linią rysujemy teraz tę samą linię w kolorze tła panelu (`.chart-line-under`), więc kolor jest jednolity.
+- TEST na gałęzi `wykresy-gladkie` (prośba autora, nie na `main` bez decyzji): linie magnetometru, Bz i wiatru w panelach i kafelkach ze średniej kroczącej z 5 minut (`meanSeries()`); skala i dymek podglądu z surowych pomiarów, kropka na linii średniej. Miniwykres w kafelku 16 px wysokości zamiast 32 px, jak u autora.
 - Linie nie są łamane w punktach, tylko gładkie: krzywe Béziera przez każdy pomiar, z nachyleniem ze średniej harmonicznej sąsiednich odcinków (jak interpolacja monotoniczna), więc linia nie przekracza szczytów i dołków danych, a w nich jest pozioma. Dane się nie zmieniają, podgląd palcem pokazuje te same punkty. `smoothPath()` w `js/ui/chart.js` z testami, `lineChart()`, `sparkline()` w `js/ui/spark.js`, `css/components.css`.
 
 ## 23.10.2026 — miniwykresy na stronie głównej bez linii i wypełnień

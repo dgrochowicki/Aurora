@@ -364,7 +364,8 @@
 /* Wskaźnik pod opisem: miernik z segmentów albo mini wykres z 2 godzin. */
 .tile-viz {
   display: block;
-  height: 32px;
+  /* 16 px jak u autora (TEST na gałęzi wykresy-gladkie; wcześniej 32 px). */
+  height: 16px;
   margin-top: 16px;
 }
 .tile-viz:empty {
@@ -873,6 +874,16 @@ html.sheet-open body {
   right: 24px;
   line-height: 16px;
   transform: translateY(calc(-100% - 4px));
+}
+/* Pod linią ta sama linia w kolorze tła panelu: półprzezroczysty kolor poziomu (np. biały 40%) wygląda wtedy jednakowo,
+   a nie jaśniej nad gradientem i ciemniej nad tłem. */
+.chart-line-under {
+  fill: none;
+  stroke: var(--sheet);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 .chart-line {
   fill: none;
