@@ -931,10 +931,9 @@ html.sheet-open body {
   font-weight: 600;
   white-space: nowrap;
 }
-/* Bz poniżej zera: wypełnienie w kolorze linii, jak .spark-area w kafelku. */
+/* Bz poniżej zera: gradient w kolorze linii, przezroczysty przy zerze (chartBelowFill w chart.js). */
 .chart-below {
-  fill: var(--chart);
-  opacity: 0.22;
+  fill: url(#chartBelowFill);
 }
 .chart-area {
   fill: url(#chartFill);

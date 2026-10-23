@@ -1,7 +1,7 @@
 // Testy podziałki wykresu w panelu szczegółów. Uruchom: npm test (Node 18+).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { niceTicks, lineChart, windTicks } from "../js/ui/chart.js";
+import { niceTicks, fitTicks, lineChart, windTicks } from "../js/ui/chart.js";
 
 test("podziałka ma co najmniej 3 linie i obejmuje zakres", () => {
   for (const [lo, hi] of [[110, 126], [-4, 6], [529, 592], [0.3, 0.4], [5, 5], [-12.3, -11.9]]) {
@@ -51,22 +51,22 @@ test("wykres bez podglądu (zachmurzenie) nie ma punktów ani kropki", () => {
   assert.doesNotMatch(html, /data-points|chart-dot/);
 });
 
-test("wiatr: skala dopasowana do danych, co najmniej 100 km/s, krok 20", () => {
+test("wiatr: skala dopasowana do danych, co najmniej 100 km/s, 6 linii co 20", () => {
   // Spokojny wiatr 440–490: 440–500 poszerzone o krok w dół i w górę.
   assert.deepEqual(windTicks([440, 490]), [520, 500, 480, 460, 440, 420]);
   assert.deepEqual(windTicks([465, 465]), [520, 500, 480, 460, 440, 420]);
   assert.deepEqual(windTicks([400, 500]), [500, 480, 460, 440, 420, 400]);
-  assert.deepEqual(windTicks([]), [600, 500, 400, 300]);
+  assert.equal(windTicks([]).length, 6);
 });
 
-test("wiatr: szerszy zakres krok 50 i 100, przy CME 200, a linia zawsze w zakresie", () => {
-  assert.deepEqual(windTicks([400, 600]), [600, 550, 500, 450, 400]);
-  assert.deepEqual(windTicks([400, 750]), [800, 700, 600, 500, 400]);
+test("wiatr: szerszy zakres krok 50 i 100, przy CME 200, zawsze 6 linii i linia w zakresie", () => {
+  assert.deepEqual(windTicks([400, 600]), [600, 550, 500, 450, 400, 350]);
+  assert.deepEqual(windTicks([400, 750]), [800, 700, 600, 500, 400, 300]);
   assert.deepEqual(windTicks([500, 1400]), [1400, 1200, 1000, 800, 600, 400]);
   for (const vals of [[440, 490], [260, 300], [400, 750], [500, 1400], [333, 334.5], [399.9, 400.1]]) {
     const ticks = windTicks(vals);
     assert.ok(ticks[0] >= Math.max(...vals) && ticks[ticks.length - 1] <= Math.min(...vals), `${vals}: ${ticks}`);
-    assert.ok(ticks.length >= 3 && ticks.length <= 8, `${vals}: ${ticks}`);
+    assert.equal(ticks.length, 6, `${vals}: ${ticks}`);
     assert.ok(ticks[0] - ticks[ticks.length - 1] >= 100, `${vals}: ${ticks}`);
   }
 });
@@ -76,4 +76,57 @@ test("oś godzin: domyślnie początek, środek i koniec, przy labels równo roz
   const hours = (html) => [...html.match(/class="chart-x"[^>]*>(.*?)<\/div>/)[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1]);
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC" })), ["20:00", "20:04", "20:08"]);
   assert.deepEqual(hours(lineChart(s, { label: "x", tz: "UTC", labels: 5 })), ["20:00", "20:02", "20:04", "20:06", "20:08"]);
+});
+
+test("podziałka dopasowana do danych: zawsze 6 linii, najmniejszy krok 1, 2 albo 5", () => {
+  // Bz od −5,6 do 2,3: co 2 (4…−6) zamiast co 5 (5…−10).
+  assert.deepEqual(fitTicks(-5.6, 2.3), [4, 2, 0, -2, -4, -6]);
+  // Przykład autora, Bz od −5 do 1: co 2, brakującą linię dokładamy w dół.
+  assert.deepEqual(fitTicks(-5.1, 1), [2, 0, -2, -4, -6, -8]);
+  // Magnetometr 96–105 nT: co 2, a nie 2,5 (krótkie podpisy).
+  assert.deepEqual(fitTicks(96.2, 104.8), [106, 104, 102, 100, 98, 96]);
+  assert.ok(!fitTicks(0.1, 9).some((v) => v % 1));
+  // Wartość dokładnie na linii nie dokłada kolejnej linii ponad 6.
+  assert.deepEqual(fitTicks(-8, 2), [2, 0, -2, -4, -6, -8]);
+  for (const [lo, hi] of [[0.3, 0.9], [-12.4, 3.1], [97, 131], [-0.2, 0], [1000, 1003], [-30.5, 12]]) {
+    const t = fitTicks(lo, hi);
+    assert.equal(t.length, 6, `${lo}–${hi}: ${t}`);
+    assert.ok(t[0] >= hi && t.at(-1) <= lo, `${lo}–${hi}: ${t}`);
+  }
+});
+
+test("podziałka dopasowana do danych nie powiększa szumu poniżej minSpan", () => {
+  // Spokojne Bz od −0,3 do 0,2 przy minSpan 4: co najmniej 4 nT na osi, dane w środku.
+  const t = fitTicks(-0.3, 0.2, { minSpan: 4 });
+  assert.ok(t[0] - t.at(-1) >= 4, `${t}`);
+  assert.ok(t[0] >= 0.2 && t.at(-1) <= -0.3);
+  // Stała wartość też dostaje zakres, a nie dzielenie przez zero.
+  const flat = fitTicks(100, 100, { minSpan: 4 });
+  assert.ok(flat[0] >= 102 && flat.at(-1) <= 98, `${flat}`);
+  assert.equal(fitTicks(5, 5).length, 6);
+});
+
+test("wykresy z fit i wiatr mają tę samą wysokość co zachmurzenie: 185 px", () => {
+  const series = (vals) => vals.map((v, i) => ({ t: i * 60000, v }));
+  const height = (html) => html.match(/viewBox="0 0 100 ([\d.]+)"/)[1];
+  assert.equal(height(lineChart(series([-5, 1]), { zero: true, fit: {} })), "185");
+  assert.equal(height(lineChart(series([0, 9]), { fit: { minSpan: 4 } })), "185");
+  assert.equal(height(lineChart(series([440, 490]), { ticks: windTicks([440, 490]), row: 37 })), "185");
+  assert.equal(height(lineChart(series([10, 80]), { ticks: [100, 80, 60, 40, 20, 0], row: 37 })), "185");
+});
+
+test("Bz: jedna barwa linii, pod zerem gradient od przezroczystego przy zerze", () => {
+  const series = (vals) => vals.map((v, i) => ({ t: i * 60000, v }));
+  const html = lineChart(series([3, -12]), { zero: true, fit: {}, tone: "level-2" });
+  assert.match(html, /is-level-2/);
+  assert.match(html, /class="chart-below" clip-path="url\(#chartBelowZero\)"/);
+  // Oś 4…−16 co 4, 185 px: zero na 37 px. Gradient zaczyna się na zerze z kryciem 0.
+  const g = html.match(/<linearGradient id="chartBelowFill"[^>]*y1="([\d.]+)"[^>]*y2="([\d.]+)">(.*?)<\/linearGradient>/);
+  assert.ok(g, html);
+  assert.equal(+g[1], 37);
+  assert.equal(+g[2], 185);
+  assert.match(g[3], /offset="0" style="stop-color:var\(--chart\);stop-opacity:0"/);
+  assert.doesNotMatch(html, /chartBand/);
+  // Bez zero nie ma wypełnienia pod zerem.
+  assert.doesNotMatch(lineChart(series([3, 12]), { fit: {} }), /chartBelowFill/);
 });

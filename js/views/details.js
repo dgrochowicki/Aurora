@@ -102,6 +102,7 @@ export const DETAILS = {
           tz: st.tz,
           scrub: { unit: "nT" },
           labels: 5,
+          fit: { minSpan: 4 },
         }) +
         infoStats([
           ["Zmiana w ostatniej godzinie", s.goesRange == null ? "—" : `${fmtNum(s.goesRange)} nT`],
@@ -134,6 +135,7 @@ export const DETAILS = {
           tone: tone(st, "bz", ref, bzLevel),
           scrub: { unit: "nT" },
           labels: 5,
+          fit: { minSpan: 4 },
         }) +
         infoStats([
           ["Ostatni odczyt", s.bz == null ? "—" : `${fmtNum(s.bz)} nT`],
@@ -185,7 +187,7 @@ export const DETAILS = {
           tz: st.tz,
           tone: tone(st, "wind", s.wind, windLevel),
           ticks: windTicks((s.windSeries || []).map((p) => p.v)),
-          // Gęstsze linie (krok 20 km/s daje ich do 7), żeby wykres nie był wyższy od innych.
+          // 6 linii co 37 px, jak inne wykresy.
           row: ROW_DENSE,
           scrub: { unit: "km/s", digits: 0 },
           labels: 5,

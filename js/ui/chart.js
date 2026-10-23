@@ -29,22 +29,34 @@ export function niceTicks(lo, hi, min = 3) {
   return Array.from({ length: n }, (_, i) => +(b - i * step).toFixed(6));
 }
 
+// Podziałka dopasowana do danych (pomysł autora 23.10.2026): zawsze `lines` linii (domyślnie 6, jak zachmurzenie, więc wszystkie
+// wykresy mają tę samą wysokość) i najmniejszy krok 1, 2 albo 5 razy potęga dziesięciu, przy którym zakres lo–hi się mieści.
+// Bz od −5,6 do 2,3 daje 4…−6 co 2 zamiast 5…−10 co 5, więc wykres nie jest płaski. Bez kroku 2,5, żeby podpisy były krótkie.
+// minSpan: najmniejszy pokazywany zakres, żeby drobny szum nie wyglądał jak burza. Brakujące linie dokładamy na przemian w dół
+// i w górę, więc dane zostają mniej więcej na środku.
+export function fitTicks(lo, hi, { lines = 6, minSpan = 0 } = {}) {
+  if (!(hi > lo)) {
+    lo -= 0.5;
+    hi += 0.5;
+  }
+  const fitStep = (raw) => {
+    const st = niceStep(raw);
+    return st / 10 ** Math.floor(Math.log10(st)) === 2.5 ? niceStep(st * 1.01) : st;
+  };
+  for (let step = fitStep(Math.max(hi - lo, minSpan) / (lines - 1)); ; step = fitStep(step * 1.01)) {
+    let a = Math.floor(+(lo / step).toFixed(9)),
+      b = Math.ceil(+(hi / step).toFixed(9));
+    if (b - a + 1 > lines) continue;
+    for (let down = true; b - a + 1 < lines; down = !down) down ? a-- : b++;
+    return Array.from({ length: lines }, (_, i) => +((b - i) * step).toFixed(6));
+  }
+}
+
 // Podziałka wykresu wiatru słonecznego (decyzja autora 21.10.2026): dopasowana do danych jak w Hello Aurora, żeby było widać skoki,
 // ale nie węższa niż WIND_SPAN, żeby drobne wahnięcie nie wyglądało jak burza (jak minSpan miniwykresu w kafelku).
-// Krok 20 km/s, przy szerszym zakresie 50, 100, a przy CME 200, żeby linii nie było za dużo. Za wąską podziałkę poszerzamy
-// o krok na przemian w dół i w górę, więc dane zostają mniej więcej na środku.
+// Od 23.10.2026 zawsze 6 linii jak inne wykresy (fitTicks), więc krok to 20, 50, 100 albo 200 km/s zależnie od zakresu.
 export const WIND_SPAN = 100;
-export function windTicks(vals) {
-  if (!vals.length) return [600, 500, 400, 300];
-  const lo = Math.min(...vals),
-    hi = Math.max(...vals),
-    span = Math.max(WIND_SPAN, hi - lo);
-  const step = span <= 150 ? 20 : span <= 300 ? 50 : span <= 800 ? 100 : 200;
-  let a = Math.floor(lo / step) * step,
-    b = Math.ceil(hi / step) * step;
-  for (let down = true; b - a < WIND_SPAN; down = !down) down ? (a -= step) : (b += step);
-  return Array.from({ length: Math.round((b - a) / step) + 1 }, (_, i) => b - i * step);
-}
+export const windTicks = (vals) => (vals.length ? fitTicks(Math.min(...vals), Math.max(...vals), { minSpan: WIND_SPAN }) : [550, 500, 450, 400, 350, 300]);
 
 // Ile miejsc po przecinku potrzeba, żeby podpisy podziałki się nie powtarzały (krok 2,5 → jedno).
 const decimals = (ticks) => (String(Math.abs(ticks[0] - ticks[1])).split(".")[1] || "").length;
@@ -76,7 +88,8 @@ function gridHTML(ticks, y, unit = "") {
 // rozłożonych równo od początku do końca (domyślnie 3: początek, środek i koniec; przy pomiarach z 2 godzin 5, mniej więcej co 30 min).
 // scrub: {unit, digits} przy pomiarach z 2 godzin: kropka na ostatnim punkcie i podgląd palcem (bindScrub) z godziną i wartością,
 // np. „21:16 · 471 km/s”.
-export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3 }) {
+// fit: {lines, minSpan} z fitTicks() zamiast niceTicks(), linie co 37 px (ROW_DENSE): przy 6 liniach 185 px jak w makiecie autora.
+export function lineChart(series, { zero = false, label, tz, ticks: fixed = null, tone = "", unit = "", row = ROW, every = 0, empty = "Brak danych z ostatnich 2 godzin.", scrub = null, labels = 3, fit = null }) {
   if (series.length < 2) return `<p class="chart-empty">${empty}</p>`;
   const vals = series.map((p) => p.v);
   let lo = Math.min(...vals),
@@ -85,8 +98,9 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     lo = Math.min(lo, 0);
     hi = Math.max(hi, 0);
   }
-  const ticks = fixed || niceTicks(lo, hi),
-    { H, y } = scale(ticks, row);
+  const ticks = fixed || (fit ? fitTicks(lo, hi, fit) : niceTicks(lo, hi));
+  if (fit && !fixed) row = ROW_DENSE;
+  const { H, y } = scale(ticks, row);
   const t0 = series[0].t,
     t1 = series[series.length - 1].t;
   // Przy podglądzie linia kończy się 2% przed krawędzią (ok. 8 px), żeby kropka ostatniego pomiaru z poświatą była cała widoczna.
@@ -99,7 +113,12 @@ export function lineChart(series, { zero = false, label, tz, ticks: fixed = null
     ? `<clipPath id="chartBelowZero"><rect x="-1" y="${y(0).toFixed(1)}" width="102" height="${H + 2}"/></clipPath>`
     : "";
   const negative = zero ? `<path class="chart-below" clip-path="url(#chartBelowZero)" d="${line}L${xEnd} ${y(0).toFixed(1)}L0 ${y(0).toFixed(1)}Z"/>` : "";
-  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
+  // Pod zerem gradient w kolorze linii: przezroczysty przy zerze, najmocniejszy przy dolnej krawędzi (prośba autora 23.10.2026).
+  // userSpaceOnUse, żeby gradient zaczynał się na zerze, a nie na górze wypełnionego kształtu.
+  const belowFill = zero
+    ? `<linearGradient id="chartBelowFill" gradientUnits="userSpaceOnUse" x1="0" y1="${y(0).toFixed(1)}" x2="0" y2="${H}"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0.35"/></linearGradient>`
+    : "";
+  const svg = `<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--chart);stop-opacity:0.35"/><stop offset="1" style="stop-color:var(--chart);stop-opacity:0"/></linearGradient>${below}${belowFill}</defs>${area}${negative}<path class="chart-line" d="${line}"/></svg>`;
   const hm = (t) => hmIn(t, tz);
   // Godziny pod osią: co every-ty punkt (i zawsze ostatni) albo `labels` punktów rozłożonych równo. Podpis to czas punktu danych,
   // żeby przy prognozie godzinowej środek był pełną godziną.
